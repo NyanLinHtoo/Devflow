@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 
 export default function HomePage() {
@@ -14,9 +15,24 @@ export default function HomePage() {
 				</div>
 
 				<div className="space-y-4">
-					<Input type="email" placeholder="you@example.com" />
+					<FormField
+						label="Email"
+						htmlFor="email"
+						helperText="Use your work email address.">
+						<Input id="email" type="email" placeholder="you@example.com" />
+					</FormField>
 
-					<Input type="password" placeholder="Password" />
+					<FormField
+						label="Password"
+						htmlFor="password"
+						error="Password must be at least 8 characters.">
+						<Input
+							id="password"
+							type="password"
+							placeholder="Enter your password"
+							aria-invalid="true"
+						/>
+					</FormField>
 
 					<Button className="w-full">Get Started</Button>
 				</div>
