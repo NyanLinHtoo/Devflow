@@ -1,66 +1,105 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { RegisterFormData, registerSchema } from "../schemas/register-schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function RegisterForm() {
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterFormData>({
+		resolver: zodResolver(registerSchema),
+		defaultValues: {
+			acceptedTerms: false,
+		},
+	});
+
+	function onSubmit(data: RegisterFormData) {
+		console.log(data);
+	}
+
 	return (
-		<form className="space-y-5">
-			<FormField label="Full name" htmlFor="fullname">
+		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+			<FormField
+				label="Full name"
+				htmlFor="fullName"
+				error={errors.fullName?.message}>
 				<Input
-					id="fullname"
-					name="fullname"
+					id="fullName"
 					type="text"
 					placeholder="Enter your name"
 					autoComplete="name"
+					{...register("fullName")}
 				/>
 			</FormField>
 
-			<FormField label="Email" htmlFor="email">
+			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"
-					name="email"
 					type="email"
 					placeholder="you@example.com"
 					autoComplete="email"
+					{...register("email")}
 				/>
 			</FormField>
 
-			<FormField label="Password" htmlFor="password">
+			<FormField
+				label="Password"
+				htmlFor="password"
+				error={errors.password?.message}>
 				<Input
 					id="password"
-					name="password"
 					type="password"
 					placeholder="Enter your password"
 					autoComplete="new-password"
+					{...register("password")}
 				/>
 			</FormField>
 
-			<FormField label="Confirm password" htmlFor="confirmPassword">
+			<FormField
+				label="Confirm password"
+				htmlFor="confirmPassword"
+				error={errors.confirmPassword?.message}>
 				<Input
 					id="confirmPassword"
-					name="confirmPassword"
 					type="password"
 					placeholder="Confirm your password"
 					autoComplete="new-password"
+					{...register("confirmPassword")}
 				/>
 			</FormField>
 
 			<label className="flex items-center gap-2 text-sm text-gray-600">
 				<input
 					type="checkbox"
-					name="terms"
 					className="size-4 rounded border-gray-300"
+					{...register("acceptedTerms")}
 				/>
-				I agree to the
-				<Link href="/#" className="font-medium text-gray-900 hover:underline">
-					Terms
-				</Link>
-				and
-				<Link href="/#" className="font-medium text-gray-900 hover:underline">
-					Privacy Policy
-				</Link>
+				<span>
+					I agree to the{" "}
+					<Link
+						href="/terms"
+						className="font-medium text-gray-900 hover:underline">
+						Terms{" "}
+					</Link>
+					and{" "}
+					<Link
+						href="/privacy"
+						className="font-medium text-gray-900 hover:underline">
+						Privacy Policy{" "}
+					</Link>
+				</span>
 			</label>
+
+			{errors.acceptedTerms?.message && (
+				<p className="text-sm text-red-600">{errors.acceptedTerms.message}</p>
+			)}
 
 			<Button type="submit" className="w-full">
 				Create account
