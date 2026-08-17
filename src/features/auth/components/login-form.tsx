@@ -1,28 +1,48 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { LoginFormData, loginSchema } from "../schemas/login-schema";
+import { useForm } from "react-hook-form";
 
 export function LoginForm() {
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+	});
+
+	function onSubmit(data: LoginFormData) {
+		console.log(data);
+	}
+
 	return (
-		<form className="space-y-5">
-			<FormField label="Email" htmlFor="email">
+		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"
-					name="email"
 					type="email"
 					placeholder="you@example.com"
 					autoComplete="email"
+					{...register("email")}
 				/>
 			</FormField>
 
-			<FormField label="Password" htmlFor="password">
+			<FormField
+				label="Password"
+				htmlFor="password"
+				error={errors.password?.message}>
 				<Input
 					id="password"
-					name="password"
 					type="password"
 					placeholder="Enter your password"
 					autoComplete="current-password"
+					{...register("password")}
 				/>
 			</FormField>
 
