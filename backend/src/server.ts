@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import prisma from "./lib/prisma.js";
+import { authRoutes } from "./modules/auth/auth.route.js";
 
 const app = Fastify({
   logger: true,
@@ -13,6 +14,8 @@ app.get("/users/count", async () => {
   const userCount = await prisma.user.count();
   return { userCount };
 });
+
+app.register(authRoutes, { prefix: "/auth" });
 
 const start = async () => {
   try {
