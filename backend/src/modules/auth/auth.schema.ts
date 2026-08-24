@@ -10,3 +10,10 @@ export const registerSchema = z.object({
     error: "You must accept the Terms and Privacy Policy.",
   }),
 });
+
+export const loginSchema = z.object({
+  email: z.email({
+    error: "Please enter a valid email address",
+  }),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
