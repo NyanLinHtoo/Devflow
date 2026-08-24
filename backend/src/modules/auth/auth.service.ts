@@ -57,3 +57,49 @@ export async function loginUser(input: LoginInput) {
   };
   return safeUser;
 }
+
+export async function createSession(userId: string) {
+  const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+
+  const expiresAt = new Date(Date.now() + sevenDaysInMs);
+
+  const session = await prisma.session.create({
+    data: {
+      userId,
+      expiresAt,
+    },
+  });
+
+  return session;
+}
+
+export async function updateSessionRefreshToken(
+  sessionId: string,
+  refreshTokenHash: string,
+) {
+  return prisma.session.update({
+    where: {
+      id: sessionId,
+    },
+    data: {
+      refreshTokenHash,
+    },
+  });
+}
+
+export async function getSessionById(sessionId: string) {
+  const session = await prisma.session.findUnique({
+    where: { id: sessionId },
+  });
+
+  return session;
+}
+
+export async function getUserById(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true },
+  });
+
+  return user;
+}
