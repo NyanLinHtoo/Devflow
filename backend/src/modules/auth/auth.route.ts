@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { loginSchema, registerSchema } from "./auth.schema.js";
 import { loginUser, registerUser } from "./auth.service.js";
-import z from "zod";
+import { z } from "zod";
 
 export function authRoutes(app: FastifyInstance) {
   app.post("/register", async (request, reply) => {
@@ -87,5 +87,15 @@ export function authRoutes(app: FastifyInstance) {
         message: "Unauthorized",
       });
     }
+  });
+
+  app.post("/logout", (_request, reply) => {
+    reply.clearCookie("access_token", {
+      path: "/",
+    });
+
+    return reply.code(200).send({
+      message: "Logged out successfully",
+    });
   });
 }
