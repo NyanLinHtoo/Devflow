@@ -1,18 +1,27 @@
+import fastifyCookie from "@fastify/cookie";
+import fastifyJwt from "@fastify/jwt";
+import "dotenv/config";
 import Fastify from "fastify";
-import prisma from "./lib/prisma.js";
 import { authRoutes } from "./modules/auth/auth.route.js";
+
+const jwtSecret = process.env.JWT_SECRET;
+
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET is not defined");
+}
 
 const app = Fastify({
   logger: true,
 });
 
-app.get("/health", () => {
-  return { status: "ok" };
-});
+app.register(fastifyCookie);
 
-app.get("/users/count", async () => {
-  const userCount = await prisma.user.count();
-  return { userCount };
+app.register(fastifyJwt, {
+  secret: jwtSecret,
+  cookie: {
+    cookieName: "access_token",
+    signed: false,
+  },
 });
 
 app.register(authRoutes, { prefix: "/auth" });
