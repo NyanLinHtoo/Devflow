@@ -3,6 +3,7 @@ import fastifyJwt from "@fastify/jwt";
 import "dotenv/config";
 import Fastify from "fastify";
 import { authRoutes } from "./modules/auth/auth.route.js";
+import fastifyCors from "@fastify/cors";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
 const refreshJwtSecret = process.env.JWT_REFRESH_SECRET;
@@ -28,6 +29,11 @@ app.register(fastifyJwt, {
 app.register(fastifyJwt, {
   secret: refreshJwtSecret,
   namespace: "refresh",
+});
+
+app.register(fastifyCors, {
+  origin: "http://localhost:3000",
+  credentials: true,
 });
 
 app.register(authRoutes, { prefix: "/auth" });

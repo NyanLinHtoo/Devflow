@@ -7,25 +7,50 @@ import Link from "next/link";
 import { RegisterFormData, registerSchema } from "../schemas/register-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { apiFetch } from "@/lib/api";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			acceptedTerms: false,
 		},
 	});
+	const [serverError, setServerError] = useState<string | null>(null);
+	const router = useRouter();
 
-	function onSubmit(data: RegisterFormData) {
-		console.log(data);
+	async function onSubmit(data: RegisterFormData) {
+		try {
+			setServerError(null);
+
+			await apiFetch("/auth/register", {
+				method: "POST",
+				body: JSON.stringify({
+					fullName: data.fullName,
+					email: data.email,
+					password: data.password,
+					acceptedTerms: data.acceptedTerms,
+				}),
+			});
+			router.push("/login");
+		} catch (error) {
+			if (error instanceof Error) {
+				setServerError(error.message);
+			} else {
+				setServerError("Something went wrong");
+			}
+		}
 	}
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+			{serverError && <p className="text-sm text-red-600">{serverError}</p>}
 			<FormField
 				label="Full name"
 				htmlFor="fullName"
@@ -101,8 +126,8 @@ export function RegisterForm() {
 				<p className="text-sm text-red-600">{errors.acceptedTerms.message}</p>
 			)}
 
-			<Button type="submit" className="w-full">
-				Create account
+			<Button type="submit" className="w-full" disabled={isSubmitting}>
+				{isSubmitting ? "Creating account..." : "Create account"}
 			</Button>
 		</form>
 	);
