@@ -4,10 +4,11 @@ import "dotenv/config";
 import Fastify from "fastify";
 import { authRoutes } from "./modules/auth/auth.route.js";
 
-const jwtSecret = process.env.JWT_SECRET;
+const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
+const refreshJwtSecret = process.env.JWT_REFRESH_SECRET;
 
-if (!jwtSecret) {
-  throw new Error("JWT_SECRET is not defined");
+if (!accessJwtSecret || !refreshJwtSecret) {
+  throw new Error("JWT secrets are not defined");
 }
 
 const app = Fastify({
@@ -17,11 +18,16 @@ const app = Fastify({
 app.register(fastifyCookie);
 
 app.register(fastifyJwt, {
-  secret: jwtSecret,
+  secret: accessJwtSecret,
   cookie: {
     cookieName: "access_token",
     signed: false,
   },
+});
+
+app.register(fastifyJwt, {
+  secret: refreshJwtSecret,
+  namespace: "refresh",
 });
 
 app.register(authRoutes, { prefix: "/auth" });

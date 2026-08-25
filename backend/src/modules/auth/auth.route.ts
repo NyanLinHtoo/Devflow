@@ -53,7 +53,7 @@ export function authRoutes(app: FastifyInstance) {
 
       const session = await createSession(user.id);
 
-      const refreshToken = await reply.jwtSign(
+      const refreshToken = await reply.refreshJwtSign(
         {
           userId: user.id,
           sessionId: session.id,
@@ -129,10 +129,11 @@ export function authRoutes(app: FastifyInstance) {
 
     if (refreshToken) {
       try {
-        const payload = app.jwt.verify<RefreshTokenPayload>(refreshToken);
+        const payload =
+          app.jwt.refresh.verify<RefreshTokenPayload>(refreshToken);
 
         await deleteSessionById(payload.sessionId);
-      } catch {
+      } catch (error) {
         request.log.warn(error, "Failed to verify refresh token during logout");
       }
     }
@@ -160,7 +161,7 @@ export function authRoutes(app: FastifyInstance) {
     }
 
     try {
-      const payload = app.jwt.verify<RefreshTokenPayload>(refreshToken);
+      const payload = app.jwt.refresh.verify<RefreshTokenPayload>(refreshToken);
 
       const session = await getSessionById(payload.sessionId);
       if (!session) {
