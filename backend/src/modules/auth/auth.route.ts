@@ -3,6 +3,7 @@ import { z } from "zod";
 import { loginSchema, registerSchema } from "./auth.schema.js";
 import {
   createSession,
+  deleteSessionById,
   getSessionById,
   getUserById,
   loginUser,
@@ -123,8 +124,24 @@ export function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/logout", (_request, reply) => {
+  app.post("/logout", async (request, reply) => {
+    const refreshToken = request.cookies.refresh_token;
+
+    if (refreshToken) {
+      try {
+        const payload = app.jwt.verify<RefreshTokenPayload>(refreshToken);
+
+        await deleteSessionById(payload.sessionId);
+      } catch {
+        request.log.warn(error, "Failed to verify refresh token during logout");
+      }
+    }
+
     reply.clearCookie("access_token", {
+      path: "/",
+    });
+
+    reply.clearCookie("refresh_token", {
       path: "/",
     });
 

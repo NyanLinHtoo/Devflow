@@ -103,3 +103,11 @@ export async function getUserById(userId: string) {
 
   return user;
 }
+
+export async function deleteSessionById(sessionId: string) {
+  await prisma.session.deleteMany({
+    where: {
+      id: sessionId,
+    },
+  });
+}
