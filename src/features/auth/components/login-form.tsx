@@ -7,22 +7,47 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { LoginFormData, loginSchema } from "../schemas/login-schema";
 import { useForm } from "react-hook-form";
+import { apiFetch } from "@/lib/api";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function LoginForm() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isSubmitting },
 	} = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
 	});
 
-	function onSubmit(data: LoginFormData) {
-		console.log(data);
+	const [serverError, setServerError] = useState<string | null>(null);
+	const router = useRouter();
+
+	async function onSubmit(data: LoginFormData) {
+		try {
+			setServerError(null);
+
+			await apiFetch("/auth/login", {
+				method: "POST",
+				body: JSON.stringify({
+					email: data.email,
+					password: data.password,
+				}),
+			});
+
+			router.push("/dashboard");
+		} catch (error) {
+			if (error instanceof Error) {
+				setServerError(error.message);
+			} else {
+				setServerError("Something went wrong");
+			}
+		}
 	}
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+			{serverError && <p className="text-sm text-red-600">{serverError}</p>}
 			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"
@@ -63,8 +88,8 @@ export function LoginForm() {
 				</Link>
 			</div>
 
-			<Button type="submit" className="w-full">
-				Sign in
+			<Button type="submit" className="w-full" disabled={isSubmitting}>
+				{isSubmitting ? "Signing in..." : "Sign in"}
 			</Button>
 		</form>
 	);

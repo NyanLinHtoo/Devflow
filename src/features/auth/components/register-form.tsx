@@ -38,6 +38,7 @@ export function RegisterForm() {
 					acceptedTerms: data.acceptedTerms,
 				}),
 			});
+
 			router.push("/login");
 		} catch (error) {
 			if (error instanceof Error) {
