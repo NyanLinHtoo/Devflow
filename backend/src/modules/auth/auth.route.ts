@@ -116,7 +116,19 @@ export function authRoutes(app: FastifyInstance) {
     try {
       await request.jwtVerify();
 
-      return reply.code(200).send(request.user);
+      const payload = request.user as {
+        userId: string;
+      };
+
+      const user = await getUserById(payload.userId);
+
+      if (!user) {
+        return reply.code(401).send({
+          message: "Unauthorized",
+        });
+      }
+
+      return reply.code(200).send(user);
     } catch {
       return reply.code(401).send({
         message: "Unauthorized",
