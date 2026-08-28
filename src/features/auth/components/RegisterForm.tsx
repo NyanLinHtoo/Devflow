@@ -3,55 +3,41 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { RegisterFormData, registerSchema } from "../schemas/register-schema";
-import { useForm } from "react-hook-form";
+import { useRegister } from "@/hooks/useRegister";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiFetch } from "@/lib/api";
-import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
 
 export function RegisterForm() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 	} = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			acceptedTerms: false,
 		},
 	});
-	const [serverError, setServerError] = useState<string | null>(null);
+
 	const router = useRouter();
+	const registerMutation = useRegister();
 
-	async function onSubmit(data: RegisterFormData) {
-		try {
-			setServerError(null);
-
-			await apiFetch("/auth/register", {
-				method: "POST",
-				body: JSON.stringify({
-					fullName: data.fullName,
-					email: data.email,
-					password: data.password,
-					acceptedTerms: data.acceptedTerms,
-				}),
-			});
-
-			router.push("/login");
-		} catch (error) {
-			if (error instanceof Error) {
-				setServerError(error.message);
-			} else {
-				setServerError("Something went wrong");
-			}
-		}
+	function onSubmit(data: RegisterFormData) {
+		registerMutation.mutate(data, {
+			onSuccess: () => {
+				router.push("/login");
+			},
+		});
 	}
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{serverError && <p className="text-sm text-red-600">{serverError}</p>}
+			{registerMutation.error instanceof Error && (
+				<p className="text-sm text-red-600">{registerMutation.error.message}</p>
+			)}
 			<FormField
 				label="Full name"
 				htmlFor="fullName"
@@ -127,8 +113,11 @@ export function RegisterForm() {
 				<p className="text-sm text-red-600">{errors.acceptedTerms.message}</p>
 			)}
 
-			<Button type="submit" className="w-full" disabled={isSubmitting}>
-				{isSubmitting ? "Creating account..." : "Create account"}
+			<Button
+				type="submit"
+				className="w-full"
+				disabled={registerMutation.isPending}>
+				{registerMutation.isPending ? "Creating account..." : "Create account"}
 			</Button>
 		</form>
 	);

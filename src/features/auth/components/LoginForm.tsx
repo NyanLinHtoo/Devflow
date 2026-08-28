@@ -3,51 +3,38 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
+import { useLogin } from "@/hooks/useLogin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { LoginFormData, loginSchema } from "../schemas/login-schema";
-import { useForm } from "react-hook-form";
-import { apiFetch } from "@/lib/api";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { LoginFormData, loginSchema } from "../schemas/loginSchema";
 
 export function LoginForm() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors, isSubmitting },
+		formState: { errors },
 	} = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
 	});
 
-	const [serverError, setServerError] = useState<string | null>(null);
 	const router = useRouter();
+	const loginMutation = useLogin();
 
-	async function onSubmit(data: LoginFormData) {
-		try {
-			setServerError(null);
-
-			await apiFetch("/auth/login", {
-				method: "POST",
-				body: JSON.stringify({
-					email: data.email,
-					password: data.password,
-				}),
-			});
-
-			router.push("/dashboard");
-		} catch (error) {
-			if (error instanceof Error) {
-				setServerError(error.message);
-			} else {
-				setServerError("Something went wrong");
-			}
-		}
+	function onSubmit(data: LoginFormData) {
+		loginMutation.mutate(data, {
+			onSuccess: () => {
+				router.push("/dashboard");
+			},
+		});
 	}
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{serverError && <p className="text-sm text-red-600">{serverError}</p>}
+			{loginMutation.error instanceof Error && (
+				<p className="text-sm text-red-600">{loginMutation.error.message}</p>
+			)}
 			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"
@@ -88,8 +75,11 @@ export function LoginForm() {
 				</Link>
 			</div>
 
-			<Button type="submit" className="w-full" disabled={isSubmitting}>
-				{isSubmitting ? "Signing in..." : "Sign in"}
+			<Button
+				type="submit"
+				className="w-full"
+				disabled={loginMutation.isPending}>
+				{loginMutation.isPending ? "Signing in..." : "Sign in"}
 			</Button>
 		</form>
 	);
