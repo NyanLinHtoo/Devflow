@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { loginSchema, registerSchema } from "./auth.schema.js";
+import { loginSchema, registerSchema } from "./authSchema.js";
 import {
   createSession,
   deleteSessionById,
@@ -9,9 +9,9 @@ import {
   loginUser,
   registerUser,
   updateSessionRefreshToken,
-} from "./auth.service.js";
+} from "./authService.js";
 import * as argon2 from "argon2";
-import { RefreshTokenPayload } from "./auth.types.js";
+import { RefreshTokenPayload } from "./authTypes.js";
 
 export function authRoutes(app: FastifyInstance) {
   app.post("/register", async (request, reply) => {

@@ -2,7 +2,7 @@ import fastifyCookie from "@fastify/cookie";
 import fastifyJwt from "@fastify/jwt";
 import "dotenv/config";
 import Fastify from "fastify";
-import { authRoutes } from "./modules/auth/auth.route.js";
+import { authRoutes } from "./modules/auth/authRoute.js";
 import fastifyCors from "@fastify/cors";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;

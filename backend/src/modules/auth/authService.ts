@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma.js";
-import { LoginInput, RegisterInput } from "./auth.types.js";
+import { LoginInput, RegisterInput } from "./authTypes.js";
 import * as argon2 from "argon2";
 
 export async function registerUser(input: RegisterInput) {
