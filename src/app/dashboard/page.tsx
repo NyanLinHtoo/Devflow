@@ -1,40 +1,27 @@
 "use client";
 
-import { apiFetch } from "@/lib/api";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type CurrentUser = {
-	userId: string;
-	email: string;
-};
+import { useEffect } from "react";
 
 export default function DashboardPage() {
 	const router = useRouter();
-	const [user, setUser] = useState<CurrentUser | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+
+	const { data: user, isLoading: isUserLoading, isError } = useCurrentUser();
 
 	useEffect(() => {
-		async function checkAuth() {
-			try {
-				const currentUser = await apiFetch<CurrentUser>("/auth/me");
-
-				setUser(currentUser);
-			} catch {
-				router.replace("/login");
-			} finally {
-				setIsLoading(false);
-			}
+		if (isError) {
+			router.replace("/login");
 		}
+	}, [isError, router]);
 
-		void checkAuth();
-	}, [router]);
-
-	if (isLoading) {
+	if (isUserLoading) {
 		return <p>Loading...</p>;
 	}
 
-	if (!user) {
+	if (isError) return router.replace("/login");
+
+	if (isError || !user) {
 		return null;
 	}
 
