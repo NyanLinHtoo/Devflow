@@ -1,0 +1,58 @@
+import type { LoginFormData } from "@/features/auth/schemas/loginSchema";
+import type { RegisterFormData } from "@/features/auth/schemas/registerSchema";
+import { apiFetch } from "@/lib/api";
+import { CurrentUser } from "@/types/authTypes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+export function useLogin() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (data: LoginFormData) =>
+			apiFetch<CurrentUser>("/auth/login", {
+				method: "POST",
+				body: JSON.stringify({
+					email: data.email,
+					password: data.password,
+				}),
+			}),
+
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["currentUser"],
+			});
+		},
+	});
+}
+
+export function useRegister() {
+	return useMutation({
+		mutationFn: (data: RegisterFormData) =>
+			apiFetch<CurrentUser>("/auth/register", {
+				method: "POST",
+				body: JSON.stringify({
+					fullName: data.fullName,
+					email: data.email,
+					password: data.password,
+					acceptedTerms: data.acceptedTerms,
+				}),
+			}),
+	});
+}
+
+export function useLogout() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () =>
+			apiFetch<{ message: string }>("/auth/logout", {
+				method: "POST",
+			}),
+
+		onSuccess: () => {
+			queryClient.removeQueries({
+				queryKey: ["currentUser"],
+			});
+		},
+	});
+}

@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import { useRegister } from "@/hooks/useRegister";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
+import { useRegister } from "@/hooks/useAuth";
 
 export function RegisterForm() {
 	const {

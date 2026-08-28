@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/useLogin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "../schemas/loginSchema";
+import { useLogin } from "@/hooks/useAuth";
 
 export function LoginForm() {
 	const {

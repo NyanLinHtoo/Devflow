@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useLogout } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useLogout } from "@/hooks/useLogout";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
