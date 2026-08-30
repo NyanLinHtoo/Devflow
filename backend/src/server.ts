@@ -4,6 +4,7 @@ import "dotenv/config";
 import Fastify from "fastify";
 import { authRoutes } from "./modules/auth/authRoute.js";
 import fastifyCors from "@fastify/cors";
+import { projectRoutes } from "./modules/project/projectRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
 const refreshJwtSecret = process.env.JWT_REFRESH_SECRET;
@@ -29,6 +30,10 @@ app.register(fastifyJwt, {
 app.register(fastifyJwt, {
   secret: refreshJwtSecret,
   namespace: "refresh",
+  cookie: {
+    cookieName: "refresh_token",
+    signed: false,
+  },
 });
 
 app.register(fastifyCors, {
@@ -37,6 +42,7 @@ app.register(fastifyCors, {
 });
 
 app.register(authRoutes, { prefix: "/auth" });
+app.register(projectRoutes, { prefix: "/projects" });
 
 const start = async () => {
   try {

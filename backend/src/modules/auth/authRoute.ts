@@ -141,8 +141,7 @@ export function authRoutes(app: FastifyInstance) {
 
     if (refreshToken) {
       try {
-        const payload =
-          app.jwt.refresh.verify<RefreshTokenPayload>(refreshToken);
+        const payload = await request.refreshJwtVerify<RefreshTokenPayload>();
 
         await deleteSessionById(payload.sessionId);
       } catch (error) {
@@ -173,7 +172,7 @@ export function authRoutes(app: FastifyInstance) {
     }
 
     try {
-      const payload = app.jwt.refresh.verify<RefreshTokenPayload>(refreshToken);
+      const payload = await request.refreshJwtVerify<RefreshTokenPayload>();
 
       const session = await getSessionById(payload.sessionId);
       if (!session) {

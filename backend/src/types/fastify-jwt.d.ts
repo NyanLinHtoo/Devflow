@@ -1,21 +1,28 @@
-import type {
-  FastifyReply as BaseFastifyReply,
-  FastifyRequest as BaseFastifyRequest,
-} from "fastify";
+import type { FastifyJwtSignOptions } from "@fastify/jwt";
+import type { FastifyRequest as BaseFastifyRequest } from "fastify";
+
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    user: {
+      userId: string;
+      email: string;
+    };
+  }
+}
 
 declare module "fastify" {
   interface FastifyReply {
-    refreshJwtSign: BaseFastifyReply["jwtSign"];
+    refreshJwtSign: (
+      payload: {
+        userId: string;
+        sessionId: string;
+      },
+      options?: FastifyJwtSignOptions,
+    ) => Promise<string>;
   }
 
   interface FastifyRequest {
     refreshJwtVerify: BaseFastifyRequest["jwtVerify"];
     refreshJwtDecode: BaseFastifyRequest["jwtDecode"];
-  }
-}
-
-declare module "@fastify/jwt" {
-  interface FastifyJWT {
-    namespaces: "refresh";
   }
 }
