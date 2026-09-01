@@ -14,3 +14,22 @@ export async function createProject(
   });
   return newProject;
 }
+
+export async function getProjectsByOwnerId(ownerId: string) {
+  const projects = await prisma.project.findMany({
+    where: { ownerId },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return projects;
+}
+
+export async function getProjectById(projectId: string, ownerId: string) {
+  const projectsById = await prisma.project.findMany({
+    where: { id: projectId, ownerId },
+  });
+
+  return projectsById;
+}

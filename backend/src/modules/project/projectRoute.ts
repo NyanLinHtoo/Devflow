@@ -1,6 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { createProjectSchema } from "./projectSchema.js";
-import { createProject } from "./projectService.js";
+import {
+  createProject,
+  getProjectById,
+  getProjectsByOwnerId,
+} from "./projectService.js";
 import { z } from "zod";
 
 export function projectRoutes(app: FastifyInstance) {
@@ -12,6 +16,7 @@ export function projectRoutes(app: FastifyInstance) {
         message: "Unauthorized",
       });
     }
+    const userId = request.user.userId;
 
     const result = createProjectSchema.safeParse(request.body);
     if (!result.success) {
@@ -22,7 +27,7 @@ export function projectRoutes(app: FastifyInstance) {
     }
 
     try {
-      const project = await createProject(request.user.userId, result.data);
+      const project = await createProject(userId, result.data);
 
       return reply.code(201).send(project);
     } catch {
@@ -31,4 +36,58 @@ export function projectRoutes(app: FastifyInstance) {
       });
     }
   });
+
+  app.get("/", async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch {
+      return reply.code(401).send({
+        message: "Unauthorized",
+      });
+    }
+
+    const userId = request.user.userId;
+
+    try {
+      const projects = await getProjectsByOwnerId(userId);
+
+      return reply.code(200).send(projects);
+    } catch {
+      return reply.code(500).send({
+        message: "Internal server error",
+      });
+    }
+  });
+
+  app.get<{ Params: { projectId: string } }>(
+    "/:projectId",
+    async (request, reply) => {
+      try {
+        await request.jwtVerify();
+      } catch {
+        return reply.code(401).send({
+          message: "Unauthorized",
+        });
+      }
+
+      const projectId = request.params.projectId;
+      const userId = request.user.userId;
+
+      try {
+        const project = await getProjectById(projectId, userId);
+
+        if (!project) {
+          return reply.code(404).send({
+            message: "Project not found",
+          });
+        }
+
+        return reply.code(200).send(project);
+      } catch {
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
 }
