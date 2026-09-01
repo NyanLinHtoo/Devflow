@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma.js";
-import { CreateProjectInput } from "./projectTypes.js";
+import type { CreateProjectInput, UpdateProjectInput } from "./projectTypes.js";
 
 export async function createProject(
   ownerId: string,
@@ -27,9 +27,47 @@ export async function getProjectsByOwnerId(ownerId: string) {
 }
 
 export async function getProjectById(projectId: string, ownerId: string) {
-  const projectsById = await prisma.project.findMany({
+  const projectsById = await prisma.project.findFirst({
     where: { id: projectId, ownerId },
   });
 
   return projectsById;
+}
+
+export async function updateProject(
+  projectId: string,
+  ownerId: string,
+  input: UpdateProjectInput,
+) {
+  const project = await getProjectById(projectId, ownerId);
+
+  if (!project) {
+    return null;
+  }
+
+  return prisma.project.update({
+    where: {
+      id: projectId,
+    },
+    data: {
+      name: input.name,
+      description: input.description,
+    },
+  });
+}
+
+export async function deleteProject(projectId: string, ownerId: string) {
+  const project = await getProjectById(projectId, ownerId);
+
+  if (!project) {
+    return null;
+  }
+
+  await prisma.project.delete({
+    where: {
+      id: projectId,
+    },
+  });
+
+  return project;
 }

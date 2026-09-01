@@ -1,4 +1,5 @@
 import { z } from "zod";
-import { createProjectSchema } from "./projectSchema.js";
+import { createProjectSchema, updateProjectSchema } from "./projectSchema.js";
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
