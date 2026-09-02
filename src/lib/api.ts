@@ -5,13 +5,16 @@ export async function apiFetch<T>(
 	options: RequestInit = {},
 	retry = true,
 ): Promise<T> {
+	const headers = new Headers(options.headers);
+
+	if (options.body) {
+		headers.set("Content-Type", "application/json");
+	}
+
 	const response = await fetch(`${API_URL}${path}`, {
 		...options,
 		credentials: "include",
-		headers: {
-			"Content-Type": "application/json",
-			...options.headers,
-		},
+		headers,
 	});
 
 	const shouldRefresh =

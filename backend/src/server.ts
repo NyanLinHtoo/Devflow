@@ -39,6 +39,7 @@ app.register(fastifyJwt, {
 app.register(fastifyCors, {
   origin: "http://localhost:3000",
   credentials: true,
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
 });
 
 app.register(authRoutes, { prefix: "/auth" });

@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import type { Project, UpdateProjectInput } from "@/types/projectTypes";
+import type {
+	CreateProjectInput,
+	Project,
+	UpdateProjectInput,
+} from "@/types/projectTypes";
 
 export function useProjects() {
 	return useQuery({
@@ -21,7 +25,7 @@ export function useCreateProject() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (data) =>
+		mutationFn: (data: CreateProjectInput) =>
 			apiFetch<Project>("/projects", {
 				method: "POST",
 				body: JSON.stringify(data),
