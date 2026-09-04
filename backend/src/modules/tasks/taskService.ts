@@ -14,3 +14,14 @@ export async function createTask(projectId: string, input: CreateTaskInput) {
 
   return newTask;
 }
+
+export async function getTasksByProjectId(projectId: string) {
+  const tasksByProjectId = await prisma.task.findMany({
+    where: { projectId },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return tasksByProjectId;
+}

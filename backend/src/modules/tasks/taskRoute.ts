@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Prisma } from "../../generated/prisma/client.js";
 import { getProjectById } from "../project/projectService.js";
 import { createTaskSchema } from "./taskSchema.js";
-import { createTask } from "./taskService.js";
+import { createTask, getTasksByProjectId } from "./taskService.js";
 
 export function taskRoutes(app: FastifyInstance) {
   app.post<{ Params: { projectId: string } }>(
@@ -50,6 +50,40 @@ export function taskRoutes(app: FastifyInstance) {
           });
         }
 
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
+
+  app.get<{ Params: { projectId: string } }>(
+    "/:projectId/tasks",
+    async (request, reply) => {
+      try {
+        await request.jwtVerify();
+      } catch {
+        return reply.code(401).send({
+          message: "Unauthorized",
+        });
+      }
+
+      const userId = request.user.userId;
+      const projectId = request.params.projectId;
+
+      try {
+        const existingProject = await getProjectById(projectId, userId);
+
+        if (!existingProject) {
+          return reply.code(404).send({
+            message: "Project not found",
+          });
+        }
+
+        const tasks = await getTasksByProjectId(projectId);
+
+        return reply.code(200).send(tasks);
+      } catch {
         return reply.code(500).send({
           message: "Internal server error",
         });
