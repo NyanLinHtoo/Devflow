@@ -2,11 +2,12 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { Prisma } from "../../generated/prisma/client.js";
 import { getProjectById } from "../project/projectService.js";
-import { createTaskSchema } from "./taskSchema.js";
+import { createTaskSchema, updateTaskSchema } from "./taskSchema.js";
 import {
   createTask,
   getTaskByIdAndProjectId,
   getTasksByProjectId,
+  updateTask,
 } from "./taskService.js";
 
 export function taskRoutes(app: FastifyInstance) {
@@ -127,6 +128,60 @@ export function taskRoutes(app: FastifyInstance) {
 
         return reply.code(200).send(task);
       } catch {
+        return reply.code(500).send({ message: "Internal server error" });
+      }
+    },
+  );
+
+  app.patch<{ Params: { projectId: string; taskId: string } }>(
+    "/:projectId/tasks/:taskId",
+    async (request, reply) => {
+      try {
+        await request.jwtVerify();
+      } catch {
+        return reply.code(401).send({
+          message: "Unauthorized",
+        });
+      }
+
+      const userId = request.user.userId;
+      const projectId = request.params.projectId;
+      const taskId = request.params.taskId;
+
+      const result = updateTaskSchema.safeParse(request.body);
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
+        });
+      }
+
+      try {
+        const project = await getProjectById(projectId, userId);
+
+        if (!project) {
+          return reply.code(404).send({
+            message: "Project not found",
+          });
+        }
+
+        const updatedTask = await updateTask(projectId, taskId, result.data);
+
+        if (!updatedTask) {
+          return reply.code(404).send({ message: "Task not found" });
+        }
+
+        return reply.code(200).send(updatedTask);
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002"
+        ) {
+          return reply.code(409).send({
+            message: "Task with this title already exists in this project",
+          });
+        }
+
         return reply.code(500).send({ message: "Internal server error" });
       }
     },

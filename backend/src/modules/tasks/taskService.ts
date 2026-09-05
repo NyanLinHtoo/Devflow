@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma.js";
-import type { CreateTaskInput } from "./taskTypes.js";
+import type { CreateTaskInput, UpdateTaskInput } from "./taskTypes.js";
 
 export async function createTask(projectId: string, input: CreateTaskInput) {
   const newTask = await prisma.task.create({
@@ -38,4 +38,30 @@ export async function getTaskByIdAndProjectId(
   });
 
   return getTaskByIdAndProjectId;
+}
+
+export async function updateTask(
+  projectId: string,
+  taskId: string,
+  input: UpdateTaskInput,
+) {
+  const existingTask = await getTaskByIdAndProjectId(projectId, taskId);
+
+  if (!existingTask) {
+    return null;
+  }
+
+  return prisma.task.update({
+    where: {
+      id: taskId,
+      projectId,
+    },
+    data: {
+      title: input.title,
+      description: input.description,
+      priority: input.priority,
+      dueDate: input.dueDate,
+      status: input.status,
+    },
+  });
 }
