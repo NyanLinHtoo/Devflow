@@ -25,3 +25,17 @@ export async function getTasksByProjectId(projectId: string) {
 
   return tasksByProjectId;
 }
+
+export async function getTaskByIdAndProjectId(
+  projectId: string,
+  taskId: string,
+) {
+  const getTaskByIdAndProjectId = await prisma.task.findFirst({
+    where: {
+      projectId,
+      id: taskId,
+    },
+  });
+
+  return getTaskByIdAndProjectId;
+}
