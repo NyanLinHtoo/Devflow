@@ -1,10 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { Prisma } from "../../generated/prisma/client.js";
-import { getProjectById } from "../project/projectService.js";
+import { deleteProject, getProjectById } from "../project/projectService.js";
 import { createTaskSchema, updateTaskSchema } from "./taskSchema.js";
 import {
   createTask,
+  deleteTask,
   getTaskByIdAndProjectId,
   getTasksByProjectId,
   updateTask,
@@ -182,6 +183,46 @@ export function taskRoutes(app: FastifyInstance) {
           });
         }
 
+        return reply.code(500).send({ message: "Internal server error" });
+      }
+    },
+  );
+
+  app.delete<{ Params: { projectId: string; taskId: string } }>(
+    "/:projectId/tasks/:taskId",
+    async (request, reply) => {
+      try {
+        await request.jwtVerify();
+      } catch {
+        return reply.code(401).send({
+          message: "Unauthorized",
+        });
+      }
+
+      const userId = request.user.userId;
+      const projectId = request.params.projectId;
+      const taskId = request.params.taskId;
+
+      try {
+        const project = await getProjectById(projectId, userId);
+
+        if (!project) {
+          return reply.code(404).send({
+            message: "Project not found",
+          });
+        }
+
+        const deletedTask = await deleteTask(projectId, taskId);
+
+        if (!deletedTask) {
+          console.log("I am here 1st");
+
+          return reply.code(404).send({ message: "Task not found" });
+        }
+        console.log("And then I am arrived here");
+
+        return reply.code(200).send({ message: "Task deleted successfully" });
+      } catch {
         return reply.code(500).send({ message: "Internal server error" });
       }
     },

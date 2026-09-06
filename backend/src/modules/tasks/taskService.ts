@@ -65,3 +65,15 @@ export async function updateTask(
     },
   });
 }
+
+export async function deleteTask(projectId: string, taskId: string) {
+  const existingTask = await getTaskByIdAndProjectId(projectId, taskId);
+
+  if (!existingTask) {
+    return null;
+  }
+
+  return prisma.task.delete({
+    where: { id: taskId },
+  });
+}
