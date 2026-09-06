@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { Prisma } from "../../generated/prisma/client.js";
-import { deleteProject, getProjectById } from "../project/projectService.js";
+import { getProjectById } from "../project/projectService.js";
 import { createTaskSchema, updateTaskSchema } from "./taskSchema.js";
 import {
   createTask,

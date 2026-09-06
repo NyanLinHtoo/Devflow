@@ -40,7 +40,7 @@ export default function DeleteProjectDialog({
 					</Dialog.Title>
 
 					<Dialog.Description className="mt-2 text-sm text-gray-600">
-						Are you sure you want to delete "{projectName}"? This action cannot
+						Are you sure you want to delete `{projectName}`? This action cannot
 						be undone.
 					</Dialog.Description>
 
