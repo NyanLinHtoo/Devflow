@@ -3,6 +3,8 @@
 import DeleteProjectDialog from "@/features/projects/components/deleteProjectDialog";
 import { EditProjectForm } from "@/features/projects/components/editProjectForm";
 import { CreateTaskForm } from "@/features/tasks/components/createTaskForm";
+import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
+import { EditTaskForm } from "@/features/tasks/components/editTaskForm";
 import { TaskCard } from "@/features/tasks/components/taskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
@@ -52,7 +54,17 @@ export default function ProjectDetail() {
 			<DeleteProjectDialog projectId={project.id} projectName={project.name} />
 
 			{tasks && tasks.length > 0 ? (
-				tasks.map((task) => <TaskCard key={task.id} task={task} />)
+				tasks.map((task) => (
+					<div key={task.id}>
+						<TaskCard task={task} />
+						<EditTaskForm projectId={projectId} task={task} />
+						<DeleteTaskDialog
+							taskId={task.id}
+							projectId={project.id}
+							taskTitle={task.title}
+						/>
+					</div>
+				))
 			) : (
 				<p>No tasks yet.</p>
 			)}
