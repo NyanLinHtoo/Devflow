@@ -11,7 +11,7 @@ type TaskCardProps = {
 export default function TaskCard({ task, projectId }: TaskCardProps) {
 	return (
 		<div>
-			<Link href={`#`}>
+			<Link href={`/projects/${projectId}/tasks/${task.id}`}>
 				<article className="rounded-lg border border-gray-200 p-4">
 					<h2 className="font-semibold">{task.title}</h2>
 					{task.description && (
