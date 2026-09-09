@@ -17,9 +17,14 @@ import {
 type EditTaskFormProps = {
 	task: Task;
 	projectId: string;
+	onSuccess?: () => void;
 };
 
-export default function EditTaskForm({ task, projectId }: EditTaskFormProps) {
+export default function EditTaskForm({
+	task,
+	projectId,
+	onSuccess,
+}: EditTaskFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -59,6 +64,7 @@ export default function EditTaskForm({ task, projectId }: EditTaskFormProps) {
 						dueDate: toDatetimeLocal(updatedTask.dueDate),
 						status: updatedTask.status,
 					});
+					onSuccess?.();
 				},
 			},
 		);

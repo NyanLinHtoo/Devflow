@@ -1,6 +1,6 @@
 "use client";
 
-import { ProjectCard } from "@/features/projects/components/ProjectCard";
+import ProjectCard from "@/features/projects/components/ProjectCard";
 import { useProjects } from "@/hooks/useProjects";
 
 export default function ProjectsPage() {

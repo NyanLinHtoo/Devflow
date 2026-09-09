@@ -4,7 +4,7 @@ import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDia
 import EditProjectForm from "@/features/projects/components/EditProjectForm";
 import CreateTaskForm from "@/features/tasks/components/CreateTaskForm";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
-import EditTaskForm from "@/features/tasks/components/EditTaskForm";
+import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
@@ -51,16 +51,16 @@ export default function ProjectDetail() {
 
 			<EditProjectForm project={project} />
 
-			<DeleteProjectDialog projectId={project.id} projectName={project.name} />
+			<DeleteProjectDialog projectId={projectId} projectName={project.name} />
 
 			{tasks && tasks.length > 0 ? (
 				tasks.map((task) => (
 					<div key={task.id}>
 						<TaskCard task={task} />
-						<EditTaskForm projectId={projectId} task={task} />
+						<EditTaskDialog projectId={projectId} task={task} />
 						<DeleteTaskDialog
 							taskId={task.id}
-							projectId={project.id}
+							projectId={projectId}
 							taskTitle={task.title}
 						/>
 					</div>
@@ -69,7 +69,7 @@ export default function ProjectDetail() {
 				<p>No tasks yet.</p>
 			)}
 
-			<CreateTaskForm projectId={project.id} />
+			<CreateTaskForm projectId={projectId} />
 		</main>
 	);
 }
