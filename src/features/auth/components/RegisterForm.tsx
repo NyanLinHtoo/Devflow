@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
 import { useRegister } from "@/hooks/useAuth";
 
-export function RegisterForm() {
+export default function RegisterForm() {
 	const {
 		register,
 		handleSubmit,

@@ -19,7 +19,7 @@ type EditTaskFormProps = {
 	projectId: string;
 };
 
-export function EditTaskForm({ task, projectId }: EditTaskFormProps) {
+export default function EditTaskForm({ task, projectId }: EditTaskFormProps) {
 	const {
 		register,
 		handleSubmit,

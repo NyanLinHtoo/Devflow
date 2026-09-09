@@ -5,7 +5,7 @@ type ProjectCardProps = {
 	project: Project;
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project }: ProjectCardProps) {
 	return (
 		<Link href={`/projects/${project.id}`}>
 			<article className="rounded-lg border border-gray-200 p-4">

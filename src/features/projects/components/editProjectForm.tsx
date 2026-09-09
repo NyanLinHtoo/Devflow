@@ -17,7 +17,7 @@ type EditProjectFormProps = {
 	project: Project;
 };
 
-export function EditProjectForm({ project }: EditProjectFormProps) {
+export default function EditProjectForm({ project }: EditProjectFormProps) {
 	const {
 		register,
 		handleSubmit,

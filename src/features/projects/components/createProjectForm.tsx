@@ -12,7 +12,7 @@ import {
 } from "../schemas/createProjectSchema";
 import { TextArea } from "@/components/ui/textArea";
 
-export function CreateProjectForm() {
+export default function CreateProjectForm() {
 	const {
 		register,
 		handleSubmit,

@@ -5,7 +5,7 @@ type TaskCardProps = {
 	task: Task;
 };
 
-export function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task }: TaskCardProps) {
 	return (
 		<Link href={`#`}>
 			<article className="rounded-lg border border-gray-200 p-4">

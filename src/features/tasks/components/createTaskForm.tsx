@@ -13,7 +13,7 @@ import {
 	createTaskSchema,
 } from "../schemas/createTaskSchema";
 
-export function CreateTaskForm({ projectId }: { projectId: string }) {
+export default function CreateTaskForm({ projectId }: { projectId: string }) {
 	const {
 		register,
 		handleSubmit,

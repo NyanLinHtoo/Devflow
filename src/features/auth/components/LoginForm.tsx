@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "../schemas/loginSchema";
 import { useLogin } from "@/hooks/useAuth";
 
-export function LoginForm() {
+export default function LoginForm() {
 	const {
 		register,
 		handleSubmit,

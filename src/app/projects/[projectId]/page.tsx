@@ -1,11 +1,11 @@
 "use client";
 
-import DeleteProjectDialog from "@/features/projects/components/deleteProjectDialog";
-import { EditProjectForm } from "@/features/projects/components/editProjectForm";
-import { CreateTaskForm } from "@/features/tasks/components/createTaskForm";
+import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
+import EditProjectForm from "@/features/projects/components/EditProjectForm";
+import CreateTaskForm from "@/features/tasks/components/CreateTaskForm";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
-import { EditTaskForm } from "@/features/tasks/components/editTaskForm";
-import { TaskCard } from "@/features/tasks/components/taskCard";
+import EditTaskForm from "@/features/tasks/components/EditTaskForm";
+import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useParams } from "next/navigation";
