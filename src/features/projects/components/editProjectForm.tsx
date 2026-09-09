@@ -15,9 +15,13 @@ import {
 
 type EditProjectFormProps = {
 	project: Project;
+	onSuccess?: () => void;
 };
 
-export default function EditProjectForm({ project }: EditProjectFormProps) {
+export default function EditProjectForm({
+	project,
+	onSuccess,
+}: EditProjectFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -33,11 +37,18 @@ export default function EditProjectForm({ project }: EditProjectFormProps) {
 	const updateProjectMutation = useUpdateProject();
 
 	function onSubmit(data: UpdateProjectFormData) {
-		updateProjectMutation.mutate({
-			projectId: project.id,
-			name: data.name,
-			description: data.description,
-		});
+		updateProjectMutation.mutate(
+			{
+				projectId: project.id,
+				name: data.name,
+				description: data.description,
+			},
+			{
+				onSuccess: () => {
+					onSuccess?.();
+				},
+			},
+		);
 	}
 
 	return (

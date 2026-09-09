@@ -1,7 +1,7 @@
 "use client";
 
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
-import EditProjectForm from "@/features/projects/components/EditProjectForm";
+import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
 import CreateTaskForm from "@/features/tasks/components/CreateTaskForm";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
@@ -49,7 +49,7 @@ export default function ProjectDetail() {
 			<p>Description: {project.description}</p>
 			<p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
 
-			<EditProjectForm project={project} />
+			<EditProjectDialog project={project} />
 
 			<DeleteProjectDialog projectId={projectId} projectName={project.name} />
 
