@@ -3,22 +3,33 @@
 import { Button } from "@/components/ui/button";
 import { useDeleteTask } from "@/hooks/useTasks";
 import { Dialog } from "@ark-ui/react/dialog";
+import { useRouter } from "next/navigation";
 
 type DeleteTaskDialogProps = {
 	projectId: string;
 	taskId: string;
 	taskTitle: string;
+	redirectAfterDelete?: boolean;
 };
 
 export default function DeleteTaskDialog({
 	projectId,
 	taskId,
 	taskTitle,
+	redirectAfterDelete = false,
 }: DeleteTaskDialogProps) {
 	const deleteTaskMutation = useDeleteTask(projectId);
 
+	const router = useRouter();
+
 	function handleDelete() {
-		deleteTaskMutation.mutate(taskId);
+		deleteTaskMutation.mutate(taskId, {
+			onSuccess: () => {
+				if (redirectAfterDelete) {
+					router.replace(`/projects/${projectId}`);
+				}
+			},
+		});
 	}
 
 	return (

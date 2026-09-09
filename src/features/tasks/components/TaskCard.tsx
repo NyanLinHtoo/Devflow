@@ -1,7 +1,5 @@
 import type { Task } from "@/types/taskTypes";
 import Link from "next/link";
-import EditTaskDialog from "./EditTaskDialog";
-import DeleteTaskDialog from "./DeleteTaskDialog";
 
 type TaskCardProps = {
 	task: Task;
@@ -27,13 +25,6 @@ export default function TaskCard({ task, projectId }: TaskCardProps) {
 					</p>
 				</article>
 			</Link>
-
-			<EditTaskDialog projectId={projectId} task={task} />
-			<DeleteTaskDialog
-				taskId={task.id}
-				projectId={projectId}
-				taskTitle={task.title}
-			/>
 		</div>
 	);
 }

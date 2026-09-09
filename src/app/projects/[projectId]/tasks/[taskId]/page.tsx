@@ -1,5 +1,7 @@
 "use client";
 
+import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
+import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import { useTask } from "@/hooks/useTasks";
 import { useParams } from "next/navigation";
 
@@ -39,6 +41,14 @@ export default function TaskDetail() {
 			</p>
 			<p>Created Date : {new Date(task.createdAt).toDateString()}</p>
 			<p>Updated Date : {new Date(task.updatedAt).toDateString()}</p>
+
+			<EditTaskDialog projectId={projectId} task={task} />
+			<DeleteTaskDialog
+				taskId={task.id}
+				projectId={projectId}
+				taskTitle={task.title}
+				redirectAfterDelete
+			/>
 		</main>
 	);
 }
