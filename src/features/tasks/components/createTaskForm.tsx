@@ -13,7 +13,15 @@ import {
 	createTaskSchema,
 } from "../schemas/createTaskSchema";
 
-export default function CreateTaskForm({ projectId }: { projectId: string }) {
+type CreateTaskFormProps = {
+	projectId: string;
+	onSuccess?: () => void;
+};
+
+export default function CreateTaskForm({
+	projectId,
+	onSuccess,
+}: CreateTaskFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -38,6 +46,7 @@ export default function CreateTaskForm({ projectId }: { projectId: string }) {
 		createTaskMutation.mutate(taskData, {
 			onSuccess: () => {
 				reset();
+				onSuccess?.();
 			},
 		});
 	}

@@ -2,7 +2,7 @@
 
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
-import CreateTaskForm from "@/features/tasks/components/CreateTaskForm";
+import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
@@ -69,7 +69,7 @@ export default function ProjectDetail() {
 				<p>No tasks yet.</p>
 			)}
 
-			<CreateTaskForm projectId={projectId} />
+			<CreateTaskDialog projectId={projectId} />
 		</main>
 	);
 }
