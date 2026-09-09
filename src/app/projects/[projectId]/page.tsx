@@ -1,11 +1,8 @@
 "use client";
 
-import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
-import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
-import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
@@ -50,28 +47,18 @@ export default function ProjectDetail() {
 			<p>Description: {project.description}</p>
 			<p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
 
-			<CreateProjectDialog />
 			<EditProjectDialog project={project} />
 
 			<DeleteProjectDialog projectId={projectId} projectName={project.name} />
 
+			<CreateTaskDialog projectId={projectId} />
 			{tasks && tasks.length > 0 ? (
 				tasks.map((task) => (
-					<div key={task.id}>
-						<TaskCard task={task} />
-						<EditTaskDialog projectId={projectId} task={task} />
-						<DeleteTaskDialog
-							taskId={task.id}
-							projectId={projectId}
-							taskTitle={task.title}
-						/>
-					</div>
+					<TaskCard key={task.id} task={task} projectId={projectId} />
 				))
 			) : (
 				<p>No tasks yet.</p>
 			)}
-
-			<CreateTaskDialog projectId={projectId} />
 		</main>
 	);
 }
