@@ -1,5 +1,6 @@
 "use client";
 
+import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
@@ -49,6 +50,7 @@ export default function ProjectDetail() {
 			<p>Description: {project.description}</p>
 			<p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
 
+			<CreateProjectDialog />
 			<EditProjectDialog project={project} />
 
 			<DeleteProjectDialog projectId={projectId} projectName={project.name} />

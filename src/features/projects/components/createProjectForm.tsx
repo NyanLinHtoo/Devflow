@@ -12,7 +12,11 @@ import {
 } from "../schemas/createProjectSchema";
 import { TextArea } from "@/components/ui/textArea";
 
-export default function CreateProjectForm() {
+export default function CreateProjectForm({
+	onSuccess,
+}: {
+	onSuccess?: () => void;
+}) {
 	const {
 		register,
 		handleSubmit,
@@ -28,6 +32,7 @@ export default function CreateProjectForm() {
 		createProjectMutation.mutate(data, {
 			onSuccess: () => {
 				reset();
+				onSuccess?.();
 			},
 		});
 	}
