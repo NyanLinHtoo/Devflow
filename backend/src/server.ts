@@ -6,6 +6,7 @@ import Fastify from "fastify";
 import { authRoutes } from "./modules/auth/authRoute.js";
 import { projectRoutes } from "./modules/project/projectRoute.js";
 import { taskRoutes } from "./modules/tasks/taskRoute.js";
+import { projectMemberRoutes } from "./modules/projectMember/projectMemberRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
 const refreshJwtSecret = process.env.JWT_REFRESH_SECRET;
@@ -46,6 +47,7 @@ app.register(fastifyCors, {
 app.register(authRoutes, { prefix: "/auth" });
 app.register(projectRoutes, { prefix: "/projects" });
 app.register(taskRoutes, { prefix: "/projects" });
+app.register(projectMemberRoutes, { prefix: "/projects" });
 
 const start = async () => {
   try {

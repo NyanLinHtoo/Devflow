@@ -215,11 +215,8 @@ export function taskRoutes(app: FastifyInstance) {
         const deletedTask = await deleteTask(projectId, taskId);
 
         if (!deletedTask) {
-          console.log("I am here 1st");
-
           return reply.code(404).send({ message: "Task not found" });
         }
-        console.log("And then I am arrived here");
 
         return reply.code(200).send({ message: "Task deleted successfully" });
       } catch {
