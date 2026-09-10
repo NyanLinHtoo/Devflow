@@ -1,15 +1,18 @@
 import prisma from "../../lib/prisma.js";
 import type { CreateProjectInput, UpdateProjectInput } from "./projectTypes.js";
 
-export async function createProject(
-  ownerId: string,
-  input: CreateProjectInput,
-) {
+export async function createProject(userId: string, input: CreateProjectInput) {
   const newProject = await prisma.project.create({
     data: {
       name: input.name,
       description: input.description,
-      ownerId,
+      ownerId: userId,
+      projectMembers: {
+        create: {
+          userId,
+          role: "MANAGER",
+        },
+      },
     },
   });
   return newProject;
