@@ -7,6 +7,10 @@ export const projectMemberParamsSchema = z.object({
   memberId: z.uuid(),
 });
 
+export const projectParamsSchema = z.object({
+  projectId: z.uuid(),
+});
+
 export const addProjectMemberSchema = z.object({
   email: z.email(),
   role: z.enum(roles),

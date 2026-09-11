@@ -1,17 +1,19 @@
-import { Prisma } from "../../generated/prisma/client.js";
-import prisma from "../../lib/prisma.js";
-import { getProjectById } from "../project/projectService.js";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+import { Prisma } from "../../generated/prisma/client.js";
+import prisma from "../../lib/prisma.js";
 import {
   addProjectMemberSchema,
   projectMemberParamsSchema,
+  projectParamsSchema,
   updateProjectMemberRoleSchema,
 } from "./projectMemberSchema.js";
 import {
   addProjectMember,
   deleteProjectMember,
+  getProjectMember,
   getProjectMembers,
+  isProjectManager,
   updateProjectMemberRole,
 } from "./projectMemberService.js";
 
@@ -27,8 +29,17 @@ export function projectMemberRoutes(app: FastifyInstance) {
         });
       }
 
+      const paramsResult = projectParamsSchema.safeParse(request.params);
+
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
+      const projectId = paramsResult.data.projectId;
 
       const result = addProjectMemberSchema.safeParse(request.body);
 
@@ -40,12 +51,11 @@ export function projectMemberRoutes(app: FastifyInstance) {
       }
 
       try {
-        const project = await getProjectById(projectId, userId);
-
-        if (!project) {
-          return reply.code(404).send({
-            message: "Project not found",
-          });
+        const isManager = await isProjectManager(projectId, userId);
+        if (!isManager) {
+          return reply
+            .code(403)
+            .send({ message: "You don't have permission add members" });
         }
 
         const targetUser = await prisma.user.findUnique({
@@ -57,12 +67,6 @@ export function projectMemberRoutes(app: FastifyInstance) {
         if (!targetUser) {
           return reply.code(404).send({
             message: "User not found",
-          });
-        }
-
-        if (targetUser.id === project.ownerId) {
-          return reply.code(400).send({
-            message: "Project owner cannot be added as a member",
           });
         }
 
@@ -101,13 +105,24 @@ export function projectMemberRoutes(app: FastifyInstance) {
         });
       }
 
+      const paramsResult = projectParamsSchema.safeParse(request.params);
+
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
+      const projectId = paramsResult.data.projectId;
 
       try {
-        const existingProject = await getProjectById(projectId, userId);
-        if (!existingProject) {
-          return reply.code(404).send({ message: "Project not found" });
+        const projectMember = await getProjectMember(projectId, userId);
+        if (!projectMember) {
+          return reply
+            .code(403)
+            .send({ message: "You are not a member of this project" });
         }
 
         const projectMembers = await getProjectMembers(projectId);
@@ -131,10 +146,18 @@ export function projectMemberRoutes(app: FastifyInstance) {
           message: "Unauthorized",
         });
       }
+      const paramsResult = projectMemberParamsSchema.safeParse(request.params);
+
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID or member ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
 
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
-      const memberId = request.params.memberId;
+      const projectId = paramsResult.data.projectId;
+      const memberId = paramsResult.data.memberId;
 
       const result = updateProjectMemberRoleSchema.safeParse(request.body);
 
@@ -146,9 +169,11 @@ export function projectMemberRoutes(app: FastifyInstance) {
       }
 
       try {
-        const existingProject = await getProjectById(projectId, userId);
-        if (!existingProject) {
-          return reply.code(404).send({ message: "Project not found" });
+        const isManager = await isProjectManager(projectId, userId);
+        if (!isManager) {
+          return reply
+            .code(403)
+            .send({ message: "You don't have permission to update" });
         }
 
         const updatedProjectMemberRole = await updateProjectMemberRole(
@@ -157,11 +182,17 @@ export function projectMemberRoutes(app: FastifyInstance) {
           result.data.role,
         );
 
-        if (!updatedProjectMemberRole) {
+        if (updatedProjectMemberRole.status === "NOT_FOUND") {
           return reply.code(404).send({ message: "Project member not found" });
         }
 
-        return reply.code(200).send(updatedProjectMemberRole);
+        if (updatedProjectMemberRole.status === "FORBIDDEN") {
+          return reply
+            .code(403)
+            .send({ message: "You don't have permission to update" });
+        }
+
+        return reply.code(200).send(updatedProjectMemberRole.member);
       } catch {
         return reply.code(500).send({
           message: "Internal server error",
@@ -195,9 +226,11 @@ export function projectMemberRoutes(app: FastifyInstance) {
       const memberId = paramsResult.data.memberId;
 
       try {
-        const existingProject = await getProjectById(projectId, userId);
-        if (!existingProject) {
-          return reply.code(404).send({ message: "Project not found" });
+        const isManager = await isProjectManager(projectId, userId);
+        if (!isManager) {
+          return reply
+            .code(403)
+            .send({ message: "You don't have permission to remove members" });
         }
 
         const deletedProjectMember = await deleteProjectMember(
@@ -205,8 +238,14 @@ export function projectMemberRoutes(app: FastifyInstance) {
           memberId,
         );
 
-        if (!deletedProjectMember) {
+        if (deletedProjectMember.status === "NOT_FOUND") {
           return reply.code(404).send({ message: "Project member not found" });
+        }
+
+        if (deletedProjectMember.status === "FORBIDDEN") {
+          return reply.code(403).send({
+            message: "You don't have permission to remove member",
+          });
         }
 
         return reply

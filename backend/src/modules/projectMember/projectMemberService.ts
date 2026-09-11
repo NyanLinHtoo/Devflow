@@ -42,9 +42,15 @@ export async function updateProjectMemberRole(
     where: { projectId, id: memberId },
   });
 
-  if (!member) return null;
+  console.log("mEMBER====>", member);
 
-  return prisma.projectMember.update({
+  if (!member) return { status: "NOT_FOUND" };
+
+  if (member.role === "MANAGER") {
+    return { status: "FORBIDDEN" };
+  }
+
+  const updatedMember = await prisma.projectMember.update({
     where: {
       id: memberId,
     },
@@ -52,6 +58,11 @@ export async function updateProjectMemberRole(
       role,
     },
   });
+
+  return {
+    status: "UPDATED",
+    member: updatedMember,
+  };
 }
 
 export async function deleteProjectMember(projectId: string, memberId: string) {
@@ -59,9 +70,30 @@ export async function deleteProjectMember(projectId: string, memberId: string) {
     where: { projectId, id: memberId },
   });
 
-  if (!member) return null;
+  if (!member) return { status: "NOT_FOUND" };
 
-  return prisma.projectMember.delete({
+  if (member.role === "MANAGER") {
+    return { status: "FORBIDDEN" };
+  }
+
+  const deletedMember = await prisma.projectMember.delete({
     where: { id: memberId },
   });
+
+  return {
+    status: "DELETED",
+    member: deletedMember,
+  };
+}
+
+export async function getProjectMember(projectId: string, userId: string) {
+  return prisma.projectMember.findFirst({
+    where: { projectId, userId },
+  });
+}
+
+export async function isProjectManager(projectId: string, userId: string) {
+  const member = await getProjectMember(projectId, userId);
+
+  return member?.role === "MANAGER";
 }
