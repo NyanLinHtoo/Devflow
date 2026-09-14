@@ -8,14 +8,13 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid()) @db.Uuid
-  fullName      String
-  email         String   @unique
-  passwordHash  String
-  acceptedTerms Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
+  id             String          @id @default(uuid()) @db.Uuid
+  fullName       String
+  email          String          @unique
+  passwordHash   String
+  acceptedTerms  Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   sessions       Session[]
   projects       Project[]
   projectMembers ProjectMember[]
@@ -26,20 +25,18 @@ model Session {
   refreshTokenHash String?
   expiresAt        DateTime
   createdAt        DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String   @db.Uuid
 
   @@index([userId])
 }
 
 model Project {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id             String          @id @default(uuid()) @db.Uuid
+  name           String
+  description    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId        String          @db.Uuid
   tasks          Task[]
@@ -49,17 +46,18 @@ model Project {
 }
 
 model Task {
-  id          String       @id @default(uuid()) @db.Uuid
-  title       String
-  description String?
-  status      TaskStatus   @default(TODO)
-  priority    TaskPriority @default(MEDIUM)
-  dueDate     DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String  @db.Uuid
+  id               String         @id @default(uuid()) @db.Uuid
+  title            String
+  description      String?
+  status           TaskStatus     @default(TODO)
+  priority         TaskPriority   @default(MEDIUM)
+  dueDate          DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String         @db.Uuid
+  assignedMember   ProjectMember? @relation(fields: [assignedMemberId], references: [id], onDelete: SetNull)
+  assignedMemberId String?        @db.Uuid
 
   @@unique([projectId, title])
 }
@@ -77,14 +75,14 @@ enum TaskPriority {
 }
 
 model ProjectMember {
-  id        String      @id @default(uuid()) @db.Uuid
-  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String      @db.Uuid
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String      @db.Uuid
-  role      ProjectRole
-
-  createdAt DateTime @default(now())
+  id            String      @id @default(uuid()) @db.Uuid
+  project       Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String      @db.Uuid
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String      @db.Uuid
+  role          ProjectRole
+  createdAt     DateTime    @default(now())
+  assignedTasks Task[]
 
   @@unique([projectId, userId])
 }

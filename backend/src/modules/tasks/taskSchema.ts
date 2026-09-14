@@ -3,6 +3,11 @@ import { z } from "zod";
 const priority = ["LOW", "MEDIUM", "HIGH"] as const;
 const status = ["TODO", "IN_PROGRESS", "DONE"] as const;
 
+export const taskParamsSchema = z.object({
+  projectId: z.uuid(),
+  taskId: z.uuid(),
+});
+
 export const createTaskSchema = z.object({
   title: z
     .string()

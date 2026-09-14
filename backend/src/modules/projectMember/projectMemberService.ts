@@ -42,8 +42,6 @@ export async function updateProjectMemberRole(
     where: { projectId, id: memberId },
   });
 
-  console.log("mEMBER====>", member);
-
   if (!member) return { status: "NOT_FOUND" };
 
   if (member.role === "MANAGER") {
@@ -96,4 +94,16 @@ export async function isProjectManager(projectId: string, userId: string) {
   const member = await getProjectMember(projectId, userId);
 
   return member?.role === "MANAGER";
+}
+
+export async function getProjectMemberById(
+  projectId: string,
+  memberId: string,
+) {
+  return prisma.projectMember.findFirst({
+    where: {
+      id: memberId,
+      projectId,
+    },
+  });
 }
