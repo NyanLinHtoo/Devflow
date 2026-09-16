@@ -19,18 +19,25 @@ export async function addProjectMember(
 }
 
 export async function getProjectMembers(projectId: string) {
-  return prisma.projectMember.findMany({
+  const projectMembers = await prisma.projectMember.findMany({
     where: { projectId },
     include: {
       user: {
         select: {
-          id: true,
           fullName: true,
           email: true,
         },
       },
     },
   });
+  const members = projectMembers.map((member) => ({
+    id: member.id,
+    userId: member.userId,
+    fullName: member.user.fullName,
+    email: member.user.email,
+    role: member.role,
+  }));
+  return members;
 }
 
 export async function updateProjectMemberRole(
