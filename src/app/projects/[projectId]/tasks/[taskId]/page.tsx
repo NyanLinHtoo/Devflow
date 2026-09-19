@@ -1,7 +1,10 @@
 "use client";
 
+import TaskAssigneeSelect from "@/features/projects/components/TaskAssigneeSelect";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useProjectMembers } from "@/hooks/useProjectMembers";
 import { useTask } from "@/hooks/useTasks";
 import { useParams } from "next/navigation";
 
@@ -11,6 +14,14 @@ export default function TaskDetail() {
 	const taskId = params.taskId;
 
 	const { data: task, isLoading, isError } = useTask(projectId, taskId);
+	const { data: currentUser } = useCurrentUser();
+	const { data: members = [] } = useProjectMembers(projectId);
+
+	const currentMember = members.find(
+		(member) => member.userId === currentUser?.id,
+	);
+
+	const canAssign = currentMember?.role === "MANAGER";
 
 	if (isLoading) {
 		return <p>Loading task...</p>;
@@ -41,6 +52,14 @@ export default function TaskDetail() {
 			</p>
 			<p>Created Date : {new Date(task.createdAt).toDateString()}</p>
 			<p>Updated Date : {new Date(task.updatedAt).toDateString()}</p>
+
+			<TaskAssigneeSelect
+				projectId={projectId}
+				taskId={task.id}
+				assignedMember={task.assignedMember}
+				members={members}
+				canAssign={canAssign}
+			/>
 
 			<EditTaskDialog projectId={projectId} task={task} />
 			<DeleteTaskDialog

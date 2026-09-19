@@ -1,3 +1,9 @@
+export type AssignedMember = {
+	id: string;
+	fullName: string;
+	email: string;
+};
+
 export type Task = {
 	id: string;
 	title: string;
@@ -6,6 +12,7 @@ export type Task = {
 	status: "TODO" | "IN_PROGRESS" | "DONE";
 	priority: "LOW" | "MEDIUM" | "HIGH";
 	dueDate: string | null;
+	assignedMember: AssignedMember | null;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -23,4 +30,8 @@ export type UpdateTaskInput = {
 	status?: "TODO" | "IN_PROGRESS" | "DONE";
 	priority?: "LOW" | "MEDIUM" | "HIGH";
 	dueDate?: string | null;
+};
+
+export type UpdateTaskAssigneeInput = {
+	assignedMemberId: string | null;
 };

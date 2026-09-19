@@ -1,5 +1,10 @@
 import { apiFetch } from "@/lib/api";
-import type { CreateTaskInput, Task, UpdateTaskInput } from "@/types/taskTypes";
+import type {
+	CreateTaskInput,
+	Task,
+	UpdateTaskAssigneeInput,
+	UpdateTaskInput,
+} from "@/types/taskTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useTasks(projectId: string) {
@@ -74,6 +79,34 @@ export function useDeleteTask(projectId: string) {
 
 			queryClient.removeQueries({
 				queryKey: ["projects", projectId, "tasks", taskId],
+			});
+		},
+	});
+}
+
+export function useUpdateTaskAssignee(projectId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			taskId,
+			data,
+		}: {
+			taskId: string;
+			data: UpdateTaskAssigneeInput;
+		}) =>
+			apiFetch<Task>(`/projects/${projectId}/tasks/${taskId}/assignee`, {
+				method: "PATCH",
+				body: JSON.stringify(data),
+			}),
+
+		onSuccess: async (updatedTask) => {
+			await queryClient.invalidateQueries({
+				queryKey: ["projects", projectId, "tasks"],
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: ["projects", projectId, "tasks", updatedTask.id],
 			});
 		},
 	});

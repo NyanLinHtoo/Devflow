@@ -4,27 +4,6 @@ The items below are intentionally deferred and are **not part of the current imp
 
 ## Phase 1 — Current Task Assignment Work (V1)
 
-### P0 — Identify memberships reliably
-
-- [ ] Add `userId` to the `GET /projects/:projectId/members` response.
-- [ ] Update the frontend `ProjectMember` type to include `userId: string`.
-- [ ] Use `currentUser.id === member.userId` when finding the current user's membership and role. Do not use the membership record's `id` for this comparison.
-- [ ] Keep the ID distinction explicit:
-  - `User.id` ↔ `ProjectMember.userId` identifies a user's membership.
-  - `ProjectMember.id` is the membership ID and is used for task assignment (`Task.assignedMemberId`).
-
-### P0 — Finish task assignment end-to-end
-
-- [ ] Confirm/create the task assignment API contract using `assignedMemberId` (a `ProjectMember.id`).
-- [ ] Validate that an assignee belongs to the task's project before saving.
-- [ ] Build a manager-only assignment control in the task UI.
-- [ ] Populate its member selector from project members and display useful labels (name/email).
-- [ ] Support unassigning a task (clear `assignedMemberId`) from the same flow.
-- [ ] Invalidate/refetch task and project-member caches after assignment or unassignment.
-- [ ] Enforce permissions on the server, not only in the UI: only project managers may assign or unassign.
-- [ ] Return clear API errors for unauthenticated users, non-members, non-managers, invalid member IDs, and cross-project assignments.
-- [ ] Verify the UI presents API failures clearly and keeps a recoverable state.
-
 ### P1 — Task model/API consistency
 
 - [ ] Review frontend and backend `Task` types for any remaining mismatch around `createdAt` and `updatedAt`.
