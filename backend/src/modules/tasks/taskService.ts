@@ -45,6 +45,8 @@ export async function getTasksByProjectId(projectId: string) {
       priority: task.priority,
       dueDate: task.dueDate,
       projectId: task.projectId,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
       assignedMember: task.assignedMember
         ? {
             id: task.assignedMember.id,
@@ -90,6 +92,8 @@ export async function getTaskByIdAndProjectId(
     priority: existingTask.priority,
     dueDate: existingTask.dueDate,
     projectId: existingTask.projectId,
+    createdAt: existingTask.createdAt,
+    updatedAt: existingTask.updatedAt,
     assignedMember: existingTask.assignedMember
       ? {
           id: existingTask.assignedMember.id,
