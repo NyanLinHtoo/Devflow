@@ -4,12 +4,6 @@ The items below are intentionally deferred and are **not part of the current imp
 
 ## Phase 1 — Current Task Assignment Work (V1)
 
-### P1 — Task model/API consistency
-
-- [ ] Review frontend and backend `Task` types for any remaining mismatch around `createdAt` and `updatedAt`.
-- [ ] Decide on one API representation for timestamps (typically ISO strings) and align types, serializers, and UI formatting.
-- [ ] Check task-create, list, detail, update, and assignment responses all follow the same contract.
-
 ### P1 — Task detail UX
 
 - [ ] Complete task-detail edit UX, including prefilled values, save/cancel behavior, and validation errors.

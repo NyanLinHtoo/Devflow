@@ -1,5 +1,6 @@
 import prisma from "../../lib/prisma.js";
 import { getProjectMemberById } from "../projectMember/projectMemberService.js";
+import { toTaskResponse } from "./taskMapper.js";
 import type { CreateTaskInput, UpdateTaskInput } from "./taskTypes.js";
 
 export async function createTask(projectId: string, input: CreateTaskInput) {
@@ -11,9 +12,21 @@ export async function createTask(projectId: string, input: CreateTaskInput) {
       dueDate: input.dueDate,
       projectId,
     },
+    include: {
+      assignedMember: {
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  return newTask;
+  return toTaskResponse(newTask);
 }
 
 export async function getTasksByProjectId(projectId: string) {
@@ -36,28 +49,7 @@ export async function getTasksByProjectId(projectId: string) {
     },
   });
 
-  const tasks = tasksByProjectId.map((task) => {
-    return {
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate,
-      projectId: task.projectId,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      assignedMember: task.assignedMember
-        ? {
-            id: task.assignedMember.id,
-            fullName: task.assignedMember.user.fullName,
-            email: task.assignedMember.user.email,
-          }
-        : null,
-    };
-  });
-
-  return tasks;
+  return tasksByProjectId.map(toTaskResponse);
 }
 
 export async function getTaskByIdAndProjectId(
@@ -84,26 +76,7 @@ export async function getTaskByIdAndProjectId(
     return null;
   }
 
-  const task = {
-    id: existingTask.id,
-    title: existingTask.title,
-    description: existingTask.description,
-    status: existingTask.status,
-    priority: existingTask.priority,
-    dueDate: existingTask.dueDate,
-    projectId: existingTask.projectId,
-    createdAt: existingTask.createdAt,
-    updatedAt: existingTask.updatedAt,
-    assignedMember: existingTask.assignedMember
-      ? {
-          id: existingTask.assignedMember.id,
-          fullName: existingTask.assignedMember.user.fullName,
-          email: existingTask.assignedMember.user.email,
-        }
-      : null,
-  };
-
-  return task;
+  return toTaskResponse(existingTask);
 }
 
 export async function updateTask(
@@ -117,7 +90,7 @@ export async function updateTask(
     return null;
   }
 
-  return prisma.task.update({
+  const task = await prisma.task.update({
     where: {
       id: taskId,
       projectId,
@@ -129,7 +102,21 @@ export async function updateTask(
       dueDate: input.dueDate,
       status: input.status,
     },
+    include: {
+      assignedMember: {
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
   });
+
+  return toTaskResponse(task);
 }
 
 export async function deleteTask(projectId: string, taskId: string) {
@@ -156,8 +143,6 @@ export async function updateTaskAssignee(
   }
 
   if (assignedMemberId !== null) {
-    console.log("Here assignedMemberId !!!!!!!!!!!!!!!! not null");
-
     const projectMember = await getProjectMemberById(
       projectId,
       assignedMemberId,
@@ -174,15 +159,20 @@ export async function updateTaskAssignee(
       data: {
         assignedMemberId,
       },
+      include: {
+        assignedMember: {
+          include: {
+            user: { select: { fullName: true, email: true } },
+          },
+        },
+      },
     });
 
     return {
       status: "ASSIGNED",
-      task: updatedTask,
+      task: toTaskResponse(updatedTask),
     };
   }
-
-  console.log("Here assignedMemberId null");
 
   const updatedTask = await prisma.task.update({
     where: {
@@ -191,10 +181,17 @@ export async function updateTaskAssignee(
     data: {
       assignedMemberId: null,
     },
+    include: {
+      assignedMember: {
+        include: {
+          user: { select: { fullName: true, email: true } },
+        },
+      },
+    },
   });
 
   return {
     status: "UNASSIGNED",
-    task: updatedTask,
+    task: toTaskResponse(updatedTask),
   };
 }
