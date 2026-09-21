@@ -31,11 +31,13 @@ export default function EditTaskDialog({
 						Editing task
 					</Dialog.Title>
 
-					<EditTaskForm
-						task={task}
-						projectId={projectId}
-						onSuccess={() => setOpen(false)}
-					/>
+					{open && (
+						<EditTaskForm
+							task={task}
+							projectId={projectId}
+							onSuccess={() => setOpen(false)}
+						/>
+					)}
 
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>

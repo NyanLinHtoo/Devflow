@@ -6,7 +6,7 @@ The items below are intentionally deferred and are **not part of the current imp
 
 ### P1 — Task detail UX
 
-- [ ] Complete task-detail edit UX, including prefilled values, save/cancel behavior, and validation errors.
+- [x] Complete task-detail edit UX, including prefilled values, save/cancel behavior, and validation errors.
 - [ ] Complete delete UX with confirmation and safe navigation afterward.
 - [ ] Define redirects after edit/delete (for example, return to the project task list when a detail view no longer exists).
 - [ ] Refetch or invalidate affected task/project data after edits and deletes.
