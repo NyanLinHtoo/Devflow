@@ -7,9 +7,9 @@ The items below are intentionally deferred and are **not part of the current imp
 ### P1 — Task detail UX
 
 - [x] Complete task-detail edit UX, including prefilled values, save/cancel behavior, and validation errors.
-- [ ] Complete delete UX with confirmation and safe navigation afterward.
-- [ ] Define redirects after edit/delete (for example, return to the project task list when a detail view no longer exists).
-- [ ] Refetch or invalidate affected task/project data after edits and deletes.
+- [x] Complete delete UX with confirmation and safe navigation afterward.
+- [x] Define redirects after edit/delete (for example, return to the project task list when a detail view no longer exists).
+- [X] Refetch or invalidate affected task/project data after edits and deletes.
 
 ## Phase 2 — Project Authorization Migration (V1 completion)
 
