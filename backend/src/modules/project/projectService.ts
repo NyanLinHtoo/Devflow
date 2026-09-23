@@ -18,9 +18,9 @@ export async function createProject(userId: string, input: CreateProjectInput) {
   return newProject;
 }
 
-export async function getProjectsByOwnerId(ownerId: string) {
+export async function getProjectsByMemberId(userId: string) {
   const projects = await prisma.project.findMany({
-    where: { ownerId },
+    where: { projectMembers: { some: { userId } } },
     orderBy: {
       createdAt: "desc",
     },
@@ -29,25 +29,18 @@ export async function getProjectsByOwnerId(ownerId: string) {
   return projects;
 }
 
-export async function getProjectById(projectId: string, ownerId: string) {
-  const projectsById = await prisma.project.findFirst({
-    where: { id: projectId, ownerId },
+export async function getProjectById(projectId: string, userId: string) {
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, projectMembers: { some: { userId } } },
   });
 
-  return projectsById;
+  return project;
 }
 
 export async function updateProject(
   projectId: string,
-  ownerId: string,
   input: UpdateProjectInput,
 ) {
-  const project = await getProjectById(projectId, ownerId);
-
-  if (!project) {
-    return null;
-  }
-
   return prisma.project.update({
     where: {
       id: projectId,
@@ -59,18 +52,10 @@ export async function updateProject(
   });
 }
 
-export async function deleteProject(projectId: string, ownerId: string) {
-  const project = await getProjectById(projectId, ownerId);
-
-  if (!project) {
-    return null;
-  }
-
+export async function deleteProject(projectId: string) {
   await prisma.project.delete({
     where: {
       id: projectId,
     },
   });
-
-  return project;
 }

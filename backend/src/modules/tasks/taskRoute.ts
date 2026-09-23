@@ -219,6 +219,13 @@ export function taskRoutes(app: FastifyInstance) {
           });
         }
 
+        const isManager = await isProjectManager(projectId, userId);
+        if (!isManager) {
+          return reply.code(403).send({
+            message: "You don't have permission to delete",
+          });
+        }
+
         const deletedTask = await deleteTask(projectId, taskId);
 
         if (!deletedTask) {

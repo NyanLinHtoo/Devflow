@@ -2,15 +2,6 @@
 
 The items below are intentionally deferred and are **not part of the current implementation**. They keep the present scope focused while making the next improvements easy to prioritize. Priorities describe the suggested order; mark items complete only after the relevant tests and manual checks pass.
 
-## Phase 1 — Current Task Assignment Work (V1)
-
-### P1 — Task detail UX
-
-- [x] Complete task-detail edit UX, including prefilled values, save/cancel behavior, and validation errors.
-- [x] Complete delete UX with confirmation and safe navigation afterward.
-- [x] Define redirects after edit/delete (for example, return to the project task list when a detail view no longer exists).
-- [X] Refetch or invalidate affected task/project data after edits and deletes.
-
 ## Phase 2 — Project Authorization Migration (V1 completion)
 
 ### P0 — Move authorization to membership roles

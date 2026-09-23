@@ -1,13 +1,18 @@
 import type { FastifyInstance } from "fastify";
-import { createProjectSchema, updateProjectSchema } from "./projectSchema.js";
+import { z } from "zod";
+import {
+  createProjectSchema,
+  projectParamsSchema,
+  updateProjectSchema,
+} from "./projectSchema.js";
 import {
   createProject,
   deleteProject,
   getProjectById,
-  getProjectsByOwnerId,
+  getProjectsByMemberId,
   updateProject,
 } from "./projectService.js";
-import { z } from "zod";
+import { isProjectManager } from "../projectMember/projectMemberService.js";
 
 export function projectRoutes(app: FastifyInstance) {
   app.post("/", async (request, reply) => {
@@ -51,7 +56,7 @@ export function projectRoutes(app: FastifyInstance) {
     const userId = request.user.userId;
 
     try {
-      const projects = await getProjectsByOwnerId(userId);
+      const projects = await getProjectsByMemberId(userId);
 
       return reply.code(200).send(projects);
     } catch {
@@ -72,7 +77,16 @@ export function projectRoutes(app: FastifyInstance) {
         });
       }
 
-      const projectId = request.params.projectId;
+      const paramsResult = projectParamsSchema.safeParse(request.params);
+
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
+      const projectId = paramsResult.data.projectId;
       const userId = request.user.userId;
 
       try {
@@ -104,7 +118,16 @@ export function projectRoutes(app: FastifyInstance) {
         });
       }
 
-      const projectId = request.params.projectId;
+      const paramsResult = projectParamsSchema.safeParse(request.params);
+
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
+      const projectId = paramsResult.data.projectId;
       const userId = request.user.userId;
 
       const result = updateProjectSchema.safeParse(request.body);
@@ -116,17 +139,23 @@ export function projectRoutes(app: FastifyInstance) {
       }
 
       try {
-        const updatedProject = await updateProject(
-          projectId,
-          userId,
-          result.data,
-        );
+        const project = await getProjectById(projectId, userId);
 
-        if (!updatedProject) {
+        if (!project) {
           return reply.code(404).send({
             message: "Project not found",
           });
         }
+
+        const isManager = await isProjectManager(projectId, userId);
+
+        if (!isManager) {
+          return reply.code(403).send({
+            message: "You don't have permission to update project",
+          });
+        }
+
+        const updatedProject = await updateProject(projectId, result.data);
 
         return reply.code(200).send(updatedProject);
       } catch {
@@ -147,18 +176,36 @@ export function projectRoutes(app: FastifyInstance) {
           message: "Unauthorized",
         });
       }
+      const paramsResult = projectParamsSchema.safeParse(request.params);
 
-      const projectId = request.params.projectId;
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
+      const projectId = paramsResult.data.projectId;
       const userId = request.user.userId;
 
       try {
-        const deletedProject = await deleteProject(projectId, userId);
+        const project = await getProjectById(projectId, userId);
 
-        if (!deletedProject) {
+        if (!project) {
           return reply.code(404).send({
             message: "Project not found",
           });
         }
+
+        const isManager = await isProjectManager(projectId, userId);
+
+        if (!isManager) {
+          return reply.code(403).send({
+            message: "You don't have permission to delete project",
+          });
+        }
+
+        await deleteProject(projectId);
 
         return reply.code(200).send({
           message: "Project deleted successfully",
