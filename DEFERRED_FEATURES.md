@@ -2,23 +2,6 @@
 
 The items below are intentionally deferred and are **not part of the current implementation**. They keep the present scope focused while making the next improvements easy to prioritize. Priorities describe the suggested order; mark items complete only after the relevant tests and manual checks pass.
 
-## Phase 2 — Project Authorization Migration (V1 completion)
-
-### P0 — Move authorization to membership roles
-
-- [ ] Inventory every project/task authorization check that currently relies on `Project.ownerId`.
-- [ ] Replace ownership checks with the requesting user's `ProjectMember` role for that project.
-- [ ] Define and enforce role rules consistently (for example, `MANAGER` manages project settings, members, and assignments; `MEMBER` has only permitted task access).
-- [ ] Ensure task read/create/edit/delete and project/member endpoints all use the same role-based authorization policy.
-- [ ] Add permission tests for manager, member, non-member, and unauthenticated requests.
-
-### P1 — Retire legacy ownership
-
-- [ ] Plan a migration/backfill for existing projects: create or verify a manager membership for each legacy `ownerId`.
-- [ ] Run and verify the backfill in a safe environment before production.
-- [ ] Remove application dependencies on `Project.ownerId`.
-- [ ] Remove `Project.ownerId` from the schema only after the migration, compatibility checks, and production verification are complete.
-
 ## Phase 3 — Authentication and Security
 
 ### P1 — Deferred V1 product/security features

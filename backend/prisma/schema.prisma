@@ -16,7 +16,6 @@ model User {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   sessions       Session[]
-  projects       Project[]
   projectMembers ProjectMember[]
 }
 
@@ -37,12 +36,8 @@ model Project {
   description    String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId        String          @db.Uuid
   tasks          Task[]
   projectMembers ProjectMember[]
-
-  @@index([ownerId])
 }
 
 model Task {

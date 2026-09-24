@@ -6,7 +6,6 @@ export async function createProject(userId: string, input: CreateProjectInput) {
     data: {
       name: input.name,
       description: input.description,
-      ownerId: userId,
       projectMembers: {
         create: {
           userId,
