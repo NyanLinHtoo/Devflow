@@ -1,6 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { loginSchema, registerSchema } from "./authSchema.js";
+import {
+  confirmPasswordResetSchema,
+  loginSchema,
+  registerSchema,
+  resetPasswordSchema,
+} from "./authSchema.js";
 import {
   createSession,
   deleteSessionById,
@@ -8,6 +13,8 @@ import {
   getUserById,
   loginUser,
   registerUser,
+  requestPasswordReset,
+  resetPassword,
   updateSessionRefreshToken,
 } from "./authService.js";
 import * as argon2 from "argon2";
@@ -39,78 +46,89 @@ export function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post("/login", async (request, reply) => {
-    const result = loginSchema.safeParse(request.body);
-    if (!result.success) {
-      return reply.code(400).send({
-        message: "Invalid request",
-        errors: z.treeifyError(result.error),
-      });
-    }
-
-    try {
-      const user = await loginUser(result.data);
-
-      const session = await createSession(user.id);
-
-      const refreshToken = await reply.refreshJwtSign(
-        {
-          userId: user.id,
-          sessionId: session.id,
+  app.post(
+    "/login",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 15 * 60 * 1000,
         },
-        {
-          sign: {
-            expiresIn: "7d",
-          },
-        },
-      );
-      const refreshTokenHash = await argon2.hash(refreshToken);
-
-      await updateSessionRefreshToken(session.id, refreshTokenHash);
-
-      const accessToken = await reply.jwtSign(
-        {
-          userId: user.id,
-          email: user.email,
-        },
-        {
-          sign: {
-            expiresIn: "15m",
-          },
-        },
-      );
-
-      reply.setCookie("access_token", accessToken, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        path: "/",
-        maxAge: 60 * 15,
-      });
-
-      reply.setCookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-      });
-
-      return reply.code(200).send(user);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === "Invalid email or password"
-      ) {
-        return reply.code(401).send({
-          message: "Invalid email or password",
+      },
+    },
+    async (request, reply) => {
+      const result = loginSchema.safeParse(request.body);
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
         });
       }
-      return reply.code(500).send({
-        message: "Internal server error",
-      });
-    }
-  });
+
+      try {
+        const user = await loginUser(result.data);
+
+        const session = await createSession(user.id);
+
+        const refreshToken = await reply.refreshJwtSign(
+          {
+            userId: user.id,
+            sessionId: session.id,
+          },
+          {
+            sign: {
+              expiresIn: "7d",
+            },
+          },
+        );
+        const refreshTokenHash = await argon2.hash(refreshToken);
+
+        await updateSessionRefreshToken(session.id, refreshTokenHash);
+
+        const accessToken = await reply.jwtSign(
+          {
+            userId: user.id,
+            email: user.email,
+          },
+          {
+            sign: {
+              expiresIn: "15m",
+            },
+          },
+        );
+
+        reply.setCookie("access_token", accessToken, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: false,
+          path: "/",
+          maxAge: 60 * 15,
+        });
+
+        reply.setCookie("refresh_token", refreshToken, {
+          httpOnly: true,
+          sameSite: "lax",
+          secure: false,
+          path: "/",
+          maxAge: 7 * 24 * 60 * 60,
+        });
+
+        return reply.code(200).send(user);
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Invalid email or password"
+        ) {
+          return reply.code(401).send({
+            message: "Invalid email or password",
+          });
+        }
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
 
   app.get("/me", async (request, reply) => {
     try {
@@ -246,4 +264,99 @@ export function authRoutes(app: FastifyInstance) {
       });
     }
   });
+
+  app.post(
+    "/forgot-password",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 15 * 60 * 1000,
+        },
+      },
+    },
+    async (request, reply) => {
+      const result = resetPasswordSchema.safeParse(request.body);
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
+        });
+      }
+
+      try {
+        const resetResult = await requestPasswordReset(result.data.email);
+
+        if (resetResult.status === "COOLDOWN") {
+          return reply.send({
+            message: "If the account exists, a reset email will be sent.",
+          });
+        }
+
+        if (resetResult.status === "CREATED") {
+          // TEMPORARY:
+          // We return the raw token only for development/testing.
+          return reply.send({
+            message: "If the account exists, a reset email will be sent.",
+            resetToken: resetResult.rawToken,
+            expiresAt: resetResult.expiresAt,
+          });
+        }
+
+        return reply.send({
+          message: "If the account exists, a reset email will be sent.",
+        });
+      } catch {
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/reset-password",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 15 * 60 * 1000,
+        },
+      },
+    },
+    async (request, reply) => {
+      const result = confirmPasswordResetSchema.safeParse(request.body);
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
+        });
+      }
+
+      try {
+        const confirmPasswordReset = await resetPassword(
+          result.data.token,
+          result.data.password,
+        );
+
+        if (
+          confirmPasswordReset.status === "INVALID" ||
+          confirmPasswordReset.status === "USED" ||
+          confirmPasswordReset.status === "EXPIRED"
+        ) {
+          return reply.status(400).send({
+            message: "A reset link is not valid",
+          });
+        }
+
+        return reply.status(200).send({
+          message: "Password successfully updated",
+        });
+      } catch {
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
 }

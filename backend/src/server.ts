@@ -6,6 +6,7 @@ import Fastify from "fastify";
 import { authRoutes } from "./modules/auth/authRoute.js";
 import { projectRoutes } from "./modules/project/projectRoute.js";
 import { taskRoutes } from "./modules/tasks/taskRoute.js";
+import fastifyRateLimit from "@fastify/rate-limit";
 import { projectMemberRoutes } from "./modules/projectMember/projectMemberRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
@@ -42,6 +43,12 @@ app.register(fastifyCors, {
   origin: "http://localhost:3000",
   credentials: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+});
+
+app.register(fastifyRateLimit, {
+  global: false,
+  max: 5,
+  timeWindow: 15 * 60 * 1000,
 });
 
 app.register(authRoutes, { prefix: "/auth" });
