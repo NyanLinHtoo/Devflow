@@ -6,8 +6,8 @@ The items below are intentionally deferred and are **not part of the current imp
 
 ### P1 — Deferred V1 product/security features
 
-- [ ] Forgot-password flow, including reset-token expiry and one-time use.
-- [ ] Email verification flow and verified-email policy.
+- [x] Forgot-password flow, including reset-token expiry and one-time use.
+- [x] Email verification flow and verified-email policy.
 - [ ] Terms page — add a dedicated page for the application terms and its acceptance/presentation flow.
 - [ ] Privacy page — add a dedicated page explaining privacy practices and its presentation flow.
 - [ ] Password visibility toggle on authentication forms.

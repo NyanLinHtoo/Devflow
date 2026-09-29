@@ -4,18 +4,23 @@ import {
   confirmPasswordResetSchema,
   loginSchema,
   registerSchema,
+  resendVerificationSchema,
   resetPasswordSchema,
+  verifyEmailSchema,
 } from "./authSchema.js";
 import {
   createSession,
   deleteSessionById,
   getSessionById,
+  getUserByEmail,
   getUserById,
   loginUser,
   registerUser,
+  requestEmailVerification,
   requestPasswordReset,
   resetPassword,
   updateSessionRefreshToken,
+  verifyEmail,
 } from "./authService.js";
 import * as argon2 from "argon2";
 import { RefreshTokenPayload } from "./authTypes.js";
@@ -32,7 +37,22 @@ export function authRoutes(app: FastifyInstance) {
 
     try {
       const user = await registerUser(result.data);
-      return reply.code(201).send(user);
+
+      const verification = await requestEmailVerification(user.id);
+
+      if (verification.status !== "CREATED") {
+        return reply.code(500).send({
+          message: "Failed to create email verification",
+        });
+      }
+
+      return reply.code(201).send({
+        user,
+        emailVerification: {
+          token: verification.rawToken,
+          expiresAt: verification.expiresAt,
+        },
+      });
     } catch (error) {
       if (error instanceof Error && error.message === "User already exists") {
         return reply.code(409).send({
@@ -121,6 +141,13 @@ export function authRoutes(app: FastifyInstance) {
         ) {
           return reply.code(401).send({
             message: "Invalid email or password",
+          });
+        } else if (
+          error instanceof Error &&
+          error.message === "EMAIL_NOT_VERIFIED"
+        ) {
+          return reply.code(403).send({
+            message: "Please verify your email before logging in.",
           });
         }
         return reply.code(500).send({
@@ -351,6 +378,107 @@ export function authRoutes(app: FastifyInstance) {
 
         return reply.status(200).send({
           message: "Password successfully updated",
+        });
+      } catch {
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
+
+  app.get(
+    "/verify-email",
+    {
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: 15 * 60 * 1000,
+        },
+      },
+    },
+    async (request, reply) => {
+      const result = verifyEmailSchema.safeParse(request.body);
+
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
+        });
+      }
+
+      try {
+        const verifyEmailResult = await verifyEmail(result.data.token);
+
+        if (verifyEmailResult.status === "NOT_FOUND") {
+          return reply.code(400).send({
+            message: "Invalid verification link",
+          });
+        }
+
+        if (verifyEmailResult.status === "USED") {
+          return reply.code(400).send({
+            message: "Verification link has already been used",
+          });
+        }
+
+        if (verifyEmailResult.status === "INVALID") {
+          return reply.code(400).send({
+            message: "Invalid or expired verification link",
+          });
+        }
+
+        return reply.code(200).send({
+          message: "Email verified successfully",
+        });
+      } catch {
+        return reply.code(500).send({
+          message: "Internal server error",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/resend-verification",
+    { config: { rateLimit: { max: 5, timeWindow: 15 * 60 * 1000 } } },
+    async (request, reply) => {
+      const result = resendVerificationSchema.safeParse(request.body);
+
+      if (!result.success) {
+        return reply.code(400).send({
+          message: "Invalid request",
+          errors: z.treeifyError(result.error),
+        });
+      }
+
+      try {
+        const existingUser = await getUserByEmail(result.data.email);
+        if (!existingUser) {
+          return reply.send({
+            message:
+              "If the account exists and needs verification, a verification email will be sent.",
+          });
+        }
+
+        const resendVerification = await requestEmailVerification(
+          existingUser.id,
+        );
+
+        if (resendVerification.status !== "CREATED") {
+          return reply.send({
+            message:
+              "If the account exists and needs verification, a verification email will be sent.",
+          });
+        }
+
+        return reply.code(200).send({
+          message:
+            "If the account exists and needs verification, a verification email will be sent.",
+          emailVerification: {
+            token: resendVerification.rawToken,
+            expiresAt: resendVerification.expiresAt,
+          },
         });
       } catch {
         return reply.code(500).send({

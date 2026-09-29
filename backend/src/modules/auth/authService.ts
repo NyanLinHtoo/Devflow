@@ -50,6 +50,10 @@ export async function loginUser(input: LoginInput) {
     throw new Error("Invalid email or password");
   }
 
+  if (user.emailVerifiedAt === null) {
+    throw new Error("EMAIL_NOT_VERIFIED");
+  }
+
   const safeUser = {
     id: user.id,
     fullName: user.fullName,
@@ -105,6 +109,15 @@ export async function getUserById(userId: string) {
   return user;
 }
 
+export async function getUserByEmail(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, fullName: true, email: true, createdAt: true },
+  });
+
+  return user;
+}
+
 export async function deleteSessionById(sessionId: string) {
   await prisma.session.deleteMany({
     where: {
@@ -113,7 +126,7 @@ export async function deleteSessionById(sessionId: string) {
   });
 }
 
-export function generatePasswordResetToken() {
+export function generateToken() {
   const rawToken = crypto.randomBytes(32).toString("hex");
   const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
@@ -153,7 +166,7 @@ export async function requestPasswordReset(email: string) {
     }
   }
 
-  const { rawToken, tokenHash } = generatePasswordResetToken();
+  const { rawToken, tokenHash } = generateToken();
 
   const expiresAt = new Date(now.getTime() + tokenLifetimeMs);
 
@@ -226,6 +239,107 @@ export async function resetPassword(token: string, password: string) {
 
   await prisma.session.deleteMany({
     where: { userId: existingResetToken.userId },
+  });
+
+  return {
+    status: "SUCCESS",
+  };
+}
+
+export async function requestEmailVerification(userId: string) {
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    return { status: "NOT_FOUND" };
+  }
+
+  if (existingUser.emailVerifiedAt !== null) {
+    return { status: "ALREADY_VERIFIED" };
+  }
+
+  const existingEmailVerification = await prisma.emailVerification.findUnique({
+    where: { userId },
+  });
+
+  const now = new Date();
+  const cooldownMs = 5 * 60 * 1000;
+
+  if (existingEmailVerification) {
+    const retryAt = new Date(
+      existingEmailVerification.lastRequestedAt.getTime() + cooldownMs,
+    );
+
+    if (now < retryAt) {
+      return {
+        status: "COOLDOWN",
+        retryAt,
+      };
+    }
+  }
+
+  const tokenLifetimeMs = 60 * 60 * 1000;
+  const expiresAt = new Date(now.getTime() + tokenLifetimeMs);
+  const { rawToken, tokenHash } = generateToken();
+
+  const emailVerification = await prisma.emailVerification.upsert({
+    where: { userId },
+    update: { tokenHash, expiresAt, lastRequestedAt: now, usedAt: null },
+    create: {
+      userId,
+      tokenHash,
+      expiresAt,
+      lastRequestedAt: now,
+      usedAt: null,
+    },
+  });
+  return {
+    status: "CREATED",
+    rawToken,
+    expiresAt: emailVerification.expiresAt,
+  };
+}
+
+export async function verifyEmail(token: string) {
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+  const now = new Date();
+
+  const emailVerification = await prisma.emailVerification.findUnique({
+    where: { tokenHash },
+  });
+
+  if (!emailVerification) {
+    return {
+      status: "NOT_FOUND",
+    };
+  }
+
+  if (emailVerification.usedAt !== null) {
+    return { status: "USED" };
+  }
+
+  if (emailVerification.expiresAt <= now) {
+    return {
+      status: "INVALID",
+    };
+  }
+
+  const claim = await prisma.emailVerification.updateMany({
+    where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+    data: { usedAt: now },
+  });
+
+  if (claim.count === 0) {
+    return { status: "INVALID" };
+  }
+
+  await prisma.user.update({
+    where: { id: emailVerification.userId },
+    data: {
+      emailVerifiedAt: now,
+    },
   });
 
   return {
