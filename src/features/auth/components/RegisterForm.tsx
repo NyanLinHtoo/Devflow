@@ -98,13 +98,13 @@ export default function RegisterForm() {
 					<Link
 						href="/terms"
 						className="font-medium text-gray-900 hover:underline">
-						Terms{" "}
+						Terms
 					</Link>
 					and{" "}
 					<Link
 						href="/privacy"
 						className="font-medium text-gray-900 hover:underline">
-						Privacy Policy{" "}
+						Privacy Policy
 					</Link>
 				</span>
 			</label>
