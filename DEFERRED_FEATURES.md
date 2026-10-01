@@ -10,8 +10,7 @@ The items below are intentionally deferred and are **not part of the current imp
 - [x] Email verification flow and verified-email policy.
 - [x] Terms page — add a dedicated page for the application terms and its acceptance/presentation flow.
 - [x] Privacy page — add a dedicated page explaining privacy practices and its presentation flow.
-- [ ] Password visibility toggle on authentication forms.
-- [ ] “Remember me” behavior with a clearly defined session lifetime.
+- [x] Password visibility toggle on authentication forms.
 - [ ] Review production cookie settings: `Secure`, `HttpOnly`, `SameSite`, domain, and expiration.
 - [ ] Implement and verify CSRF protections appropriate to the chosen cookie/auth architecture.
 

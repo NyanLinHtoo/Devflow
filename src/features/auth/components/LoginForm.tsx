@@ -58,16 +58,7 @@ export default function LoginForm() {
 				/>
 			</FormField>
 
-			<div className="flex items-center justify-between">
-				<label className="flex items-center gap-2 text-sm text-gray-600">
-					<input
-						type="checkbox"
-						name="remember"
-						className="size-4 rounded border-gray-300"
-					/>
-					Remember me
-				</label>
-
+			<div className="flex justify-end">
 				<Link
 					href="/forgot-password"
 					className="text-sm font-medium text-gray-900 hover:underline">
