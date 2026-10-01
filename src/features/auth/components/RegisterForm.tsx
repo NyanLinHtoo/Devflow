@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
 import { useRegister } from "@/hooks/useAuth";
+import { PasswordInput } from "@/components/ui/input/passwordInput";
 
 export default function RegisterForm() {
 	const {
@@ -65,9 +66,8 @@ export default function RegisterForm() {
 				label="Password"
 				htmlFor="password"
 				error={errors.password?.message}>
-				<Input
+				<PasswordInput
 					id="password"
-					type="password"
 					placeholder="Enter your password"
 					autoComplete="new-password"
 					{...register("password")}
@@ -78,9 +78,8 @@ export default function RegisterForm() {
 				label="Confirm password"
 				htmlFor="confirmPassword"
 				error={errors.confirmPassword?.message}>
-				<Input
+				<PasswordInput
 					id="confirmPassword"
-					type="password"
 					placeholder="Confirm your password"
 					autoComplete="new-password"
 					{...register("confirmPassword")}

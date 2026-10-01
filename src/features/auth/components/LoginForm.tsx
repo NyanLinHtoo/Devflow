@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "../schemas/loginSchema";
 import { useLogin } from "@/hooks/useAuth";
+import { PasswordInput } from "@/components/ui/input/passwordInput";
 
 export default function LoginForm() {
 	const {
@@ -49,9 +50,8 @@ export default function LoginForm() {
 				label="Password"
 				htmlFor="password"
 				error={errors.password?.message}>
-				<Input
+				<PasswordInput
 					id="password"
-					type="password"
 					placeholder="Enter your password"
 					autoComplete="current-password"
 					{...register("password")}

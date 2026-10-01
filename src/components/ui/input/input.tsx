@@ -2,9 +2,10 @@ import type { InputHTMLAttributes } from "react";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
-export function Input({ className = "", ...props }: InputProps) {
+export function Input({ className = "", disabled, ...props }: InputProps) {
 	return (
 		<input
+			disabled={disabled}
 			className={[
 				"h-10 w-full rounded-md border border-gray-300 text-black bg-white px-3 text-sm",
 				"outline-none transition-colors",
