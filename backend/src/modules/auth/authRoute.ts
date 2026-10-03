@@ -97,7 +97,7 @@ export function authRoutes(app: FastifyInstance) {
           },
           {
             sign: {
-              expiresIn: "7d",
+              expiresIn: "30d",
             },
           },
         );
@@ -120,7 +120,7 @@ export function authRoutes(app: FastifyInstance) {
         reply.setCookie("access_token", accessToken, {
           httpOnly: true,
           sameSite: "lax",
-          secure: false,
+          secure: process.env.NODE_ENV === "production",
           path: "/",
           maxAge: 60 * 15,
         });
@@ -128,9 +128,9 @@ export function authRoutes(app: FastifyInstance) {
         reply.setCookie("refresh_token", refreshToken, {
           httpOnly: true,
           sameSite: "lax",
-          secure: false,
+          secure: process.env.NODE_ENV === "production",
           path: "/",
-          maxAge: 7 * 24 * 60 * 60,
+          maxAge: 30 * 24 * 60 * 60,
         });
 
         return reply.code(200).send(user);
@@ -277,7 +277,7 @@ export function authRoutes(app: FastifyInstance) {
       reply.setCookie("access_token", accessToken, {
         httpOnly: true,
         sameSite: "lax",
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
         path: "/",
         maxAge: 60 * 15,
       });

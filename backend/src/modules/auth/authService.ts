@@ -64,9 +64,9 @@ export async function loginUser(input: LoginInput) {
 }
 
 export async function createSession(userId: string) {
-  const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+  const sessionLifetimeMs = 30 * 24 * 60 * 60 * 1000;
 
-  const expiresAt = new Date(Date.now() + sevenDaysInMs);
+  const expiresAt = new Date(Date.now() + sessionLifetimeMs);
 
   const session = await prisma.session.create({
     data: {
