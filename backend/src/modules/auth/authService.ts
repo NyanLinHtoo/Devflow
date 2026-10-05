@@ -3,6 +3,17 @@ import { LoginInput, RegisterInput } from "./authTypes.js";
 import * as argon2 from "argon2";
 import crypto from "crypto";
 
+type RequestPasswordResetResult =
+  | { status: "NOT_FOUND" }
+  | { status: "COOLDOWN"; retryAt: Date }
+  | { status: "CREATED"; rawToken: string; expiresAt: Date };
+
+type RequestEmailVerificationResult =
+  | { status: "NOT_FOUND" }
+  | { status: "ALREADY_VERIFIED" }
+  | { status: "COOLDOWN"; retryAt: Date }
+  | { status: "CREATED"; rawToken: string; expiresAt: Date };
+
 export async function registerUser(input: RegisterInput) {
   const existingUser = await prisma.user.findUnique({
     where: { email: input.email },
@@ -133,7 +144,9 @@ export function generateToken() {
   return { rawToken, tokenHash };
 }
 
-export async function requestPasswordReset(email: string) {
+export async function requestPasswordReset(
+  email: string,
+): Promise<RequestPasswordResetResult> {
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -223,30 +236,32 @@ export async function resetPassword(token: string, password: string) {
 
   const passwordHash = await argon2.hash(password);
 
-  const claim = await prisma.passwordResetToken.updateMany({
-    where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
-    data: { usedAt: now },
+  return prisma.$transaction(async (tx) => {
+    const claim = await tx.passwordResetToken.updateMany({
+      where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+
+    if (claim.count === 0) {
+      return { status: "INVALID" as const };
+    }
+
+    await tx.user.update({
+      where: { id: existingResetToken.userId },
+      data: { passwordHash },
+    });
+
+    await tx.session.deleteMany({
+      where: { userId: existingResetToken.userId },
+    });
+
+    return { status: "SUCCESS" as const };
   });
-
-  if (claim.count === 0) {
-    return { status: "INVALID" };
-  }
-
-  await prisma.user.update({
-    where: { id: existingResetToken.userId },
-    data: { passwordHash },
-  });
-
-  await prisma.session.deleteMany({
-    where: { userId: existingResetToken.userId },
-  });
-
-  return {
-    status: "SUCCESS",
-  };
 }
 
-export async function requestEmailVerification(userId: string) {
+export async function requestEmailVerification(
+  userId: string,
+): Promise<RequestEmailVerificationResult> {
   const existingUser = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -326,23 +341,23 @@ export async function verifyEmail(token: string) {
     };
   }
 
-  const claim = await prisma.emailVerification.updateMany({
-    where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
-    data: { usedAt: now },
+  return prisma.$transaction(async (tx) => {
+    const claim = await tx.emailVerification.updateMany({
+      where: { tokenHash, usedAt: null, expiresAt: { gt: now } },
+      data: { usedAt: now },
+    });
+
+    if (claim.count === 0) {
+      return { status: "INVALID" as const };
+    }
+
+    await tx.user.update({
+      where: { id: emailVerification.userId },
+      data: {
+        emailVerifiedAt: now,
+      },
+    });
+
+    return { status: "SUCCESS" as const };
   });
-
-  if (claim.count === 0) {
-    return { status: "INVALID" };
-  }
-
-  await prisma.user.update({
-    where: { id: emailVerification.userId },
-    data: {
-      emailVerifiedAt: now,
-    },
-  });
-
-  return {
-    status: "SUCCESS",
-  };
 }
