@@ -24,6 +24,13 @@ import {
 } from "./authService.js";
 import * as argon2 from "argon2";
 import { RefreshTokenPayload } from "./authTypes.js";
+import { Prisma } from "../../generated/prisma/client.js";
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../email/emailService.js";
+
+const exposeAuthTokens = process.env.NODE_ENV !== "production";
 
 export function authRoutes(app: FastifyInstance) {
   app.post("/register", async (request, reply) => {
@@ -46,18 +53,41 @@ export function authRoutes(app: FastifyInstance) {
         });
       }
 
+      const emailResult = await sendVerificationEmail(
+        user.email,
+        verification.rawToken,
+      );
+
+      if (emailResult.status !== "SENT") {
+        request.log.warn(
+          { status: emailResult.status },
+          "Verification email was not sent",
+        );
+      }
+
       return reply.code(201).send({
         user,
-        emailVerification: {
-          token: verification.rawToken,
-          expiresAt: verification.expiresAt,
-        },
+        ...(exposeAuthTokens
+          ? {
+              emailVerification: {
+                token: verification.rawToken,
+                expiresAt: verification.expiresAt,
+              },
+            }
+          : {}),
       });
     } catch (error) {
       if (error instanceof Error && error.message === "User already exists") {
         return reply.code(409).send({
           message: "User already exists",
         });
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        return reply.code(409).send({ message: "User already exists" });
       }
 
       return reply.code(500).send({
@@ -321,12 +351,26 @@ export function authRoutes(app: FastifyInstance) {
         }
 
         if (resetResult.status === "CREATED") {
-          // TEMPORARY:
-          // We return the raw token only for development/testing.
+          const emailResult = await sendPasswordResetEmail(
+            result.data.email,
+            resetResult.rawToken,
+          );
+
+          if (emailResult.status !== "SENT") {
+            request.log.warn(
+              { status: emailResult.status },
+              "Password reset email was not sent",
+            );
+          }
+
           return reply.send({
             message: "If the account exists, a reset email will be sent.",
-            resetToken: resetResult.rawToken,
-            expiresAt: resetResult.expiresAt,
+            ...(exposeAuthTokens
+              ? {
+                  resetToken: resetResult.rawToken,
+                  expiresAt: resetResult.expiresAt,
+                }
+              : {}),
           });
         }
 
@@ -398,7 +442,7 @@ export function authRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const result = verifyEmailSchema.safeParse(request.body);
+      const result = verifyEmailSchema.safeParse(request.query);
 
       if (!result.success) {
         return reply.code(400).send({
@@ -472,13 +516,29 @@ export function authRoutes(app: FastifyInstance) {
           });
         }
 
+        const emailResult = await sendVerificationEmail(
+          existingUser.email,
+          resendVerification.rawToken,
+        );
+
+        if (emailResult.status !== "SENT") {
+          request.log.warn(
+            { status: emailResult.status },
+            "Verification email was not sent",
+          );
+        }
+
         return reply.code(200).send({
           message:
             "If the account exists and needs verification, a verification email will be sent.",
-          emailVerification: {
-            token: resendVerification.rawToken,
-            expiresAt: resendVerification.expiresAt,
-          },
+          ...(exposeAuthTokens
+            ? {
+                emailVerification: {
+                  token: resendVerification.rawToken,
+                  expiresAt: resendVerification.expiresAt,
+                },
+              }
+            : {}),
         });
       } catch {
         return reply.code(500).send({

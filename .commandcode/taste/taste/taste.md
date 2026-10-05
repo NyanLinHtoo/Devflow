@@ -1,0 +1,12 @@
+# Taste
+- Wants code reviews from a strict senior-developer perspective: identify problems and tell them concretely how to improve, not just pass/fail. Confidence: 0.6
+- Wants review findings delivered as an itemized, prioritized list (critical → high → medium → low) so they can work through it top-down. Confidence: 0.7
+- Prefers to fix issues incrementally, one item at a time, rather than a big-bang refactor. Confidence: 0.7
+- Review-only first: hold off on changing code until explicitly asked to implement. Confidence: 0.7
+- Scopes review requests to one area at a time (e.g. "only in backend") rather than the whole stack. Confidence: 0.6
+- Usually writes the code themselves and asks the assistant to review their diffs as they go, but will hand implementation off to the assistant when they explicitly ask it to (e.g. "implement X for me"). Confidence: 0.55
+- After the assistant implements changes, wants a clear walkthrough of what was changed and why ("explain me back how you did"), not just the resulting diff. Confidence: 0.6
+- Wants the trade-offs and consequences spelled out for alternative approaches — including what breaks if a recommended step is skipped — instead of a single prescriptive answer. Confidence: 0.5
+- Communicates in short, terse directives (e.g. "Let's move for Resend") that greenlight the assistant's proposed next step, expecting the assistant to plan and execute the details without further back-and-forth. Confidence: 0.6
+- Prefers Conventional Commits format and asks the assistant to draft the commit message(s) for the changes. Confidence: 0.5
+- Commits fixes incrementally as they land, deferring manual testing until a later batch of work is finished rather than verifying each change immediately. Confidence: 0.5
