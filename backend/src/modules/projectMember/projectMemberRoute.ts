@@ -186,10 +186,10 @@ export function projectMemberRoutes(app: FastifyInstance) {
           return reply.code(404).send({ message: "Project member not found" });
         }
 
-        if (updatedProjectMemberRole.status === "FORBIDDEN") {
-          return reply
-            .code(403)
-            .send({ message: "You don't have permission to update" });
+        if (updatedProjectMemberRole.status === "LAST_MANAGER") {
+          return reply.code(403).send({
+            message: "A project must keep at least one manager",
+          });
         }
 
         return reply.code(200).send(updatedProjectMemberRole.member);
@@ -242,9 +242,9 @@ export function projectMemberRoutes(app: FastifyInstance) {
           return reply.code(404).send({ message: "Project member not found" });
         }
 
-        if (deletedProjectMember.status === "FORBIDDEN") {
+        if (deletedProjectMember.status === "LAST_MANAGER") {
           return reply.code(403).send({
-            message: "You don't have permission to remove member",
+            message: "A project must keep at least one manager",
           });
         }
 

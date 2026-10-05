@@ -5,6 +5,7 @@ import { getProjectById } from "../project/projectService.js";
 import {
   createTaskSchema,
   taskParamsSchema,
+  taskProjectParamsSchema,
   updateTaskSchema,
 } from "./taskSchema.js";
 import {
@@ -31,7 +32,16 @@ export function taskRoutes(app: FastifyInstance) {
       }
 
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
+
+      const paramsResult = taskProjectParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
+      const projectId = paramsResult.data.projectId;
 
       const result = createTaskSchema.safeParse(request.body);
       if (!result.success) {
@@ -82,7 +92,16 @@ export function taskRoutes(app: FastifyInstance) {
       }
 
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
+
+      const paramsResult = taskProjectParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
+      const projectId = paramsResult.data.projectId;
 
       try {
         const existingProject = await getProjectById(projectId, userId);
@@ -115,9 +134,17 @@ export function taskRoutes(app: FastifyInstance) {
         });
       }
 
+      const paramsResult = taskParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID or task ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
-      const taskId = request.params.taskId;
+      const projectId = paramsResult.data.projectId;
+      const taskId = paramsResult.data.taskId;
 
       try {
         const existingProject = await getProjectById(projectId, userId);
@@ -152,9 +179,17 @@ export function taskRoutes(app: FastifyInstance) {
         });
       }
 
+      const paramsResult = taskParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID or task ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
-      const taskId = request.params.taskId;
+      const projectId = paramsResult.data.projectId;
+      const taskId = paramsResult.data.taskId;
 
       const result = updateTaskSchema.safeParse(request.body);
       if (!result.success) {
@@ -206,9 +241,17 @@ export function taskRoutes(app: FastifyInstance) {
         });
       }
 
+      const paramsResult = taskParamsSchema.safeParse(request.params);
+      if (!paramsResult.success) {
+        return reply.code(400).send({
+          message: "Invalid project ID or task ID",
+          errors: z.treeifyError(paramsResult.error),
+        });
+      }
+
       const userId = request.user.userId;
-      const projectId = request.params.projectId;
-      const taskId = request.params.taskId;
+      const projectId = paramsResult.data.projectId;
+      const taskId = paramsResult.data.taskId;
 
       try {
         const project = await getProjectById(projectId, userId);
@@ -216,13 +259,6 @@ export function taskRoutes(app: FastifyInstance) {
         if (!project) {
           return reply.code(404).send({
             message: "Project not found",
-          });
-        }
-
-        const isManager = await isProjectManager(projectId, userId);
-        if (!isManager) {
-          return reply.code(403).send({
-            message: "You don't have permission to delete",
           });
         }
 

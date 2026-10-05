@@ -8,6 +8,10 @@ export const taskParamsSchema = z.object({
   taskId: z.uuid(),
 });
 
+export const taskProjectParamsSchema = z.object({
+  projectId: z.uuid(),
+});
+
 export const createTaskSchema = z.object({
   title: z
     .string()
