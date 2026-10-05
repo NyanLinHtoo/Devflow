@@ -51,8 +51,14 @@ export async function updateProjectMemberRole(
 
   if (!member) return { status: "NOT_FOUND" };
 
-  if (member.role === "MANAGER") {
-    return { status: "FORBIDDEN" };
+  if (member.role === "MANAGER" && role !== "MANAGER") {
+    const managerCount = await prisma.projectMember.count({
+      where: { projectId, role: "MANAGER" },
+    });
+
+    if (managerCount <= 1) {
+      return { status: "LAST_MANAGER" };
+    }
   }
 
   const updatedMember = await prisma.projectMember.update({
@@ -78,7 +84,13 @@ export async function deleteProjectMember(projectId: string, memberId: string) {
   if (!member) return { status: "NOT_FOUND" };
 
   if (member.role === "MANAGER") {
-    return { status: "FORBIDDEN" };
+    const managerCount = await prisma.projectMember.count({
+      where: { projectId, role: "MANAGER" },
+    });
+
+    if (managerCount <= 1) {
+      return { status: "LAST_MANAGER" };
+    }
   }
 
   const deletedMember = await prisma.projectMember.delete({

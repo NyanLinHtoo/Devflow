@@ -43,20 +43,9 @@ export function authRoutes(app: FastifyInstance) {
     }
 
     try {
-      const user = await registerUser(result.data);
+      const { user, rawToken, expiresAt } = await registerUser(result.data);
 
-      const verification = await requestEmailVerification(user.id);
-
-      if (verification.status !== "CREATED") {
-        return reply.code(500).send({
-          message: "Failed to create email verification",
-        });
-      }
-
-      const emailResult = await sendVerificationEmail(
-        user.email,
-        verification.rawToken,
-      );
+      const emailResult = await sendVerificationEmail(user.email, rawToken);
 
       if (emailResult.status !== "SENT") {
         request.log.warn(
@@ -70,8 +59,8 @@ export function authRoutes(app: FastifyInstance) {
         ...(exposeAuthTokens
           ? {
               emailVerification: {
-                token: verification.rawToken,
-                expiresAt: verification.expiresAt,
+                token: rawToken,
+                expiresAt,
               },
             }
           : {}),

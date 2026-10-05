@@ -27,7 +27,8 @@ export const updateProjectSchema = z
     description: z
       .string()
       .max(500, "Description must be at most 500 characters")
-      .optional(),
+      .optional()
+      .nullable(),
   })
   .refine((data) => data.name !== undefined || data.description !== undefined, {
     message: "At least one field must be provided",

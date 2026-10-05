@@ -12,7 +12,7 @@ export const projectParamsSchema = z.object({
 });
 
 export const addProjectMemberSchema = z.object({
-  email: z.email(),
+  email: z.email().transform((value) => value.trim().toLowerCase()),
   role: z.enum(roles),
 });
 
