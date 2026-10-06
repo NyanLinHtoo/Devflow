@@ -30,7 +30,13 @@ if (!frontendOriginValue) {
 const frontendOrigin = new URL(frontendOriginValue).origin;
 
 const app = Fastify({
-  logger: true,
+  logger: {
+    redact: [
+      "req.headers.cookie",
+      "req.headers.authorization",
+      "res.headers['set-cookie']",
+    ],
+  },
   trustProxy: process.env.TRUST_PROXY === "true",
 });
 
