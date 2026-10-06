@@ -1,4 +1,5 @@
 import prisma from "../../lib/prisma.js";
+import { toProjectMemberResponse } from "./projectMemberMapper.js";
 import type {
   AddProjectMemberInput,
   UpdateProjectMemberRoleInput,
@@ -9,13 +10,23 @@ export async function addProjectMember(
   userId: string,
   role: AddProjectMemberInput["role"],
 ) {
-  return prisma.projectMember.create({
+  const member = await prisma.projectMember.create({
     data: {
       projectId,
       userId,
       role,
     },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+        },
+      },
+    },
   });
+
+  return toProjectMemberResponse(member);
 }
 
 export async function getProjectMembers(projectId: string) {
@@ -30,14 +41,8 @@ export async function getProjectMembers(projectId: string) {
       },
     },
   });
-  const members = projectMembers.map((member) => ({
-    id: member.id,
-    userId: member.userId,
-    fullName: member.user.fullName,
-    email: member.user.email,
-    role: member.role,
-  }));
-  return members;
+
+  return projectMembers.map(toProjectMemberResponse);
 }
 
 export async function updateProjectMemberRole(
@@ -49,7 +54,7 @@ export async function updateProjectMemberRole(
     where: { projectId, id: memberId },
   });
 
-  if (!member) return { status: "NOT_FOUND" };
+  if (!member) return { status: "NOT_FOUND" as const };
 
   if (member.role === "MANAGER" && role !== "MANAGER") {
     const managerCount = await prisma.projectMember.count({
@@ -57,7 +62,7 @@ export async function updateProjectMemberRole(
     });
 
     if (managerCount <= 1) {
-      return { status: "LAST_MANAGER" };
+      return { status: "LAST_MANAGER" as const };
     }
   }
 
@@ -68,11 +73,19 @@ export async function updateProjectMemberRole(
     data: {
       role,
     },
+    include: {
+      user: {
+        select: {
+          fullName: true,
+          email: true,
+        },
+      },
+    },
   });
 
   return {
-    status: "UPDATED",
-    member: updatedMember,
+    status: "UPDATED" as const,
+    member: toProjectMemberResponse(updatedMember),
   };
 }
 
@@ -81,7 +94,7 @@ export async function deleteProjectMember(projectId: string, memberId: string) {
     where: { projectId, id: memberId },
   });
 
-  if (!member) return { status: "NOT_FOUND" };
+  if (!member) return { status: "NOT_FOUND" as const };
 
   if (member.role === "MANAGER") {
     const managerCount = await prisma.projectMember.count({
@@ -89,18 +102,15 @@ export async function deleteProjectMember(projectId: string, memberId: string) {
     });
 
     if (managerCount <= 1) {
-      return { status: "LAST_MANAGER" };
+      return { status: "LAST_MANAGER" as const };
     }
   }
 
-  const deletedMember = await prisma.projectMember.delete({
+  await prisma.projectMember.delete({
     where: { id: memberId },
   });
 
-  return {
-    status: "DELETED",
-    member: deletedMember,
-  };
+  return { status: "DELETED" as const };
 }
 
 export async function getProjectMember(projectId: string, userId: string) {

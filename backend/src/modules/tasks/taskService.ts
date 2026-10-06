@@ -139,7 +139,7 @@ export async function updateTaskAssignee(
   const existingTask = await getTaskByIdAndProjectId(projectId, taskId);
 
   if (!existingTask) {
-    return { status: "TASK_NOT_FOUND" };
+    return { status: "TASK_NOT_FOUND" as const };
   }
 
   if (assignedMemberId !== null) {
@@ -149,29 +149,8 @@ export async function updateTaskAssignee(
     );
 
     if (!projectMember) {
-      return { status: "MEMBER_NOT_FOUND" };
+      return { status: "MEMBER_NOT_FOUND" as const };
     }
-
-    const updatedTask = await prisma.task.update({
-      where: {
-        id: taskId,
-      },
-      data: {
-        assignedMemberId,
-      },
-      include: {
-        assignedMember: {
-          include: {
-            user: { select: { fullName: true, email: true } },
-          },
-        },
-      },
-    });
-
-    return {
-      status: "ASSIGNED",
-      task: toTaskResponse(updatedTask),
-    };
   }
 
   const updatedTask = await prisma.task.update({
@@ -179,7 +158,7 @@ export async function updateTaskAssignee(
       id: taskId,
     },
     data: {
-      assignedMemberId: null,
+      assignedMemberId,
     },
     include: {
       assignedMember: {
@@ -191,7 +170,7 @@ export async function updateTaskAssignee(
   });
 
   return {
-    status: "UNASSIGNED",
+    status: assignedMemberId ? "ASSIGNED" : "UNASSIGNED",
     task: toTaskResponse(updatedTask),
   };
 }

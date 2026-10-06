@@ -1,4 +1,5 @@
 import prisma from "../../lib/prisma.js";
+import { toProjectResponse } from "./projectMapper.js";
 import type { CreateProjectInput, UpdateProjectInput } from "./projectTypes.js";
 
 export async function createProject(userId: string, input: CreateProjectInput) {
@@ -14,7 +15,7 @@ export async function createProject(userId: string, input: CreateProjectInput) {
       },
     },
   });
-  return newProject;
+  return toProjectResponse(newProject);
 }
 
 export async function getProjectsByMemberId(userId: string) {
@@ -25,7 +26,7 @@ export async function getProjectsByMemberId(userId: string) {
     },
   });
 
-  return projects;
+  return projects.map(toProjectResponse);
 }
 
 export async function getProjectById(projectId: string, userId: string) {
@@ -33,14 +34,14 @@ export async function getProjectById(projectId: string, userId: string) {
     where: { id: projectId, projectMembers: { some: { userId } } },
   });
 
-  return project;
+  return project ? toProjectResponse(project) : null;
 }
 
 export async function updateProject(
   projectId: string,
   input: UpdateProjectInput,
 ) {
-  return prisma.project.update({
+  const project = await prisma.project.update({
     where: {
       id: projectId,
     },
@@ -49,6 +50,8 @@ export async function updateProject(
       description: input.description,
     },
   });
+
+  return toProjectResponse(project);
 }
 
 export async function deleteProject(projectId: string) {
