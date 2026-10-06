@@ -58,6 +58,7 @@ model Session {
   userId           String   @db.Uuid
 
   @@index([userId])
+  @@index([expiresAt])
 }
 
 model Project {

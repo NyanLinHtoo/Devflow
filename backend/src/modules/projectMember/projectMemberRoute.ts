@@ -1,11 +1,11 @@
 import type { FastifyInstance } from "fastify";
-import { z } from "zod";
 import { Prisma } from "../../generated/prisma/client.js";
 import prisma from "../../lib/prisma.js";
+import { validate } from "../../lib/validation.js";
+import { projectParamsSchema } from "../project/projectSchema.js";
 import {
   addProjectMemberSchema,
   projectMemberParamsSchema,
-  projectParamsSchema,
   updateProjectMemberRoleSchema,
 } from "./projectMemberSchema.js";
 import {
@@ -21,59 +21,35 @@ export function projectMemberRoutes(app: FastifyInstance) {
   app.post<{ Params: { projectId: string } }>(
     "/:projectId/members",
     async (request, reply) => {
-      try {
-        await request.jwtVerify();
-      } catch {
-        return reply.code(401).send({
-          message: "Unauthorized",
-        });
-      }
-
-      const paramsResult = projectParamsSchema.safeParse(request.params);
-
-      if (!paramsResult.success) {
-        return reply.code(400).send({
-          message: "Invalid project ID",
-          errors: z.treeifyError(paramsResult.error),
-        });
-      }
-
       const userId = request.user.userId;
-      const projectId = paramsResult.data.projectId;
+      const { projectId } = validate(projectParamsSchema, request.params);
+      const input = validate(addProjectMemberSchema, request.body);
 
-      const result = addProjectMemberSchema.safeParse(request.body);
+      const isManager = await isProjectManager(projectId, userId);
 
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
+      if (!isManager) {
+        return reply
+          .code(403)
+          .send({ message: "You don't have permission add members" });
+      }
+
+      const targetUser = await prisma.user.findUnique({
+        where: {
+          email: input.email,
+        },
+      });
+
+      if (!targetUser) {
+        return reply.code(404).send({
+          message: "User not found",
         });
       }
 
       try {
-        const isManager = await isProjectManager(projectId, userId);
-        if (!isManager) {
-          return reply
-            .code(403)
-            .send({ message: "You don't have permission add members" });
-        }
-
-        const targetUser = await prisma.user.findUnique({
-          where: {
-            email: result.data.email,
-          },
-        });
-
-        if (!targetUser) {
-          return reply.code(404).send({
-            message: "User not found",
-          });
-        }
-
         const projectMember = await addProjectMember(
           projectId,
           targetUser.id,
-          result.data.role,
+          input.role,
         );
 
         return reply.code(201).send(projectMember);
@@ -87,9 +63,7 @@ export function projectMemberRoutes(app: FastifyInstance) {
           });
         }
 
-        return reply.code(500).send({
-          message: "Internal server error",
-        });
+        throw error;
       }
     },
   );
@@ -97,163 +71,96 @@ export function projectMemberRoutes(app: FastifyInstance) {
   app.get<{ Params: { projectId: string } }>(
     "/:projectId/members",
     async (request, reply) => {
-      try {
-        await request.jwtVerify();
-      } catch {
-        return reply.code(401).send({
-          message: "Unauthorized",
-        });
-      }
-
-      const paramsResult = projectParamsSchema.safeParse(request.params);
-
-      if (!paramsResult.success) {
-        return reply.code(400).send({
-          message: "Invalid project ID",
-          errors: z.treeifyError(paramsResult.error),
-        });
-      }
-
       const userId = request.user.userId;
-      const projectId = paramsResult.data.projectId;
+      const { projectId } = validate(projectParamsSchema, request.params);
 
-      try {
-        const projectMember = await getProjectMember(projectId, userId);
-        if (!projectMember) {
-          return reply
-            .code(403)
-            .send({ message: "You are not a member of this project" });
-        }
+      const projectMember = await getProjectMember(projectId, userId);
 
-        const projectMembers = await getProjectMembers(projectId);
-
-        return reply.code(200).send(projectMembers);
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
-        });
+      if (!projectMember) {
+        return reply
+          .code(403)
+          .send({ message: "You are not a member of this project" });
       }
+
+      const projectMembers = await getProjectMembers(projectId);
+
+      return reply.code(200).send(projectMembers);
     },
   );
 
   app.patch<{ Params: { projectId: string; memberId: string } }>(
     "/:projectId/members/:memberId",
     async (request, reply) => {
-      try {
-        await request.jwtVerify();
-      } catch {
-        return reply.code(401).send({
-          message: "Unauthorized",
-        });
-      }
-      const paramsResult = projectMemberParamsSchema.safeParse(request.params);
-
-      if (!paramsResult.success) {
-        return reply.code(400).send({
-          message: "Invalid project ID or member ID",
-          errors: z.treeifyError(paramsResult.error),
-        });
-      }
-
       const userId = request.user.userId;
-      const projectId = paramsResult.data.projectId;
-      const memberId = paramsResult.data.memberId;
+      const { projectId, memberId } = validate(
+        projectMemberParamsSchema,
+        request.params,
+      );
+      const input = validate(updateProjectMemberRoleSchema, request.body);
 
-      const result = updateProjectMemberRoleSchema.safeParse(request.body);
+      const isManager = await isProjectManager(projectId, userId);
 
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
+      if (!isManager) {
+        return reply
+          .code(403)
+          .send({ message: "You don't have permission to update" });
+      }
+
+      const updatedProjectMemberRole = await updateProjectMemberRole(
+        projectId,
+        memberId,
+        input.role,
+      );
+
+      if (updatedProjectMemberRole.status === "NOT_FOUND") {
+        return reply.code(404).send({ message: "Project member not found" });
+      }
+
+      if (updatedProjectMemberRole.status === "LAST_MANAGER") {
+        return reply.code(403).send({
+          message: "A project must keep at least one manager",
         });
       }
 
-      try {
-        const isManager = await isProjectManager(projectId, userId);
-        if (!isManager) {
-          return reply
-            .code(403)
-            .send({ message: "You don't have permission to update" });
-        }
-
-        const updatedProjectMemberRole = await updateProjectMemberRole(
-          projectId,
-          memberId,
-          result.data.role,
-        );
-
-        if (updatedProjectMemberRole.status === "NOT_FOUND") {
-          return reply.code(404).send({ message: "Project member not found" });
-        }
-
-        if (updatedProjectMemberRole.status === "LAST_MANAGER") {
-          return reply.code(403).send({
-            message: "A project must keep at least one manager",
-          });
-        }
-
-        return reply.code(200).send(updatedProjectMemberRole.member);
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
-        });
-      }
+      return reply.code(200).send(updatedProjectMemberRole.member);
     },
   );
 
   app.delete<{ Params: { projectId: string; memberId: string } }>(
     "/:projectId/members/:memberId",
     async (request, reply) => {
-      try {
-        await request.jwtVerify();
-      } catch {
-        return reply.code(401).send({
-          message: "Unauthorized",
-        });
-      }
-
-      const paramsResult = projectMemberParamsSchema.safeParse(request.params);
-
-      if (!paramsResult.success) {
-        return reply.code(400).send({
-          message: "Invalid project ID or member ID",
-          errors: z.treeifyError(paramsResult.error),
-        });
-      }
-
       const userId = request.user.userId;
-      const projectId = paramsResult.data.projectId;
-      const memberId = paramsResult.data.memberId;
+      const { projectId, memberId } = validate(
+        projectMemberParamsSchema,
+        request.params,
+      );
 
-      try {
-        const isManager = await isProjectManager(projectId, userId);
-        if (!isManager) {
-          return reply
-            .code(403)
-            .send({ message: "You don't have permission to remove members" });
-        }
+      const isManager = await isProjectManager(projectId, userId);
 
-        const deletedProjectMember = await deleteProjectMember(
-          projectId,
-          memberId,
-        );
-
-        if (deletedProjectMember.status === "NOT_FOUND") {
-          return reply.code(404).send({ message: "Project member not found" });
-        }
-
-        if (deletedProjectMember.status === "LAST_MANAGER") {
-          return reply.code(403).send({
-            message: "A project must keep at least one manager",
-          });
-        }
-
+      if (!isManager) {
         return reply
-          .code(200)
-          .send({ message: "Project member removed successfully" });
-      } catch {
-        return reply.code(500).send({ message: "Internal server error" });
+          .code(403)
+          .send({ message: "You don't have permission to remove members" });
       }
+
+      const deletedProjectMember = await deleteProjectMember(
+        projectId,
+        memberId,
+      );
+
+      if (deletedProjectMember.status === "NOT_FOUND") {
+        return reply.code(404).send({ message: "Project member not found" });
+      }
+
+      if (deletedProjectMember.status === "LAST_MANAGER") {
+        return reply.code(403).send({
+          message: "A project must keep at least one manager",
+        });
+      }
+
+      return reply
+        .code(200)
+        .send({ message: "Project member removed successfully" });
     },
   );
 }

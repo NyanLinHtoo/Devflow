@@ -1,7 +1,9 @@
-import prisma from "../../lib/prisma.js";
-import { LoginInput, RegisterInput } from "./authTypes.js";
 import * as argon2 from "argon2";
 import crypto from "crypto";
+import { Prisma } from "../../generated/prisma/client.js";
+import { appError } from "../../lib/errors.js";
+import prisma from "../../lib/prisma.js";
+import { LoginInput, RegisterInput } from "./authTypes.js";
 
 type RequestPasswordResetResult =
   | { status: "NOT_FOUND" }
@@ -20,43 +22,54 @@ export async function registerUser(input: RegisterInput) {
   });
 
   if (existingUser) {
-    throw new Error("User already exists");
+    throw appError("userAlreadyExists");
   }
 
   const passwordHash = await argon2.hash(input.password);
 
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        fullName: input.fullName,
-        email: input.email,
-        passwordHash,
-        acceptedTerms: input.acceptedTerms,
-      },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        createdAt: true,
-      },
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          fullName: input.fullName,
+          email: input.email,
+          passwordHash,
+          acceptedTerms: input.acceptedTerms,
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          createdAt: true,
+        },
+      });
+
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
+      const { rawToken, tokenHash } = generateToken();
+
+      await tx.emailVerification.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+          lastRequestedAt: now,
+          usedAt: null,
+        },
+      });
+
+      return { user, rawToken, expiresAt };
     });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw appError("userAlreadyExists");
+    }
 
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
-    const { rawToken, tokenHash } = generateToken();
-
-    await tx.emailVerification.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        expiresAt,
-        lastRequestedAt: now,
-        usedAt: null,
-      },
-    });
-
-    return { user, rawToken, expiresAt };
-  });
+    throw error;
+  }
 }
 
 export async function loginUser(input: LoginInput) {
@@ -67,7 +80,7 @@ export async function loginUser(input: LoginInput) {
   });
 
   if (!user) {
-    throw new Error("Invalid email or password");
+    throw appError("invalidCredentials");
   }
 
   const isPasswordValid = await argon2.verify(
@@ -75,11 +88,11 @@ export async function loginUser(input: LoginInput) {
     input.password,
   );
   if (!isPasswordValid) {
-    throw new Error("Invalid email or password");
+    throw appError("invalidCredentials");
   }
 
   if (user.emailVerifiedAt === null) {
-    throw new Error("EMAIL_NOT_VERIFIED");
+    throw appError("emailNotVerified");
   }
 
   const safeUser = {
@@ -117,6 +130,17 @@ export async function updateSessionRefreshToken(
     data: {
       refreshTokenHash,
     },
+  });
+}
+
+export async function rotateSession(
+  sessionId: string,
+  refreshTokenHash: string,
+  expiresAt: Date,
+) {
+  return prisma.session.update({
+    where: { id: sessionId },
+    data: { refreshTokenHash, expiresAt },
   });
 }
 

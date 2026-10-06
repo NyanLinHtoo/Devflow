@@ -1,5 +1,10 @@
+import * as argon2 from "argon2";
 import type { FastifyInstance } from "fastify";
-import { z } from "zod";
+import { validate } from "../../lib/validation.js";
+import {
+  sendPasswordResetEmail,
+  sendVerificationEmail,
+} from "../email/emailService.js";
 import {
   confirmPasswordResetSchema,
   loginSchema,
@@ -19,31 +24,58 @@ import {
   requestEmailVerification,
   requestPasswordReset,
   resetPassword,
+  rotateSession,
   updateSessionRefreshToken,
   verifyEmail,
 } from "./authService.js";
-import * as argon2 from "argon2";
 import { RefreshTokenPayload } from "./authTypes.js";
-import { Prisma } from "../../generated/prisma/client.js";
-import {
-  sendPasswordResetEmail,
-  sendVerificationEmail,
-} from "../email/emailService.js";
 
 const exposeAuthTokens = process.env.NODE_ENV !== "production";
 
-export function authRoutes(app: FastifyInstance) {
-  app.post("/register", async (request, reply) => {
-    const result = registerSchema.safeParse(request.body);
-    if (!result.success) {
-      return reply.code(400).send({
-        message: "Invalid request",
-        errors: z.treeifyError(result.error),
-      });
-    }
+const cookieDomain = process.env.COOKIE_DOMAIN;
 
-    try {
-      const { user, rawToken, expiresAt } = await registerUser(result.data);
+const ACCESS_TOKEN_MAX_AGE = 60 * 15;
+const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60;
+const REFRESH_TOKEN_TTL_MS = REFRESH_TOKEN_MAX_AGE * 1000;
+
+const accessCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: ACCESS_TOKEN_MAX_AGE,
+  ...(cookieDomain ? { domain: cookieDomain } : {}),
+};
+
+const refreshCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: REFRESH_TOKEN_MAX_AGE,
+  ...(cookieDomain ? { domain: cookieDomain } : {}),
+};
+
+const clearCookieOptions = {
+  path: "/",
+  ...(cookieDomain ? { domain: cookieDomain } : {}),
+};
+
+export function authRoutes(app: FastifyInstance) {
+  app.post(
+    "/register",
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: 15 * 60 * 1000,
+        },
+      },
+    },
+    async (request, reply) => {
+      const input = validate(registerSchema, request.body);
+
+      const { user, rawToken, expiresAt } = await registerUser(input);
 
       const emailResult = await sendVerificationEmail(user.email, rawToken);
 
@@ -65,25 +97,8 @@ export function authRoutes(app: FastifyInstance) {
             }
           : {}),
       });
-    } catch (error) {
-      if (error instanceof Error && error.message === "User already exists") {
-        return reply.code(409).send({
-          message: "User already exists",
-        });
-      }
-
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
-        return reply.code(409).send({ message: "User already exists" });
-      }
-
-      return reply.code(500).send({
-        message: "Internal server error",
-      });
-    }
-  });
+    },
+  );
 
   app.post(
     "/login",
@@ -96,83 +111,43 @@ export function authRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const result = loginSchema.safeParse(request.body);
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
-        });
-      }
+      const input = validate(loginSchema, request.body);
 
-      try {
-        const user = await loginUser(result.data);
+      const user = await loginUser(input);
 
-        const session = await createSession(user.id);
+      const session = await createSession(user.id);
 
-        const refreshToken = await reply.refreshJwtSign(
-          {
-            userId: user.id,
-            sessionId: session.id,
+      const refreshToken = await reply.refreshJwtSign(
+        {
+          userId: user.id,
+          sessionId: session.id,
+        },
+        {
+          sign: {
+            expiresIn: "30d",
           },
-          {
-            sign: {
-              expiresIn: "30d",
-            },
+        },
+      );
+      const refreshTokenHash = await argon2.hash(refreshToken);
+
+      await updateSessionRefreshToken(session.id, refreshTokenHash);
+
+      const accessToken = await reply.jwtSign(
+        {
+          userId: user.id,
+          email: user.email,
+        },
+        {
+          sign: {
+            expiresIn: "15m",
           },
-        );
-        const refreshTokenHash = await argon2.hash(refreshToken);
+        },
+      );
 
-        await updateSessionRefreshToken(session.id, refreshTokenHash);
+      reply.setCookie("access_token", accessToken, accessCookieOptions);
+      reply.setCookie("refresh_token", refreshToken, refreshCookieOptions);
 
-        const accessToken = await reply.jwtSign(
-          {
-            userId: user.id,
-            email: user.email,
-          },
-          {
-            sign: {
-              expiresIn: "15m",
-            },
-          },
-        );
-
-        reply.setCookie("access_token", accessToken, {
-          httpOnly: true,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
-          path: "/",
-          maxAge: 60 * 15,
-        });
-
-        reply.setCookie("refresh_token", refreshToken, {
-          httpOnly: true,
-          sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
-          path: "/",
-          maxAge: 30 * 24 * 60 * 60,
-        });
-
-        return reply.code(200).send(user);
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message === "Invalid email or password"
-        ) {
-          return reply.code(401).send({
-            message: "Invalid email or password",
-          });
-        } else if (
-          error instanceof Error &&
-          error.message === "EMAIL_NOT_VERIFIED"
-        ) {
-          return reply.code(403).send({
-            message: "Please verify your email before logging in.",
-          });
-        }
-        return reply.code(500).send({
-          message: "Internal server error",
-        });
-      }
+      return reply.code(200).send(user);
     },
   );
 
@@ -180,11 +155,7 @@ export function authRoutes(app: FastifyInstance) {
     try {
       await request.jwtVerify();
 
-      const payload = request.user as {
-        userId: string;
-      };
-
-      const user = await getUserById(payload.userId);
+      const user = await getUserById(request.user.userId);
 
       if (!user) {
         return reply.code(401).send({
@@ -213,13 +184,8 @@ export function authRoutes(app: FastifyInstance) {
       }
     }
 
-    reply.clearCookie("access_token", {
-      path: "/",
-    });
-
-    reply.clearCookie("refresh_token", {
-      path: "/",
-    });
+    reply.clearCookie("access_token", clearCookieOptions);
+    reply.clearCookie("refresh_token", clearCookieOptions);
 
     return reply.code(200).send({
       message: "Logged out successfully",
@@ -281,6 +247,25 @@ export function authRoutes(app: FastifyInstance) {
         });
       }
 
+      const newRefreshToken = await reply.refreshJwtSign(
+        {
+          userId: user.id,
+          sessionId: session.id,
+        },
+        {
+          sign: {
+            expiresIn: "30d",
+          },
+        },
+      );
+      const newRefreshTokenHash = await argon2.hash(newRefreshToken);
+
+      await rotateSession(
+        session.id,
+        newRefreshTokenHash,
+        new Date(Date.now() + REFRESH_TOKEN_TTL_MS),
+      );
+
       const accessToken = await reply.jwtSign(
         {
           userId: user.id,
@@ -293,13 +278,8 @@ export function authRoutes(app: FastifyInstance) {
         },
       );
 
-      reply.setCookie("access_token", accessToken, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 15,
-      });
+      reply.setCookie("access_token", accessToken, accessCookieOptions);
+      reply.setCookie("refresh_token", newRefreshToken, refreshCookieOptions);
 
       return reply.code(200).send({
         message: "Access token refreshed",
@@ -322,55 +302,43 @@ export function authRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const result = resetPasswordSchema.safeParse(request.body);
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
+      const input = validate(resetPasswordSchema, request.body);
+
+      const resetResult = await requestPasswordReset(input.email);
+
+      if (resetResult.status === "COOLDOWN") {
+        return reply.send({
+          message: "If the account exists, a reset email will be sent.",
         });
       }
 
-      try {
-        const resetResult = await requestPasswordReset(result.data.email);
+      if (resetResult.status === "CREATED") {
+        const emailResult = await sendPasswordResetEmail(
+          input.email,
+          resetResult.rawToken,
+        );
 
-        if (resetResult.status === "COOLDOWN") {
-          return reply.send({
-            message: "If the account exists, a reset email will be sent.",
-          });
-        }
-
-        if (resetResult.status === "CREATED") {
-          const emailResult = await sendPasswordResetEmail(
-            result.data.email,
-            resetResult.rawToken,
+        if (emailResult.status !== "SENT") {
+          request.log.warn(
+            { status: emailResult.status },
+            "Password reset email was not sent",
           );
-
-          if (emailResult.status !== "SENT") {
-            request.log.warn(
-              { status: emailResult.status },
-              "Password reset email was not sent",
-            );
-          }
-
-          return reply.send({
-            message: "If the account exists, a reset email will be sent.",
-            ...(exposeAuthTokens
-              ? {
-                  resetToken: resetResult.rawToken,
-                  expiresAt: resetResult.expiresAt,
-                }
-              : {}),
-          });
         }
 
         return reply.send({
           message: "If the account exists, a reset email will be sent.",
-        });
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
+          ...(exposeAuthTokens
+            ? {
+                resetToken: resetResult.rawToken,
+                expiresAt: resetResult.expiresAt,
+              }
+            : {}),
         });
       }
+
+      return reply.send({
+        message: "If the account exists, a reset email will be sent.",
+      });
     },
   );
 
@@ -385,38 +353,26 @@ export function authRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const result = confirmPasswordResetSchema.safeParse(request.body);
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
+      const input = validate(confirmPasswordResetSchema, request.body);
+
+      const confirmPasswordReset = await resetPassword(
+        input.token,
+        input.password,
+      );
+
+      if (
+        confirmPasswordReset.status === "INVALID" ||
+        confirmPasswordReset.status === "USED" ||
+        confirmPasswordReset.status === "EXPIRED"
+      ) {
+        return reply.status(400).send({
+          message: "A reset link is not valid",
         });
       }
 
-      try {
-        const confirmPasswordReset = await resetPassword(
-          result.data.token,
-          result.data.password,
-        );
-
-        if (
-          confirmPasswordReset.status === "INVALID" ||
-          confirmPasswordReset.status === "USED" ||
-          confirmPasswordReset.status === "EXPIRED"
-        ) {
-          return reply.status(400).send({
-            message: "A reset link is not valid",
-          });
-        }
-
-        return reply.status(200).send({
-          message: "Password successfully updated",
-        });
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
-        });
-      }
+      return reply.status(200).send({
+        message: "Password successfully updated",
+      });
     },
   );
 
@@ -431,44 +387,31 @@ export function authRoutes(app: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const result = verifyEmailSchema.safeParse(request.query);
+      const input = validate(verifyEmailSchema, request.query);
 
-      if (!result.success) {
+      const verifyEmailResult = await verifyEmail(input.token);
+
+      if (verifyEmailResult.status === "NOT_FOUND") {
         return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
+          message: "Invalid verification link",
         });
       }
 
-      try {
-        const verifyEmailResult = await verifyEmail(result.data.token);
-
-        if (verifyEmailResult.status === "NOT_FOUND") {
-          return reply.code(400).send({
-            message: "Invalid verification link",
-          });
-        }
-
-        if (verifyEmailResult.status === "USED") {
-          return reply.code(400).send({
-            message: "Verification link has already been used",
-          });
-        }
-
-        if (verifyEmailResult.status === "INVALID") {
-          return reply.code(400).send({
-            message: "Invalid or expired verification link",
-          });
-        }
-
-        return reply.code(200).send({
-          message: "Email verified successfully",
-        });
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
+      if (verifyEmailResult.status === "USED") {
+        return reply.code(400).send({
+          message: "Verification link has already been used",
         });
       }
+
+      if (verifyEmailResult.status === "INVALID") {
+        return reply.code(400).send({
+          message: "Invalid or expired verification link",
+        });
+      }
+
+      return reply.code(200).send({
+        message: "Email verified successfully",
+      });
     },
   );
 
@@ -476,64 +419,51 @@ export function authRoutes(app: FastifyInstance) {
     "/resend-verification",
     { config: { rateLimit: { max: 5, timeWindow: 15 * 60 * 1000 } } },
     async (request, reply) => {
-      const result = resendVerificationSchema.safeParse(request.body);
+      const input = validate(resendVerificationSchema, request.body);
 
-      if (!result.success) {
-        return reply.code(400).send({
-          message: "Invalid request",
-          errors: z.treeifyError(result.error),
-        });
-      }
-
-      try {
-        const existingUser = await getUserByEmail(result.data.email);
-        if (!existingUser) {
-          return reply.send({
-            message:
-              "If the account exists and needs verification, a verification email will be sent.",
-          });
-        }
-
-        const resendVerification = await requestEmailVerification(
-          existingUser.id,
-        );
-
-        if (resendVerification.status !== "CREATED") {
-          return reply.send({
-            message:
-              "If the account exists and needs verification, a verification email will be sent.",
-          });
-        }
-
-        const emailResult = await sendVerificationEmail(
-          existingUser.email,
-          resendVerification.rawToken,
-        );
-
-        if (emailResult.status !== "SENT") {
-          request.log.warn(
-            { status: emailResult.status },
-            "Verification email was not sent",
-          );
-        }
-
-        return reply.code(200).send({
+      const existingUser = await getUserByEmail(input.email);
+      if (!existingUser) {
+        return reply.send({
           message:
             "If the account exists and needs verification, a verification email will be sent.",
-          ...(exposeAuthTokens
-            ? {
-                emailVerification: {
-                  token: resendVerification.rawToken,
-                  expiresAt: resendVerification.expiresAt,
-                },
-              }
-            : {}),
-        });
-      } catch {
-        return reply.code(500).send({
-          message: "Internal server error",
         });
       }
+
+      const resendVerification = await requestEmailVerification(
+        existingUser.id,
+      );
+
+      if (resendVerification.status !== "CREATED") {
+        return reply.send({
+          message:
+            "If the account exists and needs verification, a verification email will be sent.",
+        });
+      }
+
+      const emailResult = await sendVerificationEmail(
+        existingUser.email,
+        resendVerification.rawToken,
+      );
+
+      if (emailResult.status !== "SENT") {
+        request.log.warn(
+          { status: emailResult.status },
+          "Verification email was not sent",
+        );
+      }
+
+      return reply.code(200).send({
+        message:
+          "If the account exists and needs verification, a verification email will be sent.",
+        ...(exposeAuthTokens
+          ? {
+              emailVerification: {
+                token: resendVerification.rawToken,
+                expiresAt: resendVerification.expiresAt,
+              },
+            }
+          : {}),
+      });
     },
   );
 }
