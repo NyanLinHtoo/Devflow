@@ -1,4 +1,5 @@
-// const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { apiError } from "@/lib/apiError";
+
 const API_URL = "/api";
 
 let refreshPromise: Promise<boolean> | null = null;
@@ -55,7 +56,10 @@ export async function apiFetch<T>(
 			message?: string;
 		};
 
-		throw new Error(errorBody.message ?? `Request failed: ${response.status}`);
+		throw apiError(
+			response.status,
+			errorBody.message ?? `Request failed: ${response.status}`,
+		);
 	}
 
 	return response.json() as Promise<T>;

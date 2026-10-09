@@ -2,15 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/useAuth";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function DashboardPage() {
 	const router = useRouter();
 	const logoutMutation = useLogout();
 
-	const { data: user, isLoading: isUserLoading, isError } = useCurrentUser();
+	const { data: user, isLoading, isError } = useRequireAuth();
 
 	function handleLogout() {
 		logoutMutation.mutate(undefined, {
@@ -20,13 +19,7 @@ export default function DashboardPage() {
 		});
 	}
 
-	useEffect(() => {
-		if (isError) {
-			router.replace("/login");
-		}
-	}, [isError, router]);
-
-	if (isUserLoading) {
+	if (isLoading) {
 		return <p>Loading...</p>;
 	}
 

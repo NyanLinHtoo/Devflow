@@ -7,17 +7,27 @@ import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useParams } from "next/navigation";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
 	const projectId = params.projectId;
 
+	const { isLoading: isAuthLoading, isError: isAuthError } = useRequireAuth();
 	const { data: project, isLoading, isError } = useProject(projectId);
 	const {
 		data: tasks,
 		isLoading: isTaskLoading,
 		isError: isTaskError,
 	} = useTasks(projectId);
+
+	if (isAuthLoading) {
+		return <p>Loading...</p>;
+	}
+
+	if (isAuthError) {
+		return null;
+	}
 
 	if (isLoading) {
 		return <p>Loading project...</p>;
