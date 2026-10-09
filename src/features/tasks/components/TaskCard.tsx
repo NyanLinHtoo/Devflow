@@ -1,3 +1,7 @@
+import {
+	taskPriorityLabels,
+	taskStatusLabels,
+} from "@/features/tasks/taskLabels";
 import type { Task } from "@/types/taskTypes";
 import Link from "next/link";
 
@@ -15,8 +19,12 @@ export default function TaskCard({ task, projectId }: TaskCardProps) {
 					{task.description && (
 						<p className="mt-2 text-sm text-gray-600">{task.description}</p>
 					)}
-					<p className="mt-2 text-sm text-gray-600">{task.status}</p>
-					<p className="mt-2 text-sm text-gray-600">{task.priority}</p>
+					<p className="mt-2 text-sm text-gray-600">
+						{taskStatusLabels[task.status]}
+					</p>
+					<p className="mt-2 text-sm text-gray-600">
+						{taskPriorityLabels[task.priority]}
+					</p>
 					<p>
 						Due Date :{" "}
 						{task.dueDate === null

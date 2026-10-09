@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
 import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import { useProjects } from "@/hooks/useProjects";
@@ -10,7 +11,7 @@ export default function ProjectsPage() {
 	const { data: projects, isLoading, isError } = useProjects();
 
 	if (isAuthLoading) {
-		return <p>Loading...</p>;
+		return <LoadingState />;
 	}
 
 	if (isAuthError) {
@@ -18,17 +19,17 @@ export default function ProjectsPage() {
 	}
 
 	if (isLoading) {
-		return <p>Loading projects...</p>;
+		return <LoadingState label="Loading projects..." />;
 	}
 
 	if (isError) {
-		return <p>Failed to load projects.</p>;
+		return <ErrorState message="Failed to load projects." />;
 	}
 
 	if (!projects || projects.length === 0) {
 		return (
 			<div>
-				<p>No projects yet.</p>
+				<EmptyState>No projects yet.</EmptyState>
 				<CreateProjectDialog />
 			</div>
 		);

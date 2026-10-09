@@ -1,13 +1,14 @@
 "use client";
 
+import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
 import { useParams } from "next/navigation";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
@@ -22,7 +23,7 @@ export default function ProjectDetail() {
 	} = useTasks(projectId);
 
 	if (isAuthLoading) {
-		return <p>Loading...</p>;
+		return <LoadingState />;
 	}
 
 	if (isAuthError) {
@@ -30,23 +31,23 @@ export default function ProjectDetail() {
 	}
 
 	if (isLoading) {
-		return <p>Loading project...</p>;
+		return <LoadingState label="Loading project..." />;
 	}
 
 	if (isError) {
-		return <p>Failed to load project.</p>;
+		return <ErrorState message="Failed to load project." />;
 	}
 
 	if (!project) {
-		return <p>Project not found.</p>;
+		return <ErrorState message="Project not found." />;
 	}
 
 	if (isTaskLoading) {
-		return <p>Loading tasks...</p>;
+		return <LoadingState label="Loading tasks..." />;
 	}
 
 	if (isTaskError) {
-		return <p>Failed to load task.</p>;
+		return <ErrorState message="Failed to load tasks." />;
 	}
 
 	return (
@@ -67,7 +68,7 @@ export default function ProjectDetail() {
 					<TaskCard key={task.id} task={task} projectId={projectId} />
 				))
 			) : (
-				<p>No tasks yet.</p>
+				<EmptyState>No tasks yet.</EmptyState>
 			)}
 		</main>
 	);

@@ -2,6 +2,8 @@ import { apiError } from "@/lib/apiError";
 
 const API_URL = "/api";
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
 const REFRESH_EXCLUDED_PATHS = new Set([
 	"/auth/login",
 	"/auth/register",
@@ -19,6 +21,7 @@ function refreshSession(): Promise<boolean> {
 		refreshPromise = fetch(`${API_URL}/auth/refresh`, {
 			method: "POST",
 			credentials: "include",
+			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
 		})
 			.then((response) => response.ok)
 			.catch(() => false)
@@ -41,10 +44,15 @@ export async function apiFetch<T>(
 		headers.set("Content-Type", "application/json");
 	}
 
+	const signal = options.signal
+		? AbortSignal.any([options.signal, AbortSignal.timeout(REQUEST_TIMEOUT_MS)])
+		: AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+
 	const response = await fetch(`${API_URL}${path}`, {
 		...options,
 		credentials: "include",
 		headers,
+		signal,
 	});
 
 	const pathname = path.split("?")[0];
