@@ -26,7 +26,9 @@ export default function CreateProjectDialog() {
 
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>
-							<Button type="button">Cancel</Button>
+							<Button type="button" variant="secondary">
+								Cancel
+							</Button>
 						</Dialog.CloseTrigger>
 					</div>
 				</Dialog.Content>

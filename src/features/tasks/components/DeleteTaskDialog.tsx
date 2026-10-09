@@ -59,7 +59,10 @@ export default function DeleteTaskDialog({
 
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>
-							<Button type="button" disabled={deleteTaskMutation.isPending}>
+							<Button
+								type="button"
+								variant="secondary"
+								disabled={deleteTaskMutation.isPending}>
 								Cancel
 							</Button>
 						</Dialog.CloseTrigger>

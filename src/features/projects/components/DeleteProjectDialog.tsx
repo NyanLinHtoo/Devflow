@@ -52,7 +52,10 @@ export default function DeleteProjectDialog({
 
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>
-							<Button type="button" disabled={deleteProjectMutation.isPending}>
+							<Button
+								type="button"
+								variant="secondary"
+								disabled={deleteProjectMutation.isPending}>
 								Cancel
 							</Button>
 						</Dialog.CloseTrigger>

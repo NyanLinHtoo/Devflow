@@ -1,8 +1,13 @@
 "use client";
 
+import { ErrorState, LoadingState } from "@/components/ui/state";
 import TaskAssigneeSelect from "@/features/projects/components/TaskAssigneeSelect";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
+import {
+	taskPriorityLabels,
+	taskStatusLabels,
+} from "@/features/tasks/taskLabels";
 import { useProjectMembers } from "@/hooks/useProjectMembers";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTask } from "@/hooks/useTasks";
@@ -28,7 +33,7 @@ export default function TaskDetail() {
 	const canAssign = currentMember?.role === "MANAGER";
 
 	if (isAuthLoading) {
-		return <p>Loading...</p>;
+		return <LoadingState />;
 	}
 
 	if (isAuthError) {
@@ -36,15 +41,15 @@ export default function TaskDetail() {
 	}
 
 	if (isLoading) {
-		return <p>Loading task...</p>;
+		return <LoadingState label="Loading task..." />;
 	}
 
 	if (isError) {
-		return <p>Failed to load task.</p>;
+		return <ErrorState message="Failed to load task." />;
 	}
 
 	if (!task) {
-		return <p>Task not found.</p>;
+		return <ErrorState message="Task not found." />;
 	}
 
 	return (
@@ -54,8 +59,8 @@ export default function TaskDetail() {
 			<p>
 				Description : {task.description ? task.description : "No description"}
 			</p>
-			<p>Status : {task.status}</p>
-			<p>Priority : {task.priority}</p>
+			<p>Status : {taskStatusLabels[task.status]}</p>
+			<p>Priority : {taskPriorityLabels[task.priority]}</p>
 			<p>
 				Due Date :{" "}
 				{task.dueDate === null
