@@ -2,7 +2,6 @@ export type Project = {
 	id: string;
 	name: string;
 	description: string | null;
-	ownerId: string;
 	createdAt: string;
 	updatedAt: string;
 };
@@ -15,5 +14,5 @@ export type CreateProjectInput = {
 export type UpdateProjectInput = {
 	projectId: string;
 	name?: string;
-	description?: string;
+	description?: string | null;
 };

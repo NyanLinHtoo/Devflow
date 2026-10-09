@@ -2,8 +2,15 @@ import type { ForgotPasswordFormData } from "@/features/auth/schemas/forgotPassw
 import type { LoginFormData } from "@/features/auth/schemas/loginSchema";
 import type { RegisterFormData } from "@/features/auth/schemas/registerSchema";
 import { apiFetch } from "@/lib/api";
-import { CurrentUser } from "@/types/authTypes";
+import type { CurrentUser } from "@/types/authTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export type RegisterResponse = CurrentUser & {
+	emailVerification?: {
+		token: string;
+		expiresAt: string;
+	};
+};
 
 export function useLogin() {
 	const queryClient = useQueryClient();
@@ -29,7 +36,7 @@ export function useLogin() {
 export function useRegister() {
 	return useMutation({
 		mutationFn: (data: RegisterFormData) =>
-			apiFetch<CurrentUser>("/auth/register", {
+			apiFetch<RegisterResponse>("/auth/register", {
 				method: "POST",
 				body: JSON.stringify({
 					fullName: data.fullName,
@@ -87,5 +94,15 @@ export function useVerifyEmail(token: string) {
 			),
 		enabled: Boolean(token),
 		retry: false,
+	});
+}
+
+export function useResendVerification() {
+	return useMutation({
+		mutationFn: (data: { email: string }) =>
+			apiFetch<{ message: string }>("/auth/resend-verification", {
+				method: "POST",
+				body: JSON.stringify(data),
+			}),
 	});
 }

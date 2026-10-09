@@ -41,7 +41,7 @@ export default function EditProjectForm({
 			{
 				projectId: project.id,
 				name: data.name,
-				description: data.description,
+				description: data.description?.trim() ? data.description : null,
 			},
 			{
 				onSuccess: () => {
