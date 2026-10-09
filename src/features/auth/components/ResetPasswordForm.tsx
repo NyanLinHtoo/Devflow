@@ -48,11 +48,6 @@ export default function ResetPasswordForm() {
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{resetPasswordMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">
-					{resetPasswordMutation.error.message}
-				</p>
-			)}
 			<FormField
 				label="New password"
 				htmlFor="password"

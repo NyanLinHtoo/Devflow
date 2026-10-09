@@ -33,9 +33,6 @@ export default function LoginForm() {
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{loginMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">{loginMutation.error.message}</p>
-			)}
 			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"

@@ -84,11 +84,6 @@ export default function EditTaskForm({
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{updateTaskMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">
-					{updateTaskMutation.error.message}
-				</p>
-			)}
 			<FormField
 				label="Task title"
 				htmlFor="title"

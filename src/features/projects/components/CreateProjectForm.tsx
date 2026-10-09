@@ -39,11 +39,6 @@ export default function CreateProjectForm({
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{createProjectMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">
-					{createProjectMutation.error.message}
-				</p>
-			)}
 			<FormField
 				label="Project name"
 				htmlFor="name"

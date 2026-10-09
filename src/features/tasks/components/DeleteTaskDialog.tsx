@@ -51,12 +51,6 @@ export default function DeleteTaskDialog({
 						undone.
 					</Dialog.Description>
 
-					{deleteTaskMutation.error instanceof Error && (
-						<p className="mt-3 text-sm text-red-600">
-							{deleteTaskMutation.error.message}
-						</p>
-					)}
-
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>
 							<Button

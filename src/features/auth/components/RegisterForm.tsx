@@ -73,12 +73,6 @@ export default function RegisterForm() {
 							: "Resend verification email"}
 				</Button>
 
-				{resendMutation.error instanceof Error && (
-					<p className="text-sm text-red-600">
-						{resendMutation.error.message}
-					</p>
-				)}
-
 				<Link
 					href="/login"
 					className="text-sm font-medium text-gray-900 hover:underline">
@@ -90,9 +84,6 @@ export default function RegisterForm() {
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{registerMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">{registerMutation.error.message}</p>
-			)}
 			<FormField
 				label="Full name"
 				htmlFor="fullName"

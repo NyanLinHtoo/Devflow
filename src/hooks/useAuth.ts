@@ -24,6 +24,7 @@ export function useLogin() {
 					password: data.password,
 				}),
 			}),
+		meta: { successMessage: "Signed in" },
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -56,6 +57,7 @@ export function useLogout() {
 			apiFetch<{ message: string }>("/auth/logout", {
 				method: "POST",
 			}),
+		meta: { successMessage: "Signed out" },
 
 		onSuccess: () => {
 			queryClient.removeQueries({
@@ -82,6 +84,7 @@ export function useResetPassword() {
 				method: "POST",
 				body: JSON.stringify(data),
 			}),
+		meta: { successMessage: "Password updated" },
 	});
 }
 
