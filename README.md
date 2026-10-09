@@ -36,10 +36,10 @@ The web client for **DevFlow**, a project and task-management application. It pr
 2. Create `.env.local`:
 
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:3001
+   BACKEND_URL=http://localhost:3001
    ```
 
-   Set this to the URL where the Fastify API is running. It is intentionally public because the browser needs the API base URL; do not put secrets in `NEXT_PUBLIC_*` variables.
+   `BACKEND_URL` points at the running Fastify API. It is used by the Next.js rewrite in `next.config.ts`, which proxies `/api/*` to it, so the browser talks to the same origin and the HttpOnly cookies stay same-origin. It is server-side only — do not prefix it with `NEXT_PUBLIC_`.
 
 3. Start the development server:
 
@@ -73,15 +73,9 @@ types/        Shared TypeScript types
 
 ## Authentication and API calls
 
-Authentication is cookie-based. The backend sets access and refresh tokens as **HttpOnly cookies**, which helps prevent client-side code from reading token values. The API helper should send requests with credentials enabled so those cookies are included:
+Authentication is cookie-based. The backend sets access and refresh tokens as **HttpOnly cookies**, which helps prevent client-side code from reading token values. The client calls the API through the Next.js rewrite (`/api/*` → `BACKEND_URL`), so requests are same-origin and the cookies are sent automatically. The `apiFetch` helper still sets `credentials: "include"` and, on a `401`, refreshes the session once (deduped across concurrent requests) before retrying.
 
-```ts
-fetch(`${apiUrl}/projects`, {
-	credentials: "include",
-});
-```
-
-For local development, the backend CORS configuration must allow the frontend origin and credentials. When deploying, update both the backend allowed origin and `NEXT_PUBLIC_API_URL` to their production values.
+For local development, the backend CORS configuration must allow the frontend origin and credentials. When deploying, set `BACKEND_URL` to the production API URL and update the backend allowed origin (`FRONTEND_ORIGIN`) to the deployed frontend origin.
 
 ## Scope
 
