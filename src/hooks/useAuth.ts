@@ -1,8 +1,9 @@
+import type { ForgotPasswordFormData } from "@/features/auth/schemas/forgotPasswordSchema";
 import type { LoginFormData } from "@/features/auth/schemas/loginSchema";
 import type { RegisterFormData } from "@/features/auth/schemas/registerSchema";
 import { apiFetch } from "@/lib/api";
 import { CurrentUser } from "@/types/authTypes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useLogin() {
 	const queryClient = useQueryClient();
@@ -54,5 +55,37 @@ export function useLogout() {
 				queryKey: ["currentUser"],
 			});
 		},
+	});
+}
+
+export function useForgotPassword() {
+	return useMutation({
+		mutationFn: (data: ForgotPasswordFormData) =>
+			apiFetch<{ message: string }>("/auth/forgot-password", {
+				method: "POST",
+				body: JSON.stringify({ email: data.email }),
+			}),
+	});
+}
+
+export function useResetPassword() {
+	return useMutation({
+		mutationFn: (data: { token: string; password: string }) =>
+			apiFetch<{ message: string }>("/auth/reset-password", {
+				method: "POST",
+				body: JSON.stringify(data),
+			}),
+	});
+}
+
+export function useVerifyEmail(token: string) {
+	return useQuery({
+		queryKey: ["verifyEmail", token],
+		queryFn: () =>
+			apiFetch<{ message: string }>(
+				`/auth/verify-email?token=${encodeURIComponent(token)}`,
+			),
+		enabled: Boolean(token),
+		retry: false,
 	});
 }

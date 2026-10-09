@@ -1,6 +1,24 @@
 // const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const API_URL = "/api";
 
+let refreshPromise: Promise<boolean> | null = null;
+
+function refreshSession(): Promise<boolean> {
+	if (!refreshPromise) {
+		refreshPromise = fetch(`${API_URL}/auth/refresh`, {
+			method: "POST",
+			credentials: "include",
+		})
+			.then((response) => response.ok)
+			.catch(() => false)
+			.finally(() => {
+				refreshPromise = null;
+			});
+	}
+
+	return refreshPromise;
+}
+
 export async function apiFetch<T>(
 	path: string,
 	options: RequestInit = {},
@@ -25,12 +43,9 @@ export async function apiFetch<T>(
 		path !== "/auth/refresh";
 
 	if (shouldRefresh) {
-		const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
-			method: "POST",
-			credentials: "include",
-		});
+		const refreshed = await refreshSession();
 
-		if (refreshResponse.ok) {
+		if (refreshed) {
 			return apiFetch<T>(path, options, false);
 		}
 	}
