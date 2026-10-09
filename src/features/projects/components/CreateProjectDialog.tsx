@@ -11,7 +11,7 @@ export default function CreateProjectDialog() {
 	return (
 		<Dialog.Root open={open} onOpenChange={(details) => setOpen(details.open)}>
 			<Dialog.Trigger asChild>
-				<Button type="button">Create task</Button>
+				<Button type="button">Create project</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Backdrop className="fixed inset-0 bg-black/40" />
@@ -19,7 +19,7 @@ export default function CreateProjectDialog() {
 			<Dialog.Positioner className="fixed inset-0 flex items-center justify-center p-4">
 				<Dialog.Content className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
 					<Dialog.Title className="text-lg font-semibold text-gray-900">
-						Creating task
+						Creating project
 					</Dialog.Title>
 
 					<CreateProjectForm onSuccess={() => setOpen(false)} />

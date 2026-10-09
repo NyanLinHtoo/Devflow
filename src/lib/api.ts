@@ -2,6 +2,16 @@ import { apiError } from "@/lib/apiError";
 
 const API_URL = "/api";
 
+const REFRESH_EXCLUDED_PATHS = new Set([
+	"/auth/login",
+	"/auth/register",
+	"/auth/refresh",
+	"/auth/forgot-password",
+	"/auth/reset-password",
+	"/auth/resend-verification",
+	"/auth/verify-email",
+]);
+
 let refreshPromise: Promise<boolean> | null = null;
 
 function refreshSession(): Promise<boolean> {
@@ -37,11 +47,11 @@ export async function apiFetch<T>(
 		headers,
 	});
 
+	const pathname = path.split("?")[0];
 	const shouldRefresh =
 		response.status === 401 &&
 		retry &&
-		path !== "/auth/login" &&
-		path !== "/auth/refresh";
+		!REFRESH_EXCLUDED_PATHS.has(pathname);
 
 	if (shouldRefresh) {
 		const refreshed = await refreshSession();
