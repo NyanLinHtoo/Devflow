@@ -78,12 +78,6 @@ export default function TaskAssigneeSelect({
 					{updateTaskAssignee.isPending ? "Saving..." : "Save"}
 				</Button>
 			</div>
-
-			{updateTaskAssignee.isError && (
-				<p className="text-sm text-red-500">
-					{updateTaskAssignee.error.message}
-				</p>
-			)}
 		</div>
 	);
 }

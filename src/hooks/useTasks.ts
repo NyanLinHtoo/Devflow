@@ -32,6 +32,7 @@ export function useCreateTask(projectId: string) {
 				method: "POST",
 				body: JSON.stringify(data),
 			}),
+		meta: { successMessage: "Task created" },
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -50,6 +51,7 @@ export function useUpdateTask(projectId: string) {
 				method: "PATCH",
 				body: JSON.stringify(data),
 			}),
+		meta: { successMessage: "Task updated" },
 
 		onSuccess: async (updatedTask) => {
 			await queryClient.invalidateQueries({
@@ -71,6 +73,7 @@ export function useDeleteTask(projectId: string) {
 			apiFetch<{ message: string }>(`/projects/${projectId}/tasks/${taskId}`, {
 				method: "DELETE",
 			}),
+		meta: { successMessage: "Task deleted" },
 
 		onSuccess: async (_data, taskId) => {
 			await queryClient.invalidateQueries({
@@ -99,6 +102,7 @@ export function useUpdateTaskAssignee(projectId: string) {
 				method: "PATCH",
 				body: JSON.stringify(data),
 			}),
+		meta: { successMessage: "Assignee updated" },
 
 		onSuccess: async (updatedTask) => {
 			await queryClient.invalidateQueries({

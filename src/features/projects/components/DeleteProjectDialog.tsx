@@ -44,12 +44,6 @@ export default function DeleteProjectDialog({
 						be undone.
 					</Dialog.Description>
 
-					{deleteProjectMutation.error instanceof Error && (
-						<p className="mt-3 text-sm text-red-600">
-							{deleteProjectMutation.error.message}
-						</p>
-					)}
-
 					<div className="mt-6 flex justify-end gap-3">
 						<Dialog.CloseTrigger asChild>
 							<Button

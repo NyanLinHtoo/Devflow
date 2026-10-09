@@ -30,6 +30,7 @@ export function useCreateProject() {
 				method: "POST",
 				body: JSON.stringify(data),
 			}),
+		meta: { successMessage: "Project created" },
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -51,6 +52,7 @@ export function useUpdateProject() {
 					description,
 				}),
 			}),
+		meta: { successMessage: "Project updated" },
 
 		onSuccess: async (updatedProject) => {
 			await queryClient.invalidateQueries({
@@ -72,6 +74,7 @@ export function useDeleteProject() {
 			apiFetch<{ message: string }>(`/projects/${projectId}`, {
 				method: "DELETE",
 			}),
+		meta: { successMessage: "Project deleted" },
 
 		onSuccess: async (_data, projectId) => {
 			await queryClient.invalidateQueries({

@@ -36,11 +36,6 @@ export default function ForgotPasswordForm() {
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{forgotPasswordMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">
-					{forgotPasswordMutation.error.message}
-				</p>
-			)}
 			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"

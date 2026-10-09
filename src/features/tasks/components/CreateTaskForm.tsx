@@ -53,11 +53,6 @@ export default function CreateTaskForm({
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-			{createTaskMutation.error instanceof Error && (
-				<p className="text-sm text-red-600">
-					{createTaskMutation.error.message}
-				</p>
-			)}
 			<FormField
 				label="Task title"
 				htmlFor="title"
