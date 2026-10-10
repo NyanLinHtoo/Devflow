@@ -6,12 +6,18 @@ import ProjectCard from "@/features/projects/components/ProjectCard";
 import { useProjects } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
+const container = "mx-auto w-full max-w-3xl px-4 py-8 sm:px-6";
+
 export default function ProjectsPage() {
 	const { isLoading: isAuthLoading, isError: isAuthError } = useRequireAuth();
 	const { data: projects, isLoading, isError } = useProjects();
 
 	if (isAuthLoading) {
-		return <LoadingState />;
+		return (
+			<main className={container}>
+				<LoadingState />
+			</main>
+		);
 	}
 
 	if (isAuthError) {
@@ -19,30 +25,45 @@ export default function ProjectsPage() {
 	}
 
 	if (isLoading) {
-		return <LoadingState label="Loading projects..." />;
+		return (
+			<main className={container}>
+				<LoadingState label="Loading projects..." />
+			</main>
+		);
 	}
 
 	if (isError) {
-		return <ErrorState message="Failed to load projects." />;
+		return (
+			<main className={container}>
+				<ErrorState message="Failed to load projects." />
+			</main>
+		);
 	}
 
 	if (!projects || projects.length === 0) {
 		return (
-			<div>
-				<EmptyState>No projects yet.</EmptyState>
+			<main className={`${container} flex flex-col items-start gap-4`}>
+				<h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
+				<EmptyState>
+					No projects yet. Create your first project to get started.
+				</EmptyState>
 				<CreateProjectDialog />
-			</div>
+			</main>
 		);
 	}
 
 	return (
-		<main>
-			<h1>Projects</h1>
-			<CreateProjectDialog />
+		<main className={container}>
+			<div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+				<h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
+				<CreateProjectDialog />
+			</div>
 
-			{projects.map((project) => (
-				<ProjectCard key={project.id} project={project} />
-			))}
+			<div className="grid gap-4 sm:grid-cols-2">
+				{projects.map((project) => (
+					<ProjectCard key={project.id} project={project} />
+				))}
+			</div>
 		</main>
 	);
 }

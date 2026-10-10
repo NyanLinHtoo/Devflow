@@ -8,7 +8,10 @@ import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProject } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+
+const container = "mx-auto w-full max-w-3xl px-4 py-8 sm:px-6";
 
 export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
@@ -23,7 +26,11 @@ export default function ProjectDetail() {
 	} = useTasks(projectId);
 
 	if (isAuthLoading) {
-		return <LoadingState />;
+		return (
+			<main className={container}>
+				<LoadingState />
+			</main>
+		);
 	}
 
 	if (isAuthError) {
@@ -31,44 +38,82 @@ export default function ProjectDetail() {
 	}
 
 	if (isLoading) {
-		return <LoadingState label="Loading project..." />;
+		return (
+			<main className={container}>
+				<LoadingState label="Loading project..." />
+			</main>
+		);
 	}
 
 	if (isError) {
-		return <ErrorState message="Failed to load project." />;
+		return (
+			<main className={container}>
+				<ErrorState message="Failed to load project." />
+			</main>
+		);
 	}
 
 	if (!project) {
-		return <ErrorState message="Project not found." />;
-	}
-
-	if (isTaskLoading) {
-		return <LoadingState label="Loading tasks..." />;
-	}
-
-	if (isTaskError) {
-		return <ErrorState message="Failed to load tasks." />;
+		return (
+			<main className={container}>
+				<ErrorState message="Project not found." />
+			</main>
+		);
 	}
 
 	return (
-		<main>
-			<h1>Project Detail</h1>
+		<main className={container}>
+			<Link
+				href="/projects"
+				className="text-sm text-muted-foreground hover:text-foreground">
+				← Back to projects
+			</Link>
 
-			<p>Name: {project.name}</p>
-			<p>Description: {project.description}</p>
-			<p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>
+			<div className="mt-4 mb-8 flex flex-wrap items-start justify-between gap-4">
+				<div>
+					<h1 className="text-2xl font-semibold tracking-tight">
+						{project.name}
+					</h1>
 
-			<EditProjectDialog project={project} />
+					{project.description && (
+						<p className="mt-1 text-sm text-muted-foreground">
+							{project.description}
+						</p>
+					)}
 
-			<DeleteProjectDialog projectId={projectId} projectName={project.name} />
+					<p className="mt-1 text-xs text-muted-foreground">
+						Created {new Date(project.createdAt).toLocaleDateString()}
+					</p>
+				</div>
 
-			<CreateTaskDialog projectId={projectId} />
+				<div className="flex flex-wrap gap-2">
+					<EditProjectDialog project={project} />
+					<DeleteProjectDialog
+						projectId={projectId}
+						projectName={project.name}
+					/>
+				</div>
+			</div>
+
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+				<h2 className="text-lg font-medium">Tasks</h2>
+				<CreateTaskDialog projectId={projectId} />
+			</div>
+
 			{tasks && tasks.length > 0 ? (
-				tasks.map((task) => (
-					<TaskCard key={task.id} task={task} projectId={projectId} />
-				))
+				<div className="grid gap-4">
+					{tasks.map((task) => (
+						<TaskCard key={task.id} task={task} projectId={projectId} />
+					))}
+				</div>
+			) : isTaskLoading ? (
+				<LoadingState label="Loading tasks..." />
+			) : isTaskError ? (
+				<ErrorState message="Failed to load tasks." />
 			) : (
-				<EmptyState>No tasks yet.</EmptyState>
+				<EmptyState>
+					No tasks yet. Create your first task to get started.
+				</EmptyState>
 			)}
 		</main>
 	);

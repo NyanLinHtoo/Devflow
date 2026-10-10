@@ -12,27 +12,31 @@ type TaskCardProps = {
 
 export default function TaskCard({ task, projectId }: TaskCardProps) {
 	return (
-		<div>
-			<Link href={`/projects/${projectId}/tasks/${task.id}`}>
-				<article className="rounded-lg border border-gray-200 p-4">
-					<h2 className="font-semibold">{task.title}</h2>
-					{task.description && (
-						<p className="mt-2 text-sm text-gray-600">{task.description}</p>
-					)}
-					<p className="mt-2 text-sm text-gray-600">
-						{taskStatusLabels[task.status]}
-					</p>
-					<p className="mt-2 text-sm text-gray-600">
+		<Link href={`/projects/${projectId}/tasks/${task.id}`} className="block">
+			<article className="rounded-lg border border-border bg-surface p-4 transition-colors hover:border-foreground/30">
+				<div className="flex items-start justify-between gap-3">
+					<h2 className="font-medium text-foreground">{task.title}</h2>
+					<span className="shrink-0 text-xs text-muted-foreground">
 						{taskPriorityLabels[task.priority]}
+					</span>
+				</div>
+
+				{task.description && (
+					<p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+						{task.description}
 					</p>
-					<p>
-						Due Date :{" "}
+				)}
+
+				<div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+					<span>{taskStatusLabels[task.status]}</span>
+					<span aria-hidden="true">·</span>
+					<span>
 						{task.dueDate === null
-							? "No Due Date"
+							? "No due date"
 							: new Date(task.dueDate).toDateString()}
-					</p>
-				</article>
-			</Link>
-		</div>
+					</span>
+				</div>
+			</article>
+		</Link>
 	);
 }

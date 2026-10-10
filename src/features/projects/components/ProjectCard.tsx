@@ -7,12 +7,14 @@ type ProjectCardProps = {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
 	return (
-		<Link href={`/projects/${project.id}`}>
-			<article className="rounded-lg border border-gray-200 p-4">
-				<h2 className="font-semibold">{project.name}</h2>
+		<Link href={`/projects/${project.id}`} className="block">
+			<article className="h-full rounded-lg border border-border bg-surface p-4 transition-colors hover:border-foreground/30">
+				<h2 className="font-medium text-foreground">{project.name}</h2>
 
 				{project.description && (
-					<p className="mt-2 text-sm text-gray-600">{project.description}</p>
+					<p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+						{project.description}
+					</p>
 				)}
 			</article>
 		</Link>

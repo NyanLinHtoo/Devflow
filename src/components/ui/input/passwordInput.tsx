@@ -15,11 +15,11 @@ export function PasswordInput({
 		<div className="relative">
 			<input
 				className={[
-					"h-10 w-full rounded-md border border-gray-300 text-black bg-white pr-10 pl-3 text-sm",
-					"outline-none transition-colors",
-					"placeholder:text-gray-400",
-					"focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10",
-					"disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60",
+					"h-10 w-full rounded-md border border-border bg-surface pr-11 pl-3 text-base text-foreground",
+					"transition-colors sm:text-sm",
+					"placeholder:text-muted-foreground",
+					"pointer-coarse:min-h-11",
+					"disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-60",
 					className,
 				].join(" ")}
 				type={showPassword ? "text" : "password"}
@@ -31,7 +31,7 @@ export function PasswordInput({
 				type="button"
 				onClick={() => setShowPassword((prev) => !prev)}
 				aria-label={showPassword ? "Hide password" : "Show password"}
-				className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-gray-500 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60">
+				className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60">
 				{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
 			</button>
 		</div>

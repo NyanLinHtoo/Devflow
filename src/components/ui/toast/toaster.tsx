@@ -4,10 +4,10 @@ import { Toast, Toaster as ArkToaster } from "@ark-ui/react/toast";
 import { toaster } from "@/lib/toaster";
 
 const typeStyles: Record<string, string> = {
-	success: "border-green-200 bg-green-50 text-green-900",
-	error: "border-red-200 bg-red-50 text-red-900",
-	warning: "border-amber-200 bg-amber-50 text-amber-900",
-	info: "border-gray-200 bg-white text-gray-900",
+	success: "border-success/30 bg-success-surface text-success",
+	error: "border-danger/30 bg-danger-surface text-danger",
+	warning: "border-warning/30 bg-warning-surface text-warning",
+	info: "border-border bg-surface text-foreground",
 };
 
 export function Toaster() {
@@ -15,7 +15,7 @@ export function Toaster() {
 		<ArkToaster toaster={toaster}>
 			{(toast) => (
 				<Toast.Root
-					className={`w-80 rounded-lg border p-4 shadow-lg ${
+					className={`w-80 max-w-[calc(100vw-2rem)] rounded-lg border p-4 shadow-lg ${
 						typeStyles[toast.type ?? "info"]
 					}`}>
 					{toast.title && (

@@ -45,9 +45,9 @@ export default function RegisterForm() {
 	if (registered) {
 		return (
 			<div className="space-y-4 text-center">
-				<p className="text-sm text-gray-600">
+				<p className="text-sm text-muted-foreground">
 					We sent a verification link to{" "}
-					<span className="font-medium text-gray-900">{registered.email}</span>.
+					<span className="font-medium text-foreground">{registered.email}</span>.
 					Verify your email before signing in.
 				</p>
 
@@ -55,7 +55,7 @@ export default function RegisterForm() {
 					<p className="text-sm">
 						<Link
 							href={`/verify-email?token=${registered.verificationToken}`}
-							className="font-medium text-gray-900 hover:underline">
+							className="font-medium text-foreground hover:underline">
 							Verify now (development)
 						</Link>
 					</p>
@@ -75,7 +75,7 @@ export default function RegisterForm() {
 
 				<Link
 					href="/login"
-					className="text-sm font-medium text-gray-900 hover:underline">
+					className="text-sm font-medium text-foreground hover:underline">
 					Back to sign in
 				</Link>
 			</div>
@@ -131,7 +131,7 @@ export default function RegisterForm() {
 				/>
 			</FormField>
 
-			<label className="flex items-center gap-2 text-sm text-gray-600">
+			<label className="flex items-center gap-2 text-sm text-muted-foreground">
 				<input
 					type="checkbox"
 					className="size-4 rounded border-gray-300"
@@ -141,20 +141,20 @@ export default function RegisterForm() {
 					I agree to the{" "}
 					<Link
 						href="/terms"
-						className="font-medium text-gray-900 hover:underline">
+						className="font-medium text-foreground hover:underline">
 						Terms
 					</Link>
 					and{" "}
 					<Link
 						href="/privacy"
-						className="font-medium text-gray-900 hover:underline">
+						className="font-medium text-foreground hover:underline">
 						Privacy Policy
 					</Link>
 				</span>
 			</label>
 
 			{errors.acceptedTerms?.message && (
-				<p className="text-sm text-red-600">{errors.acceptedTerms.message}</p>
+				<p className="text-sm text-danger">{errors.acceptedTerms.message}</p>
 			)}
 
 			<Button
