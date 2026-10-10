@@ -13,12 +13,12 @@ export default function VerifyEmailStatus() {
 	if (!token) {
 		return (
 			<div className="space-y-4 text-center">
-				<p className="text-sm text-red-600">
+				<p className="text-sm text-danger">
 					This verification link is missing its token.
 				</p>
 				<Link
 					href="/login"
-					className="text-sm font-medium text-gray-900 hover:underline">
+					className="text-sm font-medium text-foreground hover:underline">
 					Back to sign in
 				</Link>
 			</div>
@@ -27,7 +27,7 @@ export default function VerifyEmailStatus() {
 
 	if (isLoading) {
 		return (
-			<p className="text-center text-sm text-gray-600">
+			<p className="text-center text-sm text-muted-foreground">
 				Verifying your email...
 			</p>
 		);
@@ -36,14 +36,14 @@ export default function VerifyEmailStatus() {
 	if (isError) {
 		return (
 			<div className="space-y-4 text-center">
-				<p className="text-sm text-red-600">
+				<p className="text-sm text-danger">
 					{error instanceof Error
 						? error.message
 						: "Could not verify this link."}
 				</p>
 				<Link
 					href="/login"
-					className="text-sm font-medium text-gray-900 hover:underline">
+					className="text-sm font-medium text-foreground hover:underline">
 					Back to sign in
 				</Link>
 			</div>
@@ -52,12 +52,12 @@ export default function VerifyEmailStatus() {
 
 	return (
 		<div className="space-y-4 text-center">
-			<p className="text-sm text-gray-600">
+			<p className="text-sm text-muted-foreground">
 				Your email has been verified. You can now sign in.
 			</p>
 			<Link
 				href="/login"
-				className="text-sm font-medium text-gray-900 hover:underline">
+				className="text-sm font-medium text-foreground hover:underline">
 				Sign in
 			</Link>
 		</div>

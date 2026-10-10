@@ -28,7 +28,7 @@ export default function ForgotPasswordForm() {
 
 	if (forgotPasswordMutation.isSuccess) {
 		return (
-			<p className="text-center text-sm text-gray-600">
+			<p className="text-center text-sm text-muted-foreground">
 				If the account exists, a reset email will be sent.
 			</p>
 		);

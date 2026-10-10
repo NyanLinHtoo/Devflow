@@ -33,20 +33,18 @@ export function FormField({
 
 	return (
 		<div className="space-y-2">
-			<label
-				htmlFor={htmlFor}
-				className="block text-sm font-medium text-gray-900">
+			<label htmlFor={htmlFor} className="block text-sm font-medium text-foreground">
 				{label}
 			</label>
 
 			{enhancedChild}
 
 			{error ? (
-				<p id={messageId} role="alert" className="text-sm text-red-600">
+				<p id={messageId} role="alert" className="text-sm text-danger">
 					{error}
 				</p>
 			) : helperText ? (
-				<p id={messageId} className="text-sm text-gray-500">
+				<p id={messageId} className="text-sm text-muted-foreground">
 					{helperText}
 				</p>
 			) : null}

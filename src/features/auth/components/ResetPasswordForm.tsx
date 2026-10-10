@@ -40,7 +40,7 @@ export default function ResetPasswordForm() {
 
 	if (!token) {
 		return (
-			<p className="text-center text-sm text-red-600">
+			<p className="text-center text-sm text-danger">
 				This reset link is missing its token. Request a new one.
 			</p>
 		);
