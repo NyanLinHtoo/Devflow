@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { Prisma } from "../../generated/prisma/client.js";
 import { validate } from "../../lib/validation.js";
-import { getProjectById } from "../project/projectService.js";
-import { isProjectManager } from "../projectMember/projectMemberService.js";
+import { getProjectById } from "../projects/projectService.js";
+import { isProjectManager } from "../project-members/projectMemberService.js";
 import { updateTaskAssigneeSchema } from "./taskAssigneeSchema.js";
 import {
   createTaskSchema,

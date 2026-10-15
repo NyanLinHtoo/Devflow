@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma.js";
-import { getProjectMemberById } from "../projectMember/projectMemberService.js";
+import { getProjectMemberById } from "../project-members/projectMemberService.js";
 import { toTaskResponse } from "./taskMapper.js";
 import type { CreateTaskInput, UpdateTaskInput } from "./taskTypes.js";
 

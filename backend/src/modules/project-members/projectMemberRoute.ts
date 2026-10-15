@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { Prisma } from "../../generated/prisma/client.js";
 import prisma from "../../lib/prisma.js";
 import { validate } from "../../lib/validation.js";
-import { projectParamsSchema } from "../project/projectSchema.js";
+import { projectParamsSchema } from "../projects/projectSchema.js";
 import {
   addProjectMemberSchema,
   projectMemberParamsSchema,

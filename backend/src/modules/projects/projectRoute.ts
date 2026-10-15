@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { validate } from "../../lib/validation.js";
-import { isProjectManager } from "../projectMember/projectMemberService.js";
+import { isProjectManager } from "../project-members/projectMemberService.js";
 import {
   createProjectSchema,
   projectParamsSchema,

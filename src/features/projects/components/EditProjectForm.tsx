@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import { TextArea } from "@/components/ui/textArea";
+import { TextArea } from "@/components/ui/text-area";
 import { useUpdateProject } from "@/hooks/useProjects";
 import type { Project } from "@/types/projectTypes";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -10,7 +10,7 @@ import {
 	CreateProjectFormData,
 	createProjectSchema,
 } from "../schemas/createProjectSchema";
-import { TextArea } from "@/components/ui/textArea";
+import { TextArea } from "@/components/ui/text-area";
 
 export default function CreateProjectForm({
 	onSuccess,

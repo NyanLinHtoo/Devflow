@@ -33,7 +33,9 @@ export function FormField({
 
 	return (
 		<div className="space-y-2">
-			<label htmlFor={htmlFor} className="block text-sm font-medium text-foreground">
+			<label
+				htmlFor={htmlFor}
+				className="block text-sm font-medium text-foreground">
 				{label}
 			</label>
 

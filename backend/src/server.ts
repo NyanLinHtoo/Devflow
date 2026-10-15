@@ -11,8 +11,8 @@ import { isAppError } from "./lib/errors.js";
 import prisma from "./lib/prisma.js";
 import { isValidationError } from "./lib/validation.js";
 import { authRoutes } from "./modules/auth/authRoute.js";
-import { projectRoutes } from "./modules/project/projectRoute.js";
-import { projectMemberRoutes } from "./modules/projectMember/projectMemberRoute.js";
+import { projectRoutes } from "./modules/projects/projectRoute.js";
+import { projectMemberRoutes } from "./modules/project-members/projectMemberRoute.js";
 import { taskRoutes } from "./modules/tasks/taskRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;

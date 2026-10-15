@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { TextArea } from "@/components/ui/textArea";
+import { TextArea } from "@/components/ui/text-area";
 import { useUpdateTask } from "@/hooks/useTasks";
 import type { Task } from "@/types/taskTypes";
 import { zodResolver } from "@hookform/resolvers/zod";

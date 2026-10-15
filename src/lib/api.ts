@@ -57,9 +57,7 @@ export async function apiFetch<T>(
 
 	const pathname = path.split("?")[0];
 	const shouldRefresh =
-		response.status === 401 &&
-		retry &&
-		!REFRESH_EXCLUDED_PATHS.has(pathname);
+		response.status === 401 && retry && !REFRESH_EXCLUDED_PATHS.has(pathname);
 
 	if (shouldRefresh) {
 		const refreshed = await refreshSession();

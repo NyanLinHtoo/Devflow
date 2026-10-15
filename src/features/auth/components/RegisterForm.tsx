@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/input/passwordInput";
+import { PasswordInput } from "@/components/ui/passwordInput";
 import { useRegister, useResendVerification } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -47,8 +47,10 @@ export default function RegisterForm() {
 			<div className="space-y-4 text-center">
 				<p className="text-sm text-muted-foreground">
 					We sent a verification link to{" "}
-					<span className="font-medium text-foreground">{registered.email}</span>.
-					Verify your email before signing in.
+					<span className="font-medium text-foreground">
+						{registered.email}
+					</span>
+					. Verify your email before signing in.
 				</p>
 
 				{registered.verificationToken && (

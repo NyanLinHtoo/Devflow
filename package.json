@@ -1,33 +1,37 @@
 {
-  "name": "devflow",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "@ark-ui/react": "^5.38.1",
-    "@hookform/resolvers": "^5.8.0",
-    "@tanstack/react-query": "^5.102.8",
-    "lucide-react": "^1.31.0",
-    "next": "16.3.0",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "react-hook-form": "^7.85.0",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+	"name": "devflow",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "eslint",
+		"typecheck": "tsc --noEmit",
+		"format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+		"check": "npm run format && npm run typecheck && npm run lint && npm run build"
+	},
+	"dependencies": {
+		"@ark-ui/react": "^5.38.1",
+		"@hookform/resolvers": "^5.8.0",
+		"@tanstack/react-query": "^5.102.8",
+		"lucide-react": "^1.31.0",
+		"next": "16.3.0",
+		"react": "19.2.8",
+		"react-dom": "19.2.8",
+		"react-hook-form": "^7.85.0",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"eslint": "^9",
+		"eslint-config-next": "16.3.0",
+		"prettier": "^3.9.10",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
 }

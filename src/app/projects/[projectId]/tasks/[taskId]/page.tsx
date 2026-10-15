@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorState, LoadingState } from "@/components/ui/state";
-import TaskAssigneeSelect from "@/features/projects/components/TaskAssigneeSelect";
+import TaskAssigneeSelect from "@/features/tasks/components/TaskAssigneeSelect";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import {
@@ -81,7 +81,9 @@ export default function TaskDetail() {
 
 			<div className="mt-4 mb-6 flex flex-wrap items-start justify-between gap-4">
 				<div>
-					<h1 className="text-2xl font-semibold tracking-tight">{task.title}</h1>
+					<h1 className="text-2xl font-semibold tracking-tight">
+						{task.title}
+					</h1>
 					<p className="mt-1 text-xs text-muted-foreground">
 						Updated {new Date(task.updatedAt).toLocaleDateString()}
 					</p>
