@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "../schemas/loginSchema";
 import { useLogin } from "@/hooks/useAuth";
-import { PasswordInput } from "@/components/ui/passwordInput";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function LoginForm() {
 	const {

@@ -2,7 +2,7 @@ import type { SelectHTMLAttributes } from "react";
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
-export function Select({ className = "", ...props }: SelectProps) {
+export function Select({ className = "", children, ...props }: SelectProps) {
 	return (
 		<select
 			className={[
@@ -12,6 +12,8 @@ export function Select({ className = "", ...props }: SelectProps) {
 				"disabled:cursor-not-allowed disabled:bg-surface-muted disabled:opacity-60",
 				className,
 			].join(" ")}
-			{...props}></select>
+			{...props}>
+			{children}
+		</select>
 	);
 }

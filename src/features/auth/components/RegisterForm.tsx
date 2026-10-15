@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/passwordInput";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useRegister, useResendVerification } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -136,7 +136,7 @@ export default function RegisterForm() {
 			<label className="flex items-center gap-2 text-sm text-muted-foreground">
 				<input
 					type="checkbox"
-					className="size-4 rounded border-gray-300"
+					className="size-4 rounded border-border accent-primary"
 					{...register("acceptedTerms")}
 				/>
 				<span>

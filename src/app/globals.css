@@ -18,6 +18,26 @@
 	--warning-surface: #fffbeb;
 }
 
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+		--surface: #141414;
+		--surface-muted: #262626;
+		--border: #2e2e2e;
+		--muted-foreground: #a1a1aa;
+		--primary: #ededed;
+		--primary-foreground: #0a0a0a;
+		--ring: #ededed;
+		--danger: #f87171;
+		--danger-surface: #2a1414;
+		--success: #4ade80;
+		--success-surface: #14241a;
+		--warning: #fbbf24;
+		--warning-surface: #2a2110;
+	}
+}
+
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

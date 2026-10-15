@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import type { Project } from "@/types/projectTypes";
 
@@ -8,7 +9,7 @@ type ProjectCardProps = {
 export default function ProjectCard({ project }: ProjectCardProps) {
 	return (
 		<Link href={`/projects/${project.id}`} className="block">
-			<article className="h-full rounded-lg border border-border bg-surface p-4 transition-colors hover:border-foreground/30">
+			<Card className="h-full transition-colors hover:border-foreground/30">
 				<h2 className="font-medium text-foreground">{project.name}</h2>
 
 				{project.description && (
@@ -16,7 +17,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 						{project.description}
 					</p>
 				)}
-			</article>
+			</Card>
 		</Link>
 	);
 }

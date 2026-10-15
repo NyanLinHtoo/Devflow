@@ -1,5 +1,7 @@
 "use client";
 
+import { Container } from "@/components/ui/container";
+import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
@@ -10,8 +12,6 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-
-const container = "mx-auto w-full max-w-3xl px-4 py-8 sm:px-6";
 
 export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
@@ -27,9 +27,9 @@ export default function ProjectDetail() {
 
 	if (isAuthLoading) {
 		return (
-			<main className={container}>
+			<Container>
 				<LoadingState />
-			</main>
+			</Container>
 		);
 	}
 
@@ -39,60 +39,57 @@ export default function ProjectDetail() {
 
 	if (isLoading) {
 		return (
-			<main className={container}>
+			<Container>
 				<LoadingState label="Loading project..." />
-			</main>
+			</Container>
 		);
 	}
 
 	if (isError) {
 		return (
-			<main className={container}>
+			<Container>
 				<ErrorState message="Failed to load project." />
-			</main>
+			</Container>
 		);
 	}
 
 	if (!project) {
 		return (
-			<main className={container}>
+			<Container>
 				<ErrorState message="Project not found." />
-			</main>
+			</Container>
 		);
 	}
 
 	return (
-		<main className={container}>
+		<Container>
 			<Link
 				href="/projects"
 				className="text-sm text-muted-foreground hover:text-foreground">
 				← Back to projects
 			</Link>
 
-			<div className="mt-4 mb-8 flex flex-wrap items-start justify-between gap-4">
-				<div>
-					<h1 className="text-2xl font-semibold tracking-tight">
-						{project.name}
-					</h1>
-
-					{project.description && (
-						<p className="mt-1 text-sm text-muted-foreground">
-							{project.description}
-						</p>
-					)}
-
-					<p className="mt-1 text-xs text-muted-foreground">
-						Created {new Date(project.createdAt).toLocaleDateString()}
-					</p>
-				</div>
-
-				<div className="flex flex-wrap gap-2">
-					<EditProjectDialog project={project} />
-					<DeleteProjectDialog
-						projectId={projectId}
-						projectName={project.name}
-					/>
-				</div>
+			<div className="mt-4">
+				<PageHeader
+					title={project.name}
+					description={
+						<>
+							{project.description ? <p>{project.description}</p> : null}
+							<p className="mt-1 text-xs">
+								Created {new Date(project.createdAt).toLocaleDateString()}
+							</p>
+						</>
+					}
+					actions={
+						<>
+							<EditProjectDialog project={project} />
+							<DeleteProjectDialog
+								projectId={projectId}
+								projectName={project.name}
+							/>
+						</>
+					}
+				/>
 			</div>
 
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -115,6 +112,6 @@ export default function ProjectDetail() {
 					No tasks yet. Create your first task to get started.
 				</EmptyState>
 			)}
-		</main>
+		</Container>
 	);
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { useUpdateTaskAssignee } from "@/hooks/useTasks";
 import type { ProjectMember } from "@/types/projectMemberTypes";
 import type { AssignedMember } from "@/types/taskTypes";
@@ -31,7 +32,9 @@ export default function TaskAssigneeSelect({
 		return (
 			<div>
 				<p className="text-sm font-medium">Assignee</p>
-				<p className="text-sm">{assignedMember?.fullName ?? "Unassigned"}</p>
+				<p className="text-sm text-muted-foreground">
+					{assignedMember?.fullName ?? "Unassigned"}
+				</p>
 			</div>
 		);
 	}
@@ -39,25 +42,22 @@ export default function TaskAssigneeSelect({
 	const handleSave = () => {
 		updateTaskAssignee.mutate({
 			taskId,
-			data: {
-				assignedMemberId: selectedMemberId,
-			},
+			data: { assignedMemberId: selectedMemberId },
 		});
 	};
 
 	return (
-		<div>
+		<div className="space-y-2">
 			<label htmlFor="task-assignee" className="text-sm font-medium">
 				Assignee
 			</label>
 
-			<div className="flex items-center gap-2">
-				<select
+			<div className="flex flex-wrap items-center gap-2">
+				<Select
 					id="task-assignee"
+					className="w-full sm:w-64"
 					value={selectedMemberId ?? ""}
-					onChange={(event) => {
-						setSelectedMemberId(event.target.value || null);
-					}}
+					onChange={(event) => setSelectedMemberId(event.target.value || null)}
 					disabled={updateTaskAssignee.isPending}>
 					<option value="">Unassigned</option>
 
@@ -66,7 +66,7 @@ export default function TaskAssigneeSelect({
 							{member.fullName}
 						</option>
 					))}
-				</select>
+				</Select>
 
 				<Button
 					type="button"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DialogContent } from "@/components/ui/dialog";
 import type { Task } from "@/types/taskTypes";
 import { Dialog } from "@ark-ui/react/dialog";
 import { useState } from "react";
@@ -23,31 +24,23 @@ export default function EditTaskDialog({
 				<Button type="button">Edit task</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Backdrop className="fixed inset-0 bg-black/40" />
+			<DialogContent title="Editing task">
+				{open && (
+					<EditTaskForm
+						task={task}
+						projectId={projectId}
+						onSuccess={() => setOpen(false)}
+					/>
+				)}
 
-			<Dialog.Positioner className="fixed inset-0 flex items-center justify-center p-4">
-				<Dialog.Content className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-surface p-6 shadow-lg">
-					<Dialog.Title className="text-lg font-semibold text-foreground">
-						Editing task
-					</Dialog.Title>
-
-					{open && (
-						<EditTaskForm
-							task={task}
-							projectId={projectId}
-							onSuccess={() => setOpen(false)}
-						/>
-					)}
-
-					<div className="mt-6 flex justify-end gap-3">
-						<Dialog.CloseTrigger asChild>
-							<Button type="button" variant="secondary">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					</div>
-				</Dialog.Content>
-			</Dialog.Positioner>
+				<div className="mt-6 flex justify-end gap-3">
+					<Dialog.CloseTrigger asChild>
+						<Button type="button" variant="secondary">
+							Cancel
+						</Button>
+					</Dialog.CloseTrigger>
+				</div>
+			</DialogContent>
 		</Dialog.Root>
 	);
 }

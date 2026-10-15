@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
-import { PasswordInput } from "@/components/ui/passwordInput";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useResetPassword } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";

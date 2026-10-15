@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DialogContent } from "@/components/ui/dialog";
 import { useDeleteTask } from "@/hooks/useTasks";
 import { Dialog } from "@ark-ui/react/dialog";
 import { useRouter } from "next/navigation";
@@ -38,38 +39,30 @@ export default function DeleteTaskDialog({
 				<Button type="button">Delete task</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Backdrop className="fixed inset-0 bg-black/40" />
+			<DialogContent title="Delete task?">
+				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
+					Are you sure you want to delete `{taskTitle}`? This action cannot be
+					undone.
+				</Dialog.Description>
 
-			<Dialog.Positioner className="fixed inset-0 flex items-center justify-center p-4">
-				<Dialog.Content className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-surface p-6 shadow-lg">
-					<Dialog.Title className="text-lg font-semibold text-foreground">
-						Delete task?
-					</Dialog.Title>
-
-					<Dialog.Description className="mt-2 text-sm text-gray-600">
-						Are you sure you want to delete `{taskTitle}`? This action cannot be
-						undone.
-					</Dialog.Description>
-
-					<div className="mt-6 flex justify-end gap-3">
-						<Dialog.CloseTrigger asChild>
-							<Button
-								type="button"
-								variant="secondary"
-								disabled={deleteTaskMutation.isPending}>
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-
+				<div className="mt-6 flex justify-end gap-3">
+					<Dialog.CloseTrigger asChild>
 						<Button
 							type="button"
-							onClick={handleDelete}
+							variant="secondary"
 							disabled={deleteTaskMutation.isPending}>
-							{deleteTaskMutation.isPending ? "Deleting..." : "Delete"}
+							Cancel
 						</Button>
-					</div>
-				</Dialog.Content>
-			</Dialog.Positioner>
+					</Dialog.CloseTrigger>
+
+					<Button
+						type="button"
+						onClick={handleDelete}
+						disabled={deleteTaskMutation.isPending}>
+						{deleteTaskMutation.isPending ? "Deleting..." : "Delete"}
+					</Button>
+				</div>
+			</DialogContent>
 		</Dialog.Root>
 	);
 }

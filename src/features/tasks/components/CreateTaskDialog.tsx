@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DialogContent } from "@/components/ui/dialog";
 import { Dialog } from "@ark-ui/react/dialog";
 import { useState } from "react";
 import CreateTaskForm from "./CreateTaskForm";
@@ -18,28 +19,20 @@ export default function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
 				<Button type="button">Create task</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Backdrop className="fixed inset-0 bg-black/40" />
+			<DialogContent title="Creating task">
+				<CreateTaskForm
+					projectId={projectId}
+					onSuccess={() => setOpen(false)}
+				/>
 
-			<Dialog.Positioner className="fixed inset-0 flex items-center justify-center p-4">
-				<Dialog.Content className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-surface p-6 shadow-lg">
-					<Dialog.Title className="text-lg font-semibold text-foreground">
-						Creating task
-					</Dialog.Title>
-
-					<CreateTaskForm
-						projectId={projectId}
-						onSuccess={() => setOpen(false)}
-					/>
-
-					<div className="mt-6 flex justify-end gap-3">
-						<Dialog.CloseTrigger asChild>
-							<Button type="button" variant="secondary">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					</div>
-				</Dialog.Content>
-			</Dialog.Positioner>
+				<div className="mt-6 flex justify-end gap-3">
+					<Dialog.CloseTrigger asChild>
+						<Button type="button" variant="secondary">
+							Cancel
+						</Button>
+					</Dialog.CloseTrigger>
+				</div>
+			</DialogContent>
 		</Dialog.Root>
 	);
 }

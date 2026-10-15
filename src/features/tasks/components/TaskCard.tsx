@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import {
 	taskPriorityLabels,
 	taskStatusLabels,
@@ -13,7 +14,7 @@ type TaskCardProps = {
 export default function TaskCard({ task, projectId }: TaskCardProps) {
 	return (
 		<Link href={`/projects/${projectId}/tasks/${task.id}`} className="block">
-			<article className="rounded-lg border border-border bg-surface p-4 transition-colors hover:border-foreground/30">
+			<Card className="transition-colors hover:border-foreground/30">
 				<div className="flex items-start justify-between gap-3">
 					<h2 className="font-medium text-foreground">{task.title}</h2>
 					<span className="shrink-0 text-xs text-muted-foreground">
@@ -36,7 +37,7 @@ export default function TaskCard({ task, projectId }: TaskCardProps) {
 							: new Date(task.dueDate).toDateString()}
 					</span>
 				</div>
-			</article>
+			</Card>
 		</Link>
 	);
 }
