@@ -37,6 +37,7 @@ export function useCreateTask(projectId: string) {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
+				exact: true,
 			});
 		},
 	});
@@ -56,6 +57,7 @@ export function useUpdateTask(projectId: string) {
 		onSuccess: async (updatedTask) => {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
+				exact: true,
 			});
 
 			await queryClient.invalidateQueries({
@@ -68,6 +70,8 @@ export function useUpdateTask(projectId: string) {
 export function useDeleteTask(projectId: string) {
 	const queryClient = useQueryClient();
 
+	const listKey = ["projects", projectId, "tasks"];
+
 	return useMutation({
 		mutationFn: (taskId: string) =>
 			apiFetch<{ message: string }>(`/projects/${projectId}/tasks/${taskId}`, {
@@ -75,13 +79,15 @@ export function useDeleteTask(projectId: string) {
 			}),
 		meta: { successMessage: "Task deleted" },
 
-		onSuccess: async (_data, taskId) => {
-			await queryClient.invalidateQueries({
-				queryKey: ["projects", projectId, "tasks"],
-			});
+		onSuccess: (_data, taskId) => {
+			queryClient.setQueryData<Task[]>(listKey, (tasks) =>
+				tasks?.filter((task) => task.id !== taskId),
+			);
 
-			queryClient.removeQueries({
-				queryKey: ["projects", projectId, "tasks", taskId],
+			queryClient.invalidateQueries({ queryKey: listKey, exact: true });
+			queryClient.invalidateQueries({
+				queryKey: [...listKey, taskId],
+				refetchType: "none",
 			});
 		},
 	});
@@ -107,6 +113,7 @@ export function useUpdateTaskAssignee(projectId: string) {
 		onSuccess: async (updatedTask) => {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
+				exact: true,
 			});
 
 			await queryClient.invalidateQueries({

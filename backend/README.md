@@ -118,8 +118,8 @@ src/
   modules/
     auth/             Routes, service, schemas, types
     email/            Resend email service
-    project/          Routes, service, schema, mapper, types
-    projectMember/    Routes, service, schema, mapper, types
+    projects/         Routes, service, schema, mapper, types
+    project-members/  Routes, service, schema, mapper, types
     tasks/            Routes, service, schemas, mapper, types
   types/              Fastify and @fastify/jwt type augmentations
   server.ts           App setup, plugins, error handling, startup
@@ -150,6 +150,19 @@ Conventions:
 - Member add/role-change/remove requires `MANAGER`.
 - Task create/update/delete is available to any project member; changing a task's assignee requires `MANAGER`.
 
+### Account role
+
+Each user also has an account-level `role` (`MANAGER` or `MEMBER`) used only for creating projects.
+New accounts are created as `MEMBER`; only `MANAGER` accounts may create projects. Promote a user
+manually (for example in Prisma Studio or with SQL):
+
+```sql
+UPDATE "User" SET "role" = 'MANAGER' WHERE "email" = 'someone@example.com';
+```
+
+The account role is independent of the per-project role: a `MEMBER` account can still be a `MANAGER`
+of an individual project.
+
 ## API overview
 
 All protected endpoints require a valid access-token cookie; unauthenticated requests return `401`.
@@ -165,7 +178,7 @@ All protected endpoints require a valid access-token cookie; unauthenticated req
 | Auth  | POST   | `/auth/reset-password`                         | Set a new password from a reset token      |
 | Auth  | GET    | `/auth/verify-email?token=`                    | Verify an email from the emailed link      |
 | Auth  | POST   | `/auth/resend-verification`                    | Re-send a verification email               |
-| Projects | POST | `/projects`                                    | Create a project (creator becomes manager) |
+| Projects | POST | `/projects`                                    | Create a project (account managers only; creator becomes project manager) |
 | Projects | GET  | `/projects`                                    | List projects the caller belongs to        |
 | Projects | GET/PATCH/DELETE | `/projects/:projectId`              | Read, update, or delete a project          |
 | Members | POST  | `/projects/:projectId/members`                 | Add a member by email and role             |

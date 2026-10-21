@@ -3,10 +3,12 @@
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import MemberList from "@/features/members/components/MemberList";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
+import { useProjectMembers } from "@/hooks/useProjectMembers";
 import { useProject } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
@@ -17,13 +19,23 @@ export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
 	const projectId = params.projectId;
 
-	const { isLoading: isAuthLoading, isError: isAuthError } = useRequireAuth();
+	const {
+		data: currentUser,
+		isLoading: isAuthLoading,
+		isError: isAuthError,
+	} = useRequireAuth();
 	const { data: project, isLoading, isError } = useProject(projectId);
 	const {
 		data: tasks,
 		isLoading: isTaskLoading,
 		isError: isTaskError,
 	} = useTasks(projectId);
+	const { data: members = [] } = useProjectMembers(projectId);
+
+	const currentMember = members.find(
+		(member) => member.userId === currentUser?.id,
+	);
+	const canManage = currentMember?.role === "MANAGER";
 
 	if (isAuthLoading) {
 		return (
@@ -81,14 +93,24 @@ export default function ProjectDetail() {
 						</>
 					}
 					actions={
-						<>
-							<EditProjectDialog project={project} />
-							<DeleteProjectDialog
-								projectId={projectId}
-								projectName={project.name}
-							/>
-						</>
+						canManage ? (
+							<>
+								<EditProjectDialog project={project} />
+								<DeleteProjectDialog
+									projectId={projectId}
+									projectName={project.name}
+								/>
+							</>
+						) : undefined
 					}
+				/>
+			</div>
+
+			<div className="mb-8">
+				<MemberList
+					projectId={projectId}
+					currentUserId={currentUser?.id}
+					canManage={canManage}
 				/>
 			</div>
 

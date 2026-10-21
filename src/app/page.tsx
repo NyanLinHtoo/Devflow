@@ -2,7 +2,9 @@ import Link from "next/link";
 
 export default function HomePage() {
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+		<main
+			id="main"
+			className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
 			<div className="w-full max-w-md space-y-8 text-center">
 				<div>
 					<h1 className="text-3xl font-semibold tracking-tight text-foreground">

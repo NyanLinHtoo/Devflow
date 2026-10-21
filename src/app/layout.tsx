@@ -31,9 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 					Skip to content
 				</a>
 				<QueryProvider>
-					<div id="main" className="flex flex-1 flex-col">
-						{children}
-					</div>
+					<div className="flex flex-1 flex-col">{children}</div>
 				</QueryProvider>
 				<Toaster />
 			</body>

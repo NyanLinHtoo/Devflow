@@ -35,6 +35,7 @@ export function useCreateProject() {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects"],
+				exact: true,
 			});
 		},
 	});
@@ -57,6 +58,7 @@ export function useUpdateProject() {
 		onSuccess: async (updatedProject) => {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects"],
+				exact: true,
 			});
 
 			await queryClient.invalidateQueries({
@@ -76,13 +78,17 @@ export function useDeleteProject() {
 			}),
 		meta: { successMessage: "Project deleted" },
 
-		onSuccess: async (_data, projectId) => {
-			await queryClient.invalidateQueries({
-				queryKey: ["projects"],
-			});
+		onSuccess: (_data, projectId) => {
+			queryClient.cancelQueries({ queryKey: ["projects", projectId] });
 
-			queryClient.removeQueries({
+			queryClient.setQueryData<Project[]>(["projects"], (projects) =>
+				projects?.filter((project) => project.id !== projectId),
+			);
+
+			queryClient.invalidateQueries({ queryKey: ["projects"], exact: true });
+			queryClient.invalidateQueries({
 				queryKey: ["projects", projectId],
+				refetchType: "none",
 			});
 		},
 	});

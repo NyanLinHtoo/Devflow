@@ -23,14 +23,16 @@ export default function DeleteTaskDialog({
 
 	const router = useRouter();
 
-	function handleDelete() {
-		deleteTaskMutation.mutate(taskId, {
-			onSuccess: () => {
-				if (redirectAfterDelete) {
-					router.replace(`/projects/${projectId}`);
-				}
-			},
-		});
+	async function handleDelete() {
+		try {
+			await deleteTaskMutation.mutateAsync(taskId);
+
+			if (redirectAfterDelete) {
+				router.replace(`/projects/${projectId}`);
+			}
+		} catch {
+			// Errors surface through the global mutation toast.
+		}
 	}
 
 	return (

@@ -25,14 +25,16 @@ The items below track work outside the current implementation. Checked items are
 - [x] Add accessible toast notifications (Ark UI Toast) for successful, failed, and status actions.
 - [x] Choose and apply the production font (Geist, previously overridden by Arial in `globals.css`).
 - [x] Establish colors/theme and apply it consistently (semantic tokens in `globals.css`).
-- [ ] Decide on dark mode — either implement a dark palette and toggle honoring `prefers-color-scheme`, or explicitly defer.
-- [ ] Refactor the UI into a cohesive design system/components where repetition has emerged (primitives are tokenized; a full pass is pending).
-- [ ] Complete a responsive and keyboard-accessible review for all core flows (an initial pass is done; tab-through plus 320px and 200%-zoom checks remain).
+- [x] Dark mode — implemented via `prefers-color-scheme` (system preference; no manual toggle).
+- [x] Consolidate the UI into a design system — `Container`, `PageHeader`, `Card`, and `DialogContent` primitives, and `components/ui/<name>/index.tsx` folder modules with short imports.
+- [ ] Complete a **manual** responsive and keyboard review for all core flows. (Initial pass is done: global focus rings, skip link, 16px inputs, touch targets, scrolling dialogs. Still needs a human tab-through plus 320px and 200%-zoom checks.)
 
 ## Phase 5 — Testing and Release Quality (V1)
 
-- [ ] Add backend tests for authentication, project membership, role permissions, task assignment/unassignment, and invalid cross-project requests.
-- [ ] Add frontend tests for manager-only controls, assignment states, error handling, and redirects.
+Automated tests are code that asserts behavior and runs without a human. Manual QA is a human walkthrough. Both are listed here.
+
+- [ ] Add automated backend tests (Jest + supertest) for authentication, project membership, role permissions, task assignment/unassignment, and invalid cross-project requests.
+- [ ] Add automated frontend tests for manager-only controls, assignment states, error handling, and redirects.
 - [ ] Exercise edge cases manually: removed member assigned to a task, stale client data, unauthorized direct API calls, empty member lists, and concurrent edits.
 - [x] Run and resolve lint, formatting, type-check, and build for frontend and backend. (No test suite exists yet, so test failures are not covered.)
 - [ ] Add a release checklist. (The production build has been verified locally.)

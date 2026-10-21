@@ -36,6 +36,12 @@ export default function TaskCard({ task, projectId }: TaskCardProps) {
 							? "No due date"
 							: new Date(task.dueDate).toDateString()}
 					</span>
+					<span aria-hidden="true">·</span>
+					<span>
+						{task.assignedMember
+							? `Assigned to ${task.assignedMember.fullName}`
+							: "Not assigned yet"}
+					</span>
 				</div>
 			</Card>
 		</Link>

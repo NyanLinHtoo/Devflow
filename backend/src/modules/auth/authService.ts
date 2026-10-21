@@ -40,6 +40,7 @@ export async function registerUser(input: RegisterInput) {
           id: true,
           fullName: true,
           email: true,
+          role: true,
           createdAt: true,
         },
       });
@@ -99,6 +100,7 @@ export async function loginUser(input: LoginInput) {
     id: user.id,
     fullName: user.fullName,
     email: user.email,
+    role: user.role,
     createdAt: user.createdAt,
   };
   return safeUser;
@@ -155,7 +157,13 @@ export async function getSessionById(sessionId: string) {
 export async function getUserById(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, fullName: true, email: true, createdAt: true },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
   });
 
   return user;
@@ -164,7 +172,13 @@ export async function getUserById(userId: string) {
 export async function getUserByEmail(email: string) {
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, fullName: true, email: true, createdAt: true },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
   });
 
   return user;

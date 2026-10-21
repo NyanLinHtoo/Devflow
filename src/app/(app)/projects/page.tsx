@@ -9,7 +9,11 @@ import { useProjects } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function ProjectsPage() {
-	const { isLoading: isAuthLoading, isError: isAuthError } = useRequireAuth();
+	const {
+		data: user,
+		isLoading: isAuthLoading,
+		isError: isAuthError,
+	} = useRequireAuth();
 	const { data: projects, isLoading, isError } = useProjects();
 
 	if (isAuthLoading) {
@@ -20,9 +24,11 @@ export default function ProjectsPage() {
 		);
 	}
 
-	if (isAuthError) {
+	if (isAuthError || !user) {
 		return null;
 	}
+
+	const canCreate = user.role === "MANAGER";
 
 	if (isLoading) {
 		return (
@@ -42,7 +48,15 @@ export default function ProjectsPage() {
 
 	return (
 		<Container>
-			<PageHeader title="Projects" actions={<CreateProjectDialog />} />
+			<PageHeader
+				title="Projects"
+				description={
+					canCreate
+						? undefined
+						: "Only managers can create projects. Ask a manager to add you."
+				}
+				actions={canCreate ? <CreateProjectDialog /> : undefined}
+			/>
 
 			{projects && projects.length > 0 ? (
 				<div className="grid gap-4 sm:grid-cols-2">
@@ -52,7 +66,9 @@ export default function ProjectsPage() {
 				</div>
 			) : (
 				<EmptyState>
-					No projects yet. Create your first project to get started.
+					{canCreate
+						? "No projects yet. Create your first project to get started."
+						: "You are not a member of any project yet."}
 				</EmptyState>
 			)}
 		</Container>

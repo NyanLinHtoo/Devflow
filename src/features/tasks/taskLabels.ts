@@ -11,3 +11,11 @@ export const taskPriorityLabels: Record<Task["priority"], string> = {
 	MEDIUM: "Medium",
 	HIGH: "High",
 };
+
+export const taskStatusOptions = (
+	Object.keys(taskStatusLabels) as Task["status"][]
+).map((value) => ({ value, label: taskStatusLabels[value] }));
+
+export const taskPriorityOptions = (
+	Object.keys(taskPriorityLabels) as Task["priority"][]
+).map((value) => ({ value, label: taskPriorityLabels[value] }));

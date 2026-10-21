@@ -18,12 +18,13 @@ export default function DeleteProjectDialog({
 	const deleteProjectMutation = useDeleteProject();
 	const router = useRouter();
 
-	function handleDelete() {
-		deleteProjectMutation.mutate(projectId, {
-			onSuccess: () => {
-				router.replace("/projects");
-			},
-		});
+	async function handleDelete() {
+		try {
+			await deleteProjectMutation.mutateAsync(projectId);
+			router.replace("/projects");
+		} catch {
+			// Errors surface through the global mutation toast.
+		}
 	}
 
 	return (

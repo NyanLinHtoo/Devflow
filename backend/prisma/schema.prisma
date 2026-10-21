@@ -16,6 +16,7 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   emailVerifiedAt DateTime?
+  role            UserRole  @default(MEMBER)
 
   sessions           Session[]
   projectMembers     ProjectMember[]
@@ -114,6 +115,11 @@ model ProjectMember {
 }
 
 enum ProjectRole {
+  MANAGER
+  MEMBER
+}
+
+enum UserRole {
   MANAGER
   MEMBER
 }

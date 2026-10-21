@@ -5,6 +5,7 @@ import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TextArea } from "@/components/ui/text-area";
+import { taskPriorityOptions } from "@/features/tasks/taskLabels";
 import { useCreateTask } from "@/hooks/useTasks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -80,7 +81,13 @@ export default function CreateTaskForm({
 				label="Priority"
 				htmlFor="priority"
 				error={errors.priority?.message}>
-				<Select id="priority" {...register("priority")} />
+				<Select id="priority" {...register("priority")}>
+					{taskPriorityOptions.map((option) => (
+						<option key={option.value} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</Select>
 			</FormField>
 
 			<FormField

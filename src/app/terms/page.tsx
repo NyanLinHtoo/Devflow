@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function TermsPage() {
 	return (
-		<main className="bg- mx-auto max-w-3xl px-6 py-12">
+		<main id="main" className="mx-auto max-w-3xl px-6 py-12">
 			<div className="space-y-8">
 				<header className="space-y-2">
 					<h1 className="text-3xl font-bold tracking-tight text-gray-900">

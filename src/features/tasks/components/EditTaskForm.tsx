@@ -5,6 +5,10 @@ import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TextArea } from "@/components/ui/text-area";
+import {
+	taskPriorityOptions,
+	taskStatusOptions,
+} from "@/features/tasks/taskLabels";
 import { useUpdateTask } from "@/hooks/useTasks";
 import type { Task } from "@/types/taskTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -111,11 +115,23 @@ export default function EditTaskForm({
 				label="Priority"
 				htmlFor="priority"
 				error={errors.priority?.message}>
-				<Select id="priority" {...register("priority")} />
+				<Select id="priority" {...register("priority")}>
+					{taskPriorityOptions.map((option) => (
+						<option key={option.value} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</Select>
 			</FormField>
 
 			<FormField label="Status" htmlFor="status" error={errors.status?.message}>
-				<Select id="status" {...register("status")} />
+				<Select id="status" {...register("status")}>
+					{taskStatusOptions.map((option) => (
+						<option key={option.value} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</Select>
 			</FormField>
 
 			<FormField
