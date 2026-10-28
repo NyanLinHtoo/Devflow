@@ -1,9 +1,7 @@
-import {
-	cloneElement,
-	isValidElement,
-	type ReactElement,
-	type ReactNode,
-} from "react";
+"use client";
+
+import type { ReactNode } from "react";
+import { FormFieldContext } from "./context";
 
 type FormFieldProps = {
 	label: string;
@@ -23,33 +21,28 @@ export function FormField({
 	const messageId = `${htmlFor}-message`;
 	const hasMessage = Boolean(error || helperText);
 
-	const enhancedChild =
-		hasMessage && isValidElement(children)
-			? cloneElement(children as ReactElement<Record<string, unknown>>, {
-					"aria-describedby": messageId,
-					"aria-invalid": error ? true : undefined,
-				})
-			: children;
-
 	return (
-		<div className="space-y-2">
-			<label
-				htmlFor={htmlFor}
-				className="block text-sm font-medium text-foreground">
-				{label}
-			</label>
+		<FormFieldContext.Provider
+			value={{ messageId, hasMessage, invalid: Boolean(error) }}>
+			<div className="space-y-2">
+				<label
+					htmlFor={htmlFor}
+					className="block text-sm font-medium text-foreground">
+					{label}
+				</label>
 
-			{enhancedChild}
+				{children}
 
-			{error ? (
-				<p id={messageId} role="alert" className="text-sm text-danger">
-					{error}
-				</p>
-			) : helperText ? (
-				<p id={messageId} className="text-sm text-muted-foreground">
-					{helperText}
-				</p>
-			) : null}
-		</div>
+				{error ? (
+					<p id={messageId} role="alert" className="text-sm text-danger">
+						{error}
+					</p>
+				) : helperText ? (
+					<p id={messageId} className="text-sm text-muted-foreground">
+						{helperText}
+					</p>
+				) : null}
+			</div>
+		</FormFieldContext.Provider>
 	);
 }

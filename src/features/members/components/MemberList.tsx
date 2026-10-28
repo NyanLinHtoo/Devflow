@@ -11,6 +11,11 @@ import { roleLabels } from "@/lib/roles";
 import AddMemberDialog from "./AddMemberDialog";
 import RemoveMemberDialog from "./RemoveMemberDialog";
 
+const roleOptions = [
+	{ value: "MEMBER", label: "Member" },
+	{ value: "MANAGER", label: "Manager" },
+];
+
 type MemberListProps = {
 	projectId: string;
 	currentUserId: string | undefined;
@@ -70,15 +75,14 @@ export default function MemberList({
 												className="w-36"
 												value={member.role}
 												disabled={updateRole.isPending}
-												onChange={(event) =>
+												onChange={(value) =>
 													updateRole.mutate({
 														memberId: member.id,
-														role: event.target.value as "MANAGER" | "MEMBER",
+														role: value as "MANAGER" | "MEMBER",
 													})
-												}>
-												<option value="MEMBER">Member</option>
-												<option value="MANAGER">Manager</option>
-											</Select>
+												}
+												options={roleOptions}
+											/>
 
 											<RemoveMemberDialog
 												projectId={projectId}

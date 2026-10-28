@@ -7,6 +7,8 @@ import type { ProjectMember } from "@/types/projectMemberTypes";
 import type { AssignedMember } from "@/types/taskTypes";
 import { useState } from "react";
 
+const UNASSIGNED = "unassigned";
+
 type TaskAssigneeSelectProps = {
 	projectId: string;
 	taskId: string;
@@ -39,6 +41,14 @@ export default function TaskAssigneeSelect({
 		);
 	}
 
+	const options = [
+		{ value: UNASSIGNED, label: "Unassigned" },
+		...members.map((member) => ({
+			value: member.id,
+			label: member.fullName,
+		})),
+	];
+
 	const handleSave = () => {
 		updateTaskAssignee.mutate({
 			taskId,
@@ -56,17 +66,13 @@ export default function TaskAssigneeSelect({
 				<Select
 					id="task-assignee"
 					className="w-full sm:w-64"
-					value={selectedMemberId ?? ""}
-					onChange={(event) => setSelectedMemberId(event.target.value || null)}
-					disabled={updateTaskAssignee.isPending}>
-					<option value="">Unassigned</option>
-
-					{members.map((member) => (
-						<option key={member.id} value={member.id}>
-							{member.fullName}
-						</option>
-					))}
-				</Select>
+					value={selectedMemberId ?? UNASSIGNED}
+					onChange={(value) =>
+						setSelectedMemberId(value === UNASSIGNED ? null : value)
+					}
+					options={options}
+					disabled={updateTaskAssignee.isPending}
+				/>
 
 				<Button
 					type="button"

@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/components/theme-provider";
 import { useLogout } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { roleLabels } from "@/lib/roles";
@@ -17,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { data: user } = useCurrentUser();
+	const { theme, setTheme } = useTheme();
 	const logoutMutation = useLogout();
 
 	function handleLogout() {
@@ -73,6 +76,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 						);
 					})}
 				</nav>
+
+				<div className="px-1">
+					<Switch
+						id="theme-toggle"
+						label="Dark mode"
+						checked={theme === "dark"}
+						onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+					/>
+				</div>
 
 				<div className="hidden lg:mt-auto lg:block">
 					{user ? (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toast";
 import { QueryProvider } from "@/lib/queryProvider";
 
@@ -25,13 +26,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 			lang="en"
 			className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
 			<body className="min-h-full flex flex-col bg-background text-foreground">
+				<script
+					dangerouslySetInnerHTML={{
+						__html:
+							"(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);}catch(e){}})();",
+					}}
+				/>
 				<a
 					href="#main"
 					className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground">
 					Skip to content
 				</a>
 				<QueryProvider>
-					<div className="flex flex-1 flex-col">{children}</div>
+					<ThemeProvider>
+						<div className="flex flex-1 flex-col">{children}</div>
+					</ThemeProvider>
 				</QueryProvider>
 				<Toaster />
 			</body>

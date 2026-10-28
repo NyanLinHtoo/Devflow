@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -8,7 +9,7 @@ import { useRegister, useResendVerification } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
 
 export default function RegisterForm() {
@@ -20,6 +21,7 @@ export default function RegisterForm() {
 	const {
 		register,
 		handleSubmit,
+		control,
 		formState: { errors },
 	} = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
@@ -133,27 +135,32 @@ export default function RegisterForm() {
 				/>
 			</FormField>
 
-			<label className="flex items-center gap-2 text-sm text-muted-foreground">
-				<input
-					type="checkbox"
-					className="size-4 rounded border-border accent-primary"
-					{...register("acceptedTerms")}
-				/>
-				<span>
-					I agree to the{" "}
-					<Link
-						href="/terms"
-						className="font-medium text-foreground hover:underline">
-						Terms
-					</Link>
-					and{" "}
-					<Link
-						href="/privacy"
-						className="font-medium text-foreground hover:underline">
-						Privacy Policy
-					</Link>
-				</span>
-			</label>
+			<Controller
+				control={control}
+				name="acceptedTerms"
+				render={({ field }) => (
+					<Checkbox
+						id="acceptedTerms"
+						checked={field.value}
+						onCheckedChange={field.onChange}
+						disabled={registerMutation.isPending}>
+						I agree to the{" "}
+						<Link
+							href="/terms"
+							onClick={(event) => event.stopPropagation()}
+							className="font-medium text-foreground hover:underline">
+							Terms
+						</Link>{" "}
+						and{" "}
+						<Link
+							href="/privacy"
+							onClick={(event) => event.stopPropagation()}
+							className="font-medium text-foreground hover:underline">
+							Privacy Policy
+						</Link>
+					</Checkbox>
+				)}
+			/>
 
 			{errors.acceptedTerms?.message && (
 				<p className="text-sm text-danger">{errors.acceptedTerms.message}</p>

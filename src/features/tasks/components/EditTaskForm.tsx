@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -10,9 +11,10 @@ import {
 	taskStatusOptions,
 } from "@/features/tasks/taskLabels";
 import { useUpdateTask } from "@/hooks/useTasks";
+import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Task } from "@/types/taskTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
 	type UpdateTaskFormData,
 	updateTaskSchema,
@@ -32,6 +34,7 @@ export default function EditTaskForm({
 	const {
 		register,
 		handleSubmit,
+		control,
 		reset,
 		formState: { errors },
 	} = useForm<UpdateTaskFormData>({
@@ -40,7 +43,7 @@ export default function EditTaskForm({
 			title: task.title,
 			description: task.description ?? "",
 			priority: task.priority,
-			dueDate: toDatetimeLocal(task.dueDate),
+			dueDate: task.dueDate ? dateToInputValue(new Date(task.dueDate)) : "",
 			status: task.status,
 		},
 	});
@@ -51,7 +54,9 @@ export default function EditTaskForm({
 		const taskData = {
 			...data,
 			description: data.description || null,
-			dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null,
+			dueDate: data.dueDate
+				? new Date(`${data.dueDate}T00:00:00`).toISOString()
+				: null,
 		};
 
 		updateTaskMutation.mutate(
@@ -65,25 +70,15 @@ export default function EditTaskForm({
 						title: updatedTask.title,
 						description: updatedTask.description ?? "",
 						priority: updatedTask.priority,
-						dueDate: toDatetimeLocal(updatedTask.dueDate),
+						dueDate: updatedTask.dueDate
+							? dateToInputValue(new Date(updatedTask.dueDate))
+							: "",
 						status: updatedTask.status,
 					});
 					onSuccess?.();
 				},
 			},
 		);
-	}
-
-	function toDatetimeLocal(isoDate: string | null) {
-		if (!isoDate) {
-			return "";
-		}
-
-		const date = new Date(isoDate);
-		const timezoneOffset = date.getTimezoneOffset() * 60_000;
-		const localDate = new Date(date.getTime() - timezoneOffset);
-
-		return localDate.toISOString().slice(0, 16);
 	}
 
 	return (
@@ -111,35 +106,62 @@ export default function EditTaskForm({
 				/>
 			</FormField>
 
-			<FormField
-				label="Priority"
-				htmlFor="priority"
-				error={errors.priority?.message}>
-				<Select id="priority" {...register("priority")}>
-					{taskPriorityOptions.map((option) => (
-						<option key={option.value} value={option.value}>
-							{option.label}
-						</option>
-					))}
-				</Select>
-			</FormField>
+			<Controller
+				control={control}
+				name="priority"
+				render={({ field }) => (
+					<FormField
+						label="Priority"
+						htmlFor="priority"
+						error={errors.priority?.message}>
+						<Select
+							id="priority"
+							value={field.value ?? null}
+							onChange={field.onChange}
+							options={taskPriorityOptions}
+							placeholder="Select priority"
+						/>
+					</FormField>
+				)}
+			/>
 
-			<FormField label="Status" htmlFor="status" error={errors.status?.message}>
-				<Select id="status" {...register("status")}>
-					{taskStatusOptions.map((option) => (
-						<option key={option.value} value={option.value}>
-							{option.label}
-						</option>
-					))}
-				</Select>
-			</FormField>
+			<Controller
+				control={control}
+				name="status"
+				render={({ field }) => (
+					<FormField
+						label="Status"
+						htmlFor="status"
+						error={errors.status?.message}>
+						<Select
+							id="status"
+							value={field.value ?? null}
+							onChange={field.onChange}
+							options={taskStatusOptions}
+							placeholder="Select status"
+						/>
+					</FormField>
+				)}
+			/>
 
-			<FormField
-				label="Due Date"
-				htmlFor="dueDate"
-				error={errors.dueDate?.message}>
-				<Input id="dueDate" type="datetime-local" {...register("dueDate")} />
-			</FormField>
+			<Controller
+				control={control}
+				name="dueDate"
+				render={({ field }) => (
+					<FormField
+						label="Due Date"
+						htmlFor="dueDate"
+						error={errors.dueDate?.message}>
+						<DatePicker
+							id="dueDate"
+							value={inputValueToDate(field.value)}
+							onChange={(date) =>
+								field.onChange(date ? dateToInputValue(date) : "")
+							}
+						/>
+					</FormField>
+				)}
+			/>
 
 			<Button
 				type="submit"

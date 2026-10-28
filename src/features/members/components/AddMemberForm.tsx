@@ -6,8 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useAddProjectMember } from "@/hooks/useProjectMembers";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { AddMemberFormData, addMemberSchema } from "../schemas/addMemberSchema";
+
+const roleOptions = [
+	{ value: "MEMBER", label: "Member" },
+	{ value: "MANAGER", label: "Manager" },
+];
 
 type AddMemberFormProps = {
 	projectId: string;
@@ -21,6 +26,7 @@ export default function AddMemberForm({
 	const {
 		register,
 		handleSubmit,
+		control,
 		reset,
 		formState: { errors },
 	} = useForm<AddMemberFormData>({
@@ -56,15 +62,24 @@ export default function AddMemberForm({
 				/>
 			</FormField>
 
-			<FormField
-				label="Role"
-				htmlFor="member-role"
-				error={errors.role?.message}>
-				<Select id="member-role" {...register("role")}>
-					<option value="MEMBER">Member</option>
-					<option value="MANAGER">Manager</option>
-				</Select>
-			</FormField>
+			<Controller
+				control={control}
+				name="role"
+				render={({ field }) => (
+					<FormField
+						label="Role"
+						htmlFor="member-role"
+						error={errors.role?.message}>
+						<Select
+							id="member-role"
+							value={field.value}
+							onChange={field.onChange}
+							options={roleOptions}
+							placeholder="Select role"
+						/>
+					</FormField>
+				)}
+			/>
 
 			<Button type="submit" className="w-full" disabled={addMember.isPending}>
 				{addMember.isPending ? "Adding..." : "Add member"}
