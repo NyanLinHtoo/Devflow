@@ -6,6 +6,10 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
 import MemberList from "@/features/members/components/MemberList";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
+import {
+	projectStatusChipClasses,
+	projectStatusLabels,
+} from "@/features/projects/projectLabels";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
 import TaskCard from "@/features/tasks/components/TaskCard";
 import { useProjectMembers } from "@/hooks/useProjectMembers";
@@ -87,6 +91,21 @@ export default function ProjectDetail() {
 					description={
 						<>
 							{project.description ? <p>{project.description}</p> : null}
+							<div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+								<span
+									className={`rounded-full px-2 py-0.5 font-medium ${projectStatusChipClasses[project.status]}`}>
+									{projectStatusLabels[project.status]}
+								</span>
+								<span className="text-muted-foreground">
+									{project.dueDate
+										? `Due ${new Date(project.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+										: "No due date"}
+								</span>
+								<span className="text-muted-foreground">
+									{project.doneTasks} / {project.totalTasks} tasks ·{" "}
+									{project.progress}%
+								</span>
+							</div>
 							<p className="mt-1 text-xs">
 								Created {new Date(project.createdAt).toLocaleDateString()}
 							</p>

@@ -1,3 +1,4 @@
+import { PROJECT_STATUSES } from "@/types/projectTypes";
 import { z } from "zod";
 
 export const updateProjectSchema = z.object({
@@ -11,6 +12,9 @@ export const updateProjectSchema = z.object({
 		.max(500, "Description must be at most 500 characters")
 		.nullable()
 		.optional(),
+
+	status: z.enum(PROJECT_STATUSES),
+	dueDate: z.string().optional(),
 });
 
 export type UpdateProjectFormData = z.infer<typeof updateProjectSchema>;

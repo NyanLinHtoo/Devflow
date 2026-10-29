@@ -1,13 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { TextArea } from "@/components/ui/text-area";
+import { projectStatusOptions } from "@/features/projects/projectLabels";
 import { useUpdateProject } from "@/hooks/useProjects";
+import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Project } from "@/types/projectTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
 	UpdateProjectFormData,
 	updateProjectSchema,
@@ -25,12 +29,17 @@ export default function EditProjectForm({
 	const {
 		register,
 		handleSubmit,
+		control,
 		formState: { errors },
 	} = useForm<UpdateProjectFormData>({
 		resolver: zodResolver(updateProjectSchema),
 		defaultValues: {
 			name: project.name,
 			description: project.description ?? "",
+			status: project.status,
+			dueDate: project.dueDate
+				? dateToInputValue(new Date(project.dueDate))
+				: "",
 		},
 	});
 
@@ -42,6 +51,10 @@ export default function EditProjectForm({
 				projectId: project.id,
 				name: data.name,
 				description: data.description?.trim() ? data.description : null,
+				status: data.status,
+				dueDate: data.dueDate
+					? new Date(`${data.dueDate}T00:00:00`).toISOString()
+					: null,
 			},
 			{
 				onSuccess: () => {
@@ -75,6 +88,44 @@ export default function EditProjectForm({
 					{...register("description")}
 				/>
 			</FormField>
+
+			<Controller
+				control={control}
+				name="status"
+				render={({ field }) => (
+					<FormField
+						label="Status"
+						htmlFor="status"
+						error={errors.status?.message}>
+						<Select
+							id="status"
+							value={field.value}
+							onChange={field.onChange}
+							options={projectStatusOptions}
+							placeholder="Select status"
+						/>
+					</FormField>
+				)}
+			/>
+
+			<Controller
+				control={control}
+				name="dueDate"
+				render={({ field }) => (
+					<FormField
+						label="Due date"
+						htmlFor="dueDate"
+						error={errors.dueDate?.message}>
+						<DatePicker
+							id="dueDate"
+							value={inputValueToDate(field.value)}
+							onChange={(date) =>
+								field.onChange(date ? dateToInputValue(date) : "")
+							}
+						/>
+					</FormField>
+				)}
+			/>
 
 			<Button
 				type="submit"

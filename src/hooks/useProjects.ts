@@ -45,13 +45,10 @@ export function useUpdateProject() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ projectId, name, description }: UpdateProjectInput) =>
+		mutationFn: ({ projectId, ...data }: UpdateProjectInput) =>
 			apiFetch<Project>(`/projects/${projectId}`, {
 				method: "PATCH",
-				body: JSON.stringify({
-					name,
-					description,
-				}),
+				body: JSON.stringify(data),
 			}),
 		meta: { successMessage: "Project updated" },
 

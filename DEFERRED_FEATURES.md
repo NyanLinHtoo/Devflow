@@ -25,9 +25,11 @@ The items below track work outside the current implementation. Checked items are
 - [x] Add accessible toast notifications (Ark UI Toast) for successful, failed, and status actions.
 - [x] Choose and apply the production font (Geist, previously overridden by Arial in `globals.css`).
 - [x] Establish colors/theme and apply it consistently (semantic tokens in `globals.css`).
-- [x] Dark mode — implemented via `prefers-color-scheme` (system preference; no manual toggle).
+- [x] Dark mode — class-based `.dark` tokens with a manual light/dark toggle (system preference as the default, persisted).
 - [x] Consolidate the UI into a design system — `Container`, `PageHeader`, `Card`, and `DialogContent` primitives, and `components/ui/<name>/index.tsx` folder modules with short imports.
 - [ ] Complete a **manual** responsive and keyboard review for all core flows. (Initial pass is done: global focus rings, skip link, 16px inputs, touch targets, scrolling dialogs. Still needs a human tab-through plus 320px and 200%-zoom checks.)
+- [ ] Profile page — active sessions management (list devices, revoke a session, sign out other sessions). Removed from the initial profile design; revisit later.
+- [ ] Profile page — preferences (appearance and notification settings). Removed from the initial profile design; revisit later.
 
 ## Phase 5 — Testing and Release Quality (V1)
 

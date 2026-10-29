@@ -10,6 +10,8 @@ export const createProjectSchema = z.object({
 		.string()
 		.max(500, "Description must be at most 500 characters")
 		.optional(),
+
+	dueDate: z.string().optional(),
 });
 
 export type CreateProjectFormData = z.infer<typeof createProjectSchema>;
