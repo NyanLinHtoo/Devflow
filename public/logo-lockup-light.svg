@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" width="240" height="64" role="img" aria-label="DevFlow">
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      font-style: normal;
+      font-weight: 600;
+      src: url(data:font/woff2;base64,d09GMgABAAAAAASkABAAAAAACKwAAARKAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGiAbgUgcKAZgP1NUQVQcAGQRCAqFGIQpCxQAATYCJAMkBCAFhDIHIAwHGxcHyAQC/t2seSG1BGprRtWFmgArDncO5yLIielXdzdLa2pb1ihUe75CV7g698ApMQ1QkZATCkgW1ADtjJxxE1ZuC+xsCV7w34kA9PBlgYRfBoREeV8FhUjSkSqrGzsJXBizLhGIXJv5abTNm8xL+NOEVZSR8KcwwAB6G03tYRxffNHT2l/aMfK8n4ET2l9ZqgkdKddAwmn3xyuVQDet3WcN4NOoCjpk0EUTLQ8lKGYdZJSS8qXeTknJIfVSlgbvEjFMuojAyV/P51oxHgRndQMYP4eRvbqPTnw2Jh8RkUbEhZsa/EF6SgMjOmJPCCS29euo7Z2esYo1EUiJYquuWiXTGg4muGizkUqqMbHAMnvRbsmI9vy69rX2jPa0dq12uXapdj5iZzHQC00jSBrAhwKxB9y74BWhnF12qF2m5P9cBAfrIwMVZaufHBroHzzm8Agfu1c1ON3INpcybnB6hY/do+gdLmSbu8fxjLA/qzqfxvZUt7DfG7Pp1ieF/RnF8RYowu71qk7382C777HI9RddBqpQdYowON1gcyndqtMrhN2jKKqPAT0G9NKYw+MRwu71qk63G/TXu1Xnh9u6LnvP1a/e4FEcLtVHlcccHo8Qdq9XdbrdYHO5up3eQV5xuMDmVvvVPnVA7fXI6F2lX+ndcahvamLcOD410VfDLs3siSzMLi2iKLu0kJDkrMspff3srcZtW41bt5l/bvUVW8PuOv7S79u37/wnKjozKrRjQ0pyaVNEampD+FPxcvQHXzheesgWvJ7kueGfhud2nHXh2eeccs6FZ59VvVDb1dbT4exq6+6qpeqphxYLHg9fCo8l3lC/UlxsbtI3F60uF9fVzhcXrDbGWbY0VeXltn4xnPpJY0/8q/nHU8vzsnLK8qh7yvIU6YZ6a2H5SktwS/mqtaC+3lJQvtoS3FK+YimsM5W0tNYpdS2tJSUtrXXiMh65/vcD+y8POXD5AWIZ+xp/N2deF1J/3WPAhUDJ3Pj7s3Vx5rKQV3Ltw2sjfiNBhf/763Q/5WU+vSr8cm/F2RPagye+ld+TTQC+15fsQD+Bq69pDx7Pld+7hk0BupMZhvqWdDnJ0iaqpCrShA91kok0KZz1uvUkUO0BDOLP+KPeooNumlAA5ociyBc5+hLHIiRI5D0kEcgLSEchpx2Wq5EPW1lAvsRTbggkG71FfJKbejAxyzQzWK1hKytYyCeFfczCBGZmWcGKhWT4CbMskMwyZqZJoYVqGulghTEmMFGDmWWsmLAwTxIdmFhklnKWWWCSbkyYB9i0zBJG0kkmVV4I7lYB1TRQMKC4/eFpdrPAGOYuxxk508b2CpZZYf/6qNUTeCDVKhvpZGaAXQ8GrUnxHEx0DJexew+J3eEt1PGx+xmeZrZyeDfjJDPBMhVOYeqzIzCUx1hifhVgmQKWzoCZ3DyJaYj7QnHhQu0q0v88rY8J7dT75LMB) format('woff2');
+    }
+    .word { fill: #171717; }
+    .accent { fill: #4F46E5; }
+  </style>
+  <rect width="64" height="64" rx="16" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="1"/>
+  <rect x="12" y="12" width="28" height="28" rx="8" fill="#A5B4FC" opacity=".7"/>
+  <rect x="20" y="20" width="28" height="28" rx="8" fill="#93C5FD" opacity=".6"/>
+  <rect x="28" y="28" width="24" height="24" rx="7" fill="#F9A8D4" opacity=".6"/>
+  <path d="M23 15h9a17 17 0 0 1 0 34h-9V15Z" fill="#EEF2FF"/>
+  <path d="M23 15v34M23 15h9a17 17 0 0 1 0 34h-9" stroke="#171717" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="82" y="41" font-family="'Space Grotesk', ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="600" letter-spacing="-0.56"><tspan class="word">Dev</tspan><tspan class="accent">Flow</tspan></text>
+</svg>

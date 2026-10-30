@@ -1,5 +1,6 @@
 "use client";
 
+import { Lockup } from "@/components/brand/lockup";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/useAuth";
@@ -43,10 +44,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 		<div className="flex min-h-screen w-full flex-col lg:flex-row">
 			<aside className="flex flex-col gap-4 border-b border-border bg-surface px-4 py-4 lg:w-64 lg:border-r lg:border-b-0 lg:px-4 lg:py-6">
 				<div className="flex items-center justify-between gap-3">
-					<Link
-						href="/dashboard"
-						className="text-lg font-semibold tracking-tight">
-						DevFlow
+					<Link href="/dashboard">
+						<Lockup className="h-8 w-auto" priority />
 					</Link>
 
 					<Button

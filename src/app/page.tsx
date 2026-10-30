@@ -1,3 +1,4 @@
+import { Lockup } from "@/components/brand/lockup";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -7,11 +8,13 @@ export default function HomePage() {
 			className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
 			<div className="w-full max-w-md space-y-8 text-center">
 				<div>
-					<h1 className="text-3xl font-semibold tracking-tight text-foreground">
-						DevFlow
-					</h1>
+					<h1 className="sr-only">DevFlow</h1>
 
-					<p className="mt-2 text-sm text-muted-foreground">
+					<div className="flex justify-center">
+						<Lockup className="h-12 w-auto" priority />
+					</div>
+
+					<p className="mt-3 text-sm text-muted-foreground">
 						Project management for modern software teams. Plan projects, assign
 						tasks, and track progress in one place.
 					</p>
