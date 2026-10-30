@@ -1,12 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/components/theme-provider";
+import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { getInitials } from "@/lib/initials";
 import { roleLabels } from "@/lib/roles";
-import { FolderKanban, LayoutDashboard, LogOut } from "lucide-react";
+import {
+	ChevronRight,
+	FolderKanban,
+	LayoutDashboard,
+	LogOut,
+	Moon,
+	Sun,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -19,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { data: user } = useCurrentUser();
-	const { theme, setTheme } = useTheme();
+	const { theme, toggleTheme } = useTheme();
 	const logoutMutation = useLogout();
 
 	function handleLogout() {
@@ -29,6 +36,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 			},
 		});
 	}
+
+	const isProfileActive = pathname.startsWith("/profile");
 
 	return (
 		<div className="flex min-h-screen w-full flex-col lg:flex-row">
@@ -43,11 +52,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 					<Button
 						variant="ghost"
 						size="sm"
-						className="lg:hidden"
-						onClick={handleLogout}
-						disabled={logoutMutation.isPending}>
-						<LogOut size={16} aria-hidden="true" />
-						{logoutMutation.isPending ? "Signing out..." : "Sign out"}
+						className="size-8 px-0"
+						onClick={() => toggleTheme()}
+						aria-label={
+							theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+						}
+						title={
+							theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+						}>
+						{theme === "dark" ? (
+							<Sun size={16} aria-hidden="true" />
+						) : (
+							<Moon size={16} aria-hidden="true" />
+						)}
 					</Button>
 				</div>
 
@@ -77,31 +94,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 					})}
 				</nav>
 
-				<div className="px-1">
-					<Switch
-						id="theme-toggle"
-						label="Dark mode"
-						checked={theme === "dark"}
-						onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-					/>
-				</div>
-
-				<div className="hidden lg:mt-auto lg:block">
+				<div className="lg:mt-auto">
 					{user ? (
-						<div className="mb-3 min-w-0">
-							<p className="truncate text-sm font-medium">{user.fullName}</p>
-							<p className="truncate text-xs text-muted-foreground">
-								{user.email}
-							</p>
-							<p className="mt-1 text-xs text-muted-foreground">
-								{roleLabels[user.role]}
-							</p>
-						</div>
+						<Link
+							href="/profile"
+							aria-current={isProfileActive ? "page" : undefined}
+							className="flex items-center gap-3 rounded-lg border border-border bg-surface-muted p-2 transition-colors hover:bg-surface">
+							<span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+								{getInitials(user.fullName)}
+							</span>
+
+							<span className="min-w-0 flex-1">
+								<span className="block truncate text-sm font-medium">
+									{user.fullName}
+								</span>
+								<span className="block truncate text-xs text-muted-foreground">
+									{user.email}
+								</span>
+								<span className="block text-xs text-muted-foreground">
+									{roleLabels[user.role]}
+								</span>
+							</span>
+
+							<ChevronRight
+								size={16}
+								aria-hidden="true"
+								className="shrink-0 text-muted-foreground"
+							/>
+						</Link>
 					) : null}
 
 					<Button
 						variant="secondary"
-						className="w-full"
+						className="mt-2 w-full"
 						onClick={handleLogout}
 						disabled={logoutMutation.isPending}>
 						<LogOut size={16} aria-hidden="true" />

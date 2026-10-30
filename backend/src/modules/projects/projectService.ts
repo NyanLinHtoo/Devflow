@@ -33,7 +33,10 @@ export async function getProjectsByMemberId(userId: string) {
     orderBy: {
       createdAt: "desc",
     },
-    include: projectInclude,
+    include: {
+      ...projectInclude,
+      projectMembers: { where: { userId }, select: { role: true } },
+    },
   });
 
   return projects.map(toProjectResponse);
@@ -42,7 +45,10 @@ export async function getProjectsByMemberId(userId: string) {
 export async function getProjectById(projectId: string, userId: string) {
   const project = await prisma.project.findFirst({
     where: { id: projectId, projectMembers: { some: { userId } } },
-    include: projectInclude,
+    include: {
+      ...projectInclude,
+      projectMembers: { where: { userId }, select: { role: true } },
+    },
   });
 
   return project ? toProjectResponse(project) : null;

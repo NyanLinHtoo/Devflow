@@ -12,7 +12,9 @@
     "start": "node dist/server.js",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx prisma/seed.ts",
+    "assign-owner": "tsx prisma/assign-owner.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",

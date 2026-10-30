@@ -11,9 +11,11 @@ import { isAppError } from "./lib/errors.js";
 import prisma from "./lib/prisma.js";
 import { isValidationError } from "./lib/validation.js";
 import { authRoutes } from "./modules/auth/authRoute.js";
+import { dashboardRoutes } from "./modules/dashboard/dashboardRoute.js";
 import { projectRoutes } from "./modules/projects/projectRoute.js";
 import { projectMemberRoutes } from "./modules/project-members/projectMemberRoute.js";
 import { taskRoutes } from "./modules/tasks/taskRoute.js";
+import { userRoutes } from "./modules/users/userRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
 const refreshJwtSecret = process.env.JWT_REFRESH_SECRET;
@@ -158,6 +160,8 @@ app.register((protectedApp) => {
   protectedApp.register(projectRoutes, { prefix: "/projects" });
   protectedApp.register(taskRoutes, { prefix: "/projects" });
   protectedApp.register(projectMemberRoutes, { prefix: "/projects" });
+  protectedApp.register(userRoutes, { prefix: "/users" });
+  protectedApp.register(dashboardRoutes, { prefix: "/dashboard" });
 });
 
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;

@@ -28,6 +28,10 @@ The items below track work outside the current implementation. Checked items are
 - [x] Dark mode — class-based `.dark` tokens with a manual light/dark toggle (system preference as the default, persisted).
 - [x] Consolidate the UI into a design system — `Container`, `PageHeader`, `Card`, and `DialogContent` primitives, and `components/ui/<name>/index.tsx` folder modules with short imports.
 - [ ] Complete a **manual** responsive and keyboard review for all core flows. (Initial pass is done: global focus rings, skip link, 16px inputs, touch targets, scrolling dialogs. Still needs a human tab-through plus 320px and 200%-zoom checks.)
+- [x] Dashboard overview — four stat cards, recent projects, and upcoming tasks (via `/dashboard/summary`).
+- [x] Projects page — search plus All/Managed/Member filters.
+- [x] Profile page — identity header, profile information, password change, and danger zone.
+- [ ] Dashboard — activity feed and a cross-project Focus kanban; needs an activity model and a cross-project task board.
 - [ ] Profile page — active sessions management (list devices, revoke a session, sign out other sessions). Removed from the initial profile design; revisit later.
 - [ ] Profile page — preferences (appearance and notification settings). Removed from the initial profile design; revisit later.
 

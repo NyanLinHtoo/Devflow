@@ -13,6 +13,7 @@ export type Project = {
 	description: string | null;
 	status: ProjectStatus;
 	dueDate: string | null;
+	currentUserRole: "MANAGER" | "MEMBER" | null;
 	totalTasks: number;
 	doneTasks: number;
 	progress: number;

@@ -19,3 +19,9 @@ export const taskStatusOptions = (
 export const taskPriorityOptions = (
 	Object.keys(taskPriorityLabels) as Task["priority"][]
 ).map((value) => ({ value, label: taskPriorityLabels[value] }));
+
+export const taskPriorityChipClasses: Record<Task["priority"], string> = {
+	LOW: "bg-surface-muted text-muted-foreground",
+	MEDIUM: "bg-warning-surface text-warning",
+	HIGH: "bg-danger-surface text-danger",
+};

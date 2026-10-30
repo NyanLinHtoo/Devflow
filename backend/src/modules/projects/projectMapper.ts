@@ -1,4 +1,5 @@
 type ProjectStatus = "PLANNING" | "IN_PROGRESS" | "IN_REVIEW" | "COMPLETED";
+type ProjectRole = "MANAGER" | "MEMBER";
 
 type ProjectModel = {
   id: string;
@@ -10,6 +11,7 @@ type ProjectModel = {
   updatedAt: Date;
   _count: { tasks: number };
   tasks: { id: string }[];
+  projectMembers?: { role: ProjectRole }[];
 };
 
 export function toProjectResponse(project: ProjectModel) {
@@ -24,6 +26,7 @@ export function toProjectResponse(project: ProjectModel) {
     description: project.description,
     status: project.status,
     dueDate: project.dueDate?.toISOString() ?? null,
+    currentUserRole: project.projectMembers?.[0]?.role ?? null,
     totalTasks,
     doneTasks,
     progress,

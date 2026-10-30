@@ -5,5 +5,7 @@ export type CurrentUser = {
 	fullName: string;
 	email: string;
 	role: AccountRole;
+	timezone: string | null;
+	bio: string | null;
 	createdAt: string;
 };

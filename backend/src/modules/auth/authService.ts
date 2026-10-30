@@ -41,6 +41,8 @@ export async function registerUser(input: RegisterInput) {
           fullName: true,
           email: true,
           role: true,
+          timezone: true,
+          bio: true,
           createdAt: true,
         },
       });
@@ -101,6 +103,8 @@ export async function loginUser(input: LoginInput) {
     fullName: user.fullName,
     email: user.email,
     role: user.role,
+    timezone: user.timezone,
+    bio: user.bio,
     createdAt: user.createdAt,
   };
   return safeUser;
@@ -162,6 +166,8 @@ export async function getUserById(userId: string) {
       fullName: true,
       email: true,
       role: true,
+      timezone: true,
+      bio: true,
       createdAt: true,
     },
   });
@@ -177,6 +183,8 @@ export async function getUserByEmail(email: string) {
       fullName: true,
       email: true,
       role: true,
+      timezone: true,
+      bio: true,
       createdAt: true,
     },
   });

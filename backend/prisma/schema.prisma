@@ -17,6 +17,8 @@ model User {
   updatedAt       DateTime  @updatedAt
   emailVerifiedAt DateTime?
   role            UserRole  @default(MEMBER)
+  timezone        String?
+  bio             String?
 
   sessions           Session[]
   projectMembers     ProjectMember[]
