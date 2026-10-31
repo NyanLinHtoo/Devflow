@@ -35,8 +35,8 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 				<div className="profile-cover-grid absolute inset-0 opacity-40" />
 			</div>
 
-			<div className="-mt-9 flex flex-wrap items-end gap-4 px-5">
-				<div className="flex size-[78px] shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground ring-4 ring-surface">
+			<div className="relative z-10 -mt-9 flex flex-wrap items-end gap-4 px-5">
+				<div className="flex size-19.5 shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground ring-4 ring-surface">
 					{getInitials(user.fullName)}
 				</div>
 

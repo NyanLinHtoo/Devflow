@@ -29,7 +29,7 @@ export function Switch({
 			</ArkSwitch.Label>
 
 			<ArkSwitch.Control className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-surface-muted transition-colors data-[state=checked]:bg-primary">
-				<ArkSwitch.Thumb className="block size-5 translate-x-0.5 rounded-full bg-surface shadow transition-transform data-[state=checked]:translate-x-[1.375rem]" />
+				<ArkSwitch.Thumb className="block size-5 translate-x-0.5 rounded-full bg-surface shadow transition-transform data-[state=checked]:translate-x-5.5" />
 			</ArkSwitch.Control>
 
 			<ArkSwitch.HiddenInput />
