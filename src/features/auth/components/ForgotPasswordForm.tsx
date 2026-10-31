@@ -6,10 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-	ForgotPasswordFormData,
-	forgotPasswordSchema,
-} from "../schemas/forgotPasswordSchema";
+import { ForgotPasswordFormData, forgotPasswordSchema } from "../schemas";
 
 export default function ForgotPasswordForm() {
 	const {

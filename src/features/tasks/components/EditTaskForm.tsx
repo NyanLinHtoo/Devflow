@@ -15,10 +15,7 @@ import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Task } from "@/types/taskTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-	type UpdateTaskFormData,
-	updateTaskSchema,
-} from "../schemas/updateTaskSchema";
+import { type UpdateTaskFormData, updateTaskSchema } from "../schemas";
 
 type EditTaskFormProps = {
 	task: Task;

@@ -7,7 +7,7 @@ import { Select } from "@/components/ui/select";
 import { useAddProjectMember } from "@/hooks/useProjectMembers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { AddMemberFormData, addMemberSchema } from "../schemas/addMemberSchema";
+import { AddMemberFormData, addMemberSchema } from "../schemas";
 
 const roleOptions = [
 	{ value: "MEMBER", label: "Member" },

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { LoginFormData, loginSchema } from "../schemas/loginSchema";
+import { LoginFormData, loginSchema } from "../schemas";
 import { useLogin } from "@/hooks/useAuth";
 import { PasswordInput } from "@/components/ui/password-input";
 

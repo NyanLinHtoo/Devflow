@@ -10,7 +10,7 @@ import { roleLabels } from "@/lib/roles";
 import type { CurrentUser } from "@/types/authTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { type ProfileFormData, profileSchema } from "../schemas";
 
 const timezones = [
 	{ value: "UTC", label: "UTC" },
@@ -21,17 +21,6 @@ const timezones = [
 	{ value: "Europe/London", label: "Europe/London" },
 	{ value: "America/New_York", label: "America/New_York" },
 ];
-
-const profileSchema = z.object({
-	fullName: z
-		.string()
-		.min(2, "Full name must be at least 2 characters")
-		.max(100, "Full name must be at most 100 characters"),
-	timezone: z.string().optional(),
-	bio: z.string().max(160, "Bio must be at most 160 characters").optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileSchema>;
 
 type ProfileInfoFormProps = {
 	user: CurrentUser;

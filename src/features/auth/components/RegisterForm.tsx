@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { RegisterFormData, registerSchema } from "../schemas/registerSchema";
+import { RegisterFormData, registerSchema } from "../schemas";
 
 export default function RegisterForm() {
 	const [registered, setRegistered] = useState<{

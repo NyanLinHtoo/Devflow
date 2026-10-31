@@ -1,6 +1,8 @@
-import type { ForgotPasswordFormData } from "@/features/auth/schemas/forgotPasswordSchema";
-import type { LoginFormData } from "@/features/auth/schemas/loginSchema";
-import type { RegisterFormData } from "@/features/auth/schemas/registerSchema";
+import type {
+	ForgotPasswordFormData,
+	LoginFormData,
+	RegisterFormData,
+} from "@/features/auth/schemas";
 import { apiFetch } from "@/lib/api";
 import type { CurrentUser } from "@/types/authTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

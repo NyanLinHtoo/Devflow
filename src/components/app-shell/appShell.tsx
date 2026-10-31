@@ -163,9 +163,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	return (
-		<div className="flex min-h-screen w-full flex-col md:flex-row">
+		<div className="min-h-screen w-full">
 			{/* Desktop sidebar */}
-			<aside className="hidden lg:flex lg:w-64 lg:flex-col lg:gap-4 lg:border-r lg:border-border lg:bg-surface lg:px-4 lg:py-6">
+			<aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col gap-4 overflow-y-auto border-r border-border bg-surface px-4 py-6 lg:flex">
 				<div className="flex items-center justify-between gap-3">
 					<Link href="/dashboard">
 						<Lockup className="h-6 w-auto" priority />
@@ -213,7 +213,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 			</aside>
 
 			{/* Tablet icon rail */}
-			<aside className="hidden md:flex md:w-18 md:flex-col md:items-center md:gap-2 md:border-r md:border-border md:bg-surface md:py-6 lg:hidden">
+			<aside className="fixed inset-y-0 left-0 z-30 hidden w-18 flex-col items-center gap-2 overflow-y-auto border-r border-border bg-surface py-6 md:flex lg:hidden">
 				<Link href="/dashboard" aria-label="DevFlow dashboard" className="mb-2">
 					<Image
 						src="/logo-mark.svg"
@@ -295,7 +295,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 				</div>
 			</div>
 
-			<div className="min-w-0 flex-1">{children}</div>
+			<div className="min-w-0 md:pl-18 lg:pl-64">{children}</div>
 
 			{/* Mobile drawer */}
 			{isMenuOpen ? (

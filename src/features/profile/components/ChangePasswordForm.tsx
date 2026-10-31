@@ -6,23 +6,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useChangePassword } from "@/hooks/useProfile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const changePasswordSchema = z
-	.object({
-		currentPassword: z.string().min(1, "Enter your current password"),
-		newPassword: z
-			.string()
-			.min(8, "Password must be at least 8 characters")
-			.max(128, "Password must be at most 128 characters"),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.newPassword === data.confirmPassword, {
-		message: "Passwords do not match",
-		path: ["confirmPassword"],
-	});
-
-type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+import { type ChangePasswordFormData, changePasswordSchema } from "../schemas";
 
 export default function ChangePasswordForm() {
 	const {

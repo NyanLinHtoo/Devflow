@@ -12,10 +12,7 @@ import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Project } from "@/types/projectTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-	UpdateProjectFormData,
-	updateProjectSchema,
-} from "../schemas/updateProjectSchema";
+import { UpdateProjectFormData, updateProjectSchema } from "../schemas";
 
 type EditProjectFormProps = {
 	project: Project;

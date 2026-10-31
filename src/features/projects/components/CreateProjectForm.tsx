@@ -9,10 +9,7 @@ import { useCreateProject } from "@/hooks/useProjects";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-	CreateProjectFormData,
-	createProjectSchema,
-} from "../schemas/createProjectSchema";
+import { CreateProjectFormData, createProjectSchema } from "../schemas";
 
 export default function CreateProjectForm({
 	onSuccess,

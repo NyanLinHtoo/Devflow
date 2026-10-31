@@ -11,10 +11,7 @@ import { useCreateTask } from "@/hooks/useTasks";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-	type CreateTaskFormData,
-	createTaskSchema,
-} from "../schemas/createTaskSchema";
+import { type CreateTaskFormData, createTaskSchema } from "../schemas";
 
 type CreateTaskFormProps = {
 	projectId: string;

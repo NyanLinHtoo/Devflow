@@ -7,10 +7,7 @@ import { useResetPassword } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import {
-	ResetPasswordFormData,
-	resetPasswordSchema,
-} from "../schemas/resetPasswordSchema";
+import { ResetPasswordFormData, resetPasswordSchema } from "../schemas";
 
 export default function ResetPasswordForm() {
 	const searchParams = useSearchParams();
