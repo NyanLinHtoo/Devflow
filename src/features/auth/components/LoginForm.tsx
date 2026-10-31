@@ -1,15 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { CooldownNotice } from "@/components/ui/cooldown";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useLogin } from "@/hooks/useAuth";
+import { useCooldown } from "@/hooks/useCooldown";
+import { isApiError } from "@/lib/apiError";
+import { formatCountdown } from "@/lib/countdown";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "../schemas";
-import { useLogin } from "@/hooks/useAuth";
-import { PasswordInput } from "@/components/ui/password-input";
 
 export default function LoginForm() {
 	const {
@@ -22,11 +27,25 @@ export default function LoginForm() {
 
 	const router = useRouter();
 	const loginMutation = useLogin();
+	const cooldown = useCooldown();
+	const [formError, setFormError] = useState<string | null>(null);
 
 	function onSubmit(data: LoginFormData) {
+		setFormError(null);
+
 		loginMutation.mutate(data, {
 			onSuccess: () => {
 				router.push("/dashboard");
+			},
+			onError: (error) => {
+				if (isApiError(error) && error.status === 429) {
+					cooldown.start(error.retryAfter ?? 60);
+					return;
+				}
+
+				setFormError(
+					error instanceof Error ? error.message : "Unable to sign in.",
+				);
 			},
 		});
 	}
@@ -63,11 +82,26 @@ export default function LoginForm() {
 				</Link>
 			</div>
 
+			{formError ? (
+				<p role="alert" className="text-sm text-danger">
+					{formError}
+				</p>
+			) : null}
+
+			<CooldownNotice
+				remaining={cooldown.remaining}
+				message="Too many attempts. Try again in"
+			/>
+
 			<Button
 				type="submit"
 				className="w-full"
-				disabled={loginMutation.isPending}>
-				{loginMutation.isPending ? "Signing in..." : "Sign in"}
+				disabled={loginMutation.isPending || cooldown.isActive}>
+				{cooldown.isActive
+					? `Try again in ${formatCountdown(cooldown.remaining)}`
+					: loginMutation.isPending
+						? "Signing in..."
+						: "Sign in"}
 			</Button>
 		</form>
 	);

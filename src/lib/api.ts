@@ -16,6 +16,24 @@ const REFRESH_EXCLUDED_PATHS = new Set([
 
 let refreshPromise: Promise<boolean> | null = null;
 
+function parseRetryAfter(message: string) {
+	const minutes = message.match(/retry in (\d+) minutes?/i);
+	const minutesValue = minutes?.[1];
+
+	if (minutesValue) {
+		return Number(minutesValue) * 60;
+	}
+
+	const seconds = message.match(/retry in (\d+) seconds?/i);
+	const secondsValue = seconds?.[1];
+
+	if (secondsValue) {
+		return Number(secondsValue);
+	}
+
+	return undefined;
+}
+
 function refreshSession(): Promise<boolean> {
 	if (!refreshPromise) {
 		refreshPromise = fetch(`${API_URL}/auth/refresh`, {
@@ -71,10 +89,18 @@ export async function apiFetch<T>(
 		const errorBody = (await response.json().catch(() => ({}))) as {
 			message?: string;
 		};
+		const message = errorBody.message ?? `Request failed: ${response.status}`;
+		const retryAfterHeader = response.headers.get("retry-after");
+		const retryAfterFromHeader = retryAfterHeader
+			? Number(retryAfterHeader)
+			: Number.NaN;
 
 		throw apiError(
 			response.status,
-			errorBody.message ?? `Request failed: ${response.status}`,
+			message,
+			Number.isFinite(retryAfterFromHeader)
+				? retryAfterFromHeader
+				: parseRetryAfter(message),
 		);
 	}
 

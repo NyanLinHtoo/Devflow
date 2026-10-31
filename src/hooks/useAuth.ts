@@ -26,7 +26,7 @@ export function useLogin() {
 					password: data.password,
 				}),
 			}),
-		meta: { successMessage: "Signed in" },
+		meta: { successMessage: "Signed in", skipErrorToast: true },
 
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -76,6 +76,7 @@ export function useForgotPassword() {
 				method: "POST",
 				body: JSON.stringify({ email: data.email }),
 			}),
+		meta: { skipErrorToast: true },
 	});
 }
 

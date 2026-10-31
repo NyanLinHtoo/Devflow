@@ -52,6 +52,49 @@ export async function getTasksByProjectId(projectId: string) {
   return tasksByProjectId.map(toTaskResponse);
 }
 
+export async function getMyTasks(userId: string) {
+  const tasks = await prisma.task.findMany({
+    where: { assignedMember: { is: { userId } } },
+    include: {
+      project: { select: { name: true } },
+      assignedMember: {
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return tasks
+    .map((task) => ({
+      ...toTaskResponse(task),
+      projectName: task.project.name,
+    }))
+    .sort((a, b) => {
+      const aDone = a.status === "DONE" ? 1 : 0;
+      const bDone = b.status === "DONE" ? 1 : 0;
+
+      if (aDone !== bDone) {
+        return aDone - bDone;
+      }
+
+      if (!a.dueDate && b.dueDate) {
+        return 1;
+      }
+
+      if (a.dueDate && !b.dueDate) {
+        return -1;
+      }
+
+      return (a.dueDate ?? "").localeCompare(b.dueDate ?? "");
+    });
+}
+
 export async function getTaskByIdAndProjectId(
   projectId: string,
   taskId: string,

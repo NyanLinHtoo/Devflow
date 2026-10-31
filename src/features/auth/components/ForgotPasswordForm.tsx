@@ -1,12 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { CooldownNotice } from "@/components/ui/cooldown";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/hooks/useAuth";
+import { useCooldown } from "@/hooks/useCooldown";
+import { isApiError } from "@/lib/apiError";
+import { formatCountdown } from "@/lib/countdown";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ForgotPasswordFormData, forgotPasswordSchema } from "../schemas";
+
+const RESEND_COOLDOWN_SECONDS = 300;
 
 export default function ForgotPasswordForm() {
 	const {
@@ -18,21 +25,38 @@ export default function ForgotPasswordForm() {
 	});
 
 	const forgotPasswordMutation = useForgotPassword();
+	const cooldown = useCooldown();
+	const [formError, setFormError] = useState<string | null>(null);
 
 	function onSubmit(data: ForgotPasswordFormData) {
-		forgotPasswordMutation.mutate(data);
-	}
+		setFormError(null);
 
-	if (forgotPasswordMutation.isSuccess) {
-		return (
-			<p className="text-center text-sm text-muted-foreground">
-				If the account exists, a reset email will be sent.
-			</p>
-		);
+		forgotPasswordMutation.mutate(data, {
+			onSuccess: () => {
+				cooldown.start(RESEND_COOLDOWN_SECONDS);
+			},
+			onError: (error) => {
+				if (isApiError(error) && error.status === 429) {
+					cooldown.start(error.retryAfter ?? 60);
+					return;
+				}
+
+				setFormError(
+					error instanceof Error ? error.message : "Unable to send the email.",
+				);
+			},
+		});
 	}
 
 	return (
 		<form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+			{forgotPasswordMutation.isSuccess ? (
+				<div className="rounded-md border border-success/30 bg-success-surface p-3 text-sm text-success">
+					If an account exists for that email, a reset link is on its way. Check
+					your inbox and spam — it can take a minute.
+				</div>
+			) : null}
+
 			<FormField label="Email" htmlFor="email" error={errors.email?.message}>
 				<Input
 					id="email"
@@ -43,11 +67,26 @@ export default function ForgotPasswordForm() {
 				/>
 			</FormField>
 
+			{formError ? (
+				<p role="alert" className="text-sm text-danger">
+					{formError}
+				</p>
+			) : null}
+
+			<CooldownNotice
+				remaining={cooldown.remaining}
+				message="You can request another email in"
+			/>
+
 			<Button
 				type="submit"
 				className="w-full"
-				disabled={forgotPasswordMutation.isPending}>
-				{forgotPasswordMutation.isPending ? "Sending..." : "Send reset email"}
+				disabled={forgotPasswordMutation.isPending || cooldown.isActive}>
+				{cooldown.isActive
+					? `Resend in ${formatCountdown(cooldown.remaining)}`
+					: forgotPasswordMutation.isPending
+						? "Sending..."
+						: "Send reset email"}
 			</Button>
 		</form>
 	);

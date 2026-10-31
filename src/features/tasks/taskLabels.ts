@@ -25,3 +25,9 @@ export const taskPriorityChipClasses: Record<Task["priority"], string> = {
 	MEDIUM: "bg-warning-surface text-warning",
 	HIGH: "bg-danger-surface text-danger",
 };
+
+export const taskStatusChipClasses: Record<Task["status"], string> = {
+	TODO: "bg-surface-muted text-muted-foreground",
+	IN_PROGRESS: "bg-warning-surface text-warning",
+	DONE: "bg-success-surface text-success",
+};

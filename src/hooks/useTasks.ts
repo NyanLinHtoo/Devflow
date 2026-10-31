@@ -39,6 +39,8 @@ export function useCreateTask(projectId: string) {
 				queryKey: ["projects", projectId, "tasks"],
 				exact: true,
 			});
+
+			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 		},
 	});
 }
@@ -63,6 +65,8 @@ export function useUpdateTask(projectId: string) {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks", updatedTask.id],
 			});
+
+			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 		},
 	});
 }
@@ -89,6 +93,7 @@ export function useDeleteTask(projectId: string) {
 				queryKey: [...listKey, taskId],
 				refetchType: "none",
 			});
+			queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 		},
 	});
 }
@@ -119,6 +124,8 @@ export function useUpdateTaskAssignee(projectId: string) {
 			await queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks", updatedTask.id],
 			});
+
+			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 		},
 	});
 }

@@ -12,6 +12,7 @@ import {
 	ChevronRight,
 	FolderKanban,
 	LayoutDashboard,
+	ListChecks,
 	LogOut,
 	Menu,
 	Moon,
@@ -25,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 
 const navItems = [
 	{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+	{ href: "/tasks", label: "My tasks", icon: ListChecks },
 	{ href: "/projects", label: "Projects", icon: FolderKanban },
 ];
 

@@ -15,6 +15,7 @@ import { dashboardRoutes } from "./modules/dashboard/dashboardRoute.js";
 import { projectRoutes } from "./modules/projects/projectRoute.js";
 import { projectMemberRoutes } from "./modules/project-members/projectMemberRoute.js";
 import { taskRoutes } from "./modules/tasks/taskRoute.js";
+import { myTaskRoutes } from "./modules/tasks/myTaskRoute.js";
 import { userRoutes } from "./modules/users/userRoute.js";
 
 const accessJwtSecret = process.env.JWT_ACCESS_SECRET;
@@ -159,6 +160,7 @@ app.register((protectedApp) => {
 
   protectedApp.register(projectRoutes, { prefix: "/projects" });
   protectedApp.register(taskRoutes, { prefix: "/projects" });
+  protectedApp.register(myTaskRoutes, { prefix: "/tasks" });
   protectedApp.register(projectMemberRoutes, { prefix: "/projects" });
   protectedApp.register(userRoutes, { prefix: "/users" });
   protectedApp.register(dashboardRoutes, { prefix: "/dashboard" });
