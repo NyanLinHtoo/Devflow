@@ -36,7 +36,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 			</div>
 
 			<div className="-mt-9 flex flex-wrap items-end gap-4 px-5">
-				<div className="flex size-[78px] shrink-0 items-center justify-center rounded-full bg-indigo-600 text-2xl font-semibold text-white ring-4 ring-surface">
+				<div className="flex size-[78px] shrink-0 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground ring-4 ring-surface">
 					{getInitials(user.fullName)}
 				</div>
 

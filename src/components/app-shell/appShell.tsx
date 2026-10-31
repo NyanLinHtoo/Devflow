@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 					<Button
 						variant="ghost"
 						size="sm"
-						className="size-8 px-0"
+						className="px-0"
 						onClick={() => toggleTheme()}
 						aria-label={
 							theme === "dark" ? "Switch to light mode" : "Switch to dark mode"

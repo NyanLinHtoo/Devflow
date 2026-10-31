@@ -14,7 +14,11 @@ function formatDueDate(dueDate: string) {
 	});
 }
 
-const avatarColors = ["bg-indigo-600", "bg-cyan-600", "bg-fuchsia-600"];
+const avatarColors = [
+	"bg-primary text-primary-foreground",
+	"bg-[#bfe3ec] text-[#1f3a40]",
+	"bg-[#f5c6dd] text-[#4a2333]",
+];
 
 type ProjectCardProps = {
 	project: Project;
@@ -60,7 +64,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 						{project.members.slice(0, 3).map((member, index) => (
 							<span
 								key={member.id}
-								className={`flex size-6 items-center justify-center rounded-full border-2 border-surface text-[10px] font-semibold text-white ${avatarColors[index % avatarColors.length]} ${
+								className={`flex size-6 items-center justify-center rounded-full border-2 border-surface text-[10px] font-semibold ${avatarColors[index % avatarColors.length]} ${
 									index > 0 ? "-ml-1.5" : ""
 								}`}>
 								{getInitials(member.fullName)}
