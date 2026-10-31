@@ -82,7 +82,7 @@ export function projectRoutes(app: FastifyInstance) {
         });
       }
 
-      const updatedProject = await updateProject(projectId, input);
+      const updatedProject = await updateProject(projectId, input, userId);
 
       return reply.code(200).send(updatedProject);
     },

@@ -11,6 +11,16 @@ export type DashboardUpcomingTask = {
 	assigneeName: string | null;
 };
 
+export type DashboardActivity = {
+	id: string;
+	title: string;
+	status: "TODO" | "IN_PROGRESS" | "DONE";
+	updatedAt: string;
+	projectId: string;
+	projectName: string;
+	actorName: string | null;
+};
+
 export type DashboardSummary = {
 	projectCount: number;
 	openTaskCount: number;
@@ -18,7 +28,9 @@ export type DashboardSummary = {
 	overdueCount: number;
 	assignedTaskCount: number;
 	memberCount: number;
+	managerCount: number;
 	upcomingTasks: DashboardUpcomingTask[];
+	recentActivity: DashboardActivity[];
 };
 
 export function useDashboardSummary() {

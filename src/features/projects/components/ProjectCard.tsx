@@ -3,6 +3,7 @@ import {
 	projectStatusChipClasses,
 	projectStatusLabels,
 } from "@/features/projects/projectLabels";
+import { getInitials } from "@/lib/initials";
 import Link from "next/link";
 import type { Project } from "@/types/projectTypes";
 
@@ -12,6 +13,8 @@ function formatDueDate(dueDate: string) {
 		day: "numeric",
 	});
 }
+
+const avatarColors = ["bg-indigo-600", "bg-cyan-600", "bg-fuchsia-600"];
 
 type ProjectCardProps = {
 	project: Project;
@@ -52,11 +55,31 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 					</div>
 				</div>
 
-				<p className="mt-3 text-xs text-muted-foreground">
-					{project.dueDate
-						? `Due ${formatDueDate(project.dueDate)}`
-						: "No due date"}
-				</p>
+				<div className="mt-3 flex items-center justify-between gap-2">
+					<div className="flex items-center">
+						{project.members.slice(0, 3).map((member, index) => (
+							<span
+								key={member.id}
+								className={`flex size-6 items-center justify-center rounded-full border-2 border-surface text-[10px] font-semibold text-white ${avatarColors[index % avatarColors.length]} ${
+									index > 0 ? "-ml-1.5" : ""
+								}`}>
+								{getInitials(member.fullName)}
+							</span>
+						))}
+
+						{project.memberCount > 3 ? (
+							<span className="-ml-1.5 flex size-6 items-center justify-center rounded-full border-2 border-surface bg-surface-muted text-[10px] font-semibold text-muted-foreground">
+								+{project.memberCount - 3}
+							</span>
+						) : null}
+					</div>
+
+					<span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted-foreground">
+						{project.dueDate
+							? `Due ${formatDueDate(project.dueDate)}`
+							: "No due date"}
+					</span>
+				</div>
 			</Card>
 		</Link>
 	);

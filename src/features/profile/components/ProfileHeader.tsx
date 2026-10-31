@@ -1,15 +1,39 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useLogout } from "@/hooks/useAuth";
 import { getInitials } from "@/lib/initials";
 import { roleLabels } from "@/lib/roles";
 import type { CurrentUser } from "@/types/authTypes";
+import { useRouter } from "next/navigation";
 
 type ProfileHeaderProps = {
 	user: CurrentUser;
 };
 
 export default function ProfileHeader({ user }: ProfileHeaderProps) {
+	const logoutMutation = useLogout();
+	const router = useRouter();
+
+	function handleLogout() {
+		logoutMutation.mutate(undefined, {
+			onSuccess: () => {
+				router.replace("/login");
+			},
+		});
+	}
+
+	function scrollToProfile() {
+		document
+			.getElementById("profile-info")
+			?.scrollIntoView({ behavior: "smooth" });
+	}
+
 	return (
 		<div>
-			<div className="h-28 rounded-lg border border-border bg-linear-to-br from-surface-muted to-surface" />
+			<div className="relative h-28 overflow-hidden rounded-lg border border-border bg-linear-to-br from-surface-muted to-surface">
+				<div className="profile-cover-grid absolute inset-0 opacity-40" />
+			</div>
 
 			<div className="-mt-9 flex flex-wrap items-end gap-4 px-5">
 				<div className="flex size-[78px] shrink-0 items-center justify-center rounded-full bg-indigo-600 text-2xl font-semibold text-white ring-4 ring-surface">
@@ -38,6 +62,18 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 							})}
 						</span>
 					</div>
+				</div>
+
+				<div className="flex flex-wrap gap-2 pb-1">
+					<Button
+						variant="secondary"
+						onClick={handleLogout}
+						disabled={logoutMutation.isPending}>
+						{logoutMutation.isPending ? "Signing out..." : "Sign out"}
+					</Button>
+					<Button type="button" onClick={scrollToProfile}>
+						Edit profile
+					</Button>
 				</div>
 			</div>
 		</div>

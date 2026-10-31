@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 			<aside className="flex flex-col gap-4 border-b border-border bg-surface px-4 py-4 lg:w-64 lg:border-r lg:border-b-0 lg:px-4 lg:py-6">
 				<div className="flex items-center justify-between gap-3">
 					<Link href="/dashboard">
-						<Lockup className="h-8 w-auto" priority />
+						<Lockup className="h-6 w-auto" priority />
 					</Link>
 
 					<Button

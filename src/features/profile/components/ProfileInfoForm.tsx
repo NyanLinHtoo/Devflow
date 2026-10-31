@@ -94,30 +94,26 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 						<Input id="fullName" type="text" {...register("fullName")} />
 					</FormField>
 
-					<FormField
-						label="Email"
-						htmlFor="email"
-						helperText="Contact an admin to change your email.">
-						<Input
-							id="email"
-							type="email"
-							value={user.email}
-							readOnly
-							disabled
-						/>
+					<FormField label="Email" htmlFor="email">
+						<div className="flex h-10 items-center justify-between gap-2 rounded-md border border-dashed border-border bg-surface-muted px-3 text-sm">
+							<span className="truncate text-muted-foreground">
+								{user.email}
+							</span>
+							<span className="shrink-0 rounded-full bg-success-surface px-2 py-0.5 text-xs font-medium text-success">
+								Verified
+							</span>
+						</div>
 					</FormField>
 
-					<FormField
-						label="Account role"
-						htmlFor="role"
-						helperText="Only admins can change your role.">
-						<Input
-							id="role"
-							type="text"
-							value={roleLabels[user.role]}
-							readOnly
-							disabled
-						/>
+					<FormField label="Account role" htmlFor="role">
+						<div className="flex h-10 items-center justify-between gap-2 rounded-md border border-dashed border-border bg-surface-muted px-3 text-sm">
+							<span className="truncate text-muted-foreground">
+								{roleLabels[user.role]}
+							</span>
+							<span className="shrink-0 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted-foreground">
+								Managed by admin
+							</span>
+						</div>
 					</FormField>
 
 					<Controller

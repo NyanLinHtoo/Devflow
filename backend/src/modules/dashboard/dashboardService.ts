@@ -16,7 +16,9 @@ export async function getDashboardSummary(userId: string) {
       overdueCount: 0,
       assignedTaskCount: 0,
       memberCount: 0,
+      managerCount: 0,
       upcomingTasks: [],
+      recentActivity: [],
     };
   }
 
@@ -32,7 +34,9 @@ export async function getDashboardSummary(userId: string) {
     overdueCount,
     assignedTaskCount,
     distinctMembers,
+    distinctManagers,
     upcomingTasks,
+    recentTasks,
   ] = await Promise.all([
     prisma.task.count({
       where: { projectId: { in: projectIds }, status: { not: "DONE" } },
@@ -62,6 +66,11 @@ export async function getDashboardSummary(userId: string) {
       select: { userId: true },
       distinct: ["userId"],
     }),
+    prisma.projectMember.findMany({
+      where: { projectId: { in: projectIds }, role: "MANAGER" },
+      select: { userId: true },
+      distinct: ["userId"],
+    }),
     prisma.task.findMany({
       where: {
         projectId: { in: projectIds },
@@ -82,6 +91,22 @@ export async function getDashboardSummary(userId: string) {
         },
       },
     }),
+    prisma.task.findMany({
+      where: { projectId: { in: projectIds } },
+      orderBy: { updatedAt: "desc" },
+      take: 4,
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        updatedAt: true,
+        projectId: true,
+        project: { select: { name: true } },
+        assignedMember: {
+          select: { user: { select: { fullName: true } } },
+        },
+      },
+    }),
   ]);
 
   return {
@@ -91,6 +116,7 @@ export async function getDashboardSummary(userId: string) {
     overdueCount,
     assignedTaskCount,
     memberCount: distinctMembers.length,
+    managerCount: distinctManagers.length,
     upcomingTasks: upcomingTasks.map((task) => ({
       id: task.id,
       title: task.title,
@@ -99,6 +125,15 @@ export async function getDashboardSummary(userId: string) {
       projectId: task.projectId,
       projectName: task.project.name,
       assigneeName: task.assignedMember?.user.fullName ?? null,
+    })),
+    recentActivity: recentTasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      status: task.status,
+      updatedAt: task.updatedAt.toISOString(),
+      projectId: task.projectId,
+      projectName: task.project.name,
+      actorName: task.assignedMember?.user.fullName ?? null,
     })),
   };
 }

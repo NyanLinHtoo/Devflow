@@ -17,7 +17,7 @@ export function Lockup({ className = "", priority = false }: LockupProps) {
 				theme === "dark" ? "/logo-lockup-dark.svg" : "/logo-lockup-light.svg"
 			}
 			alt="DevFlow"
-			width={240}
+			width={270}
 			height={64}
 			unoptimized
 			priority={priority}

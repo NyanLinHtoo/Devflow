@@ -12,7 +12,7 @@ export default function CreateProjectDialog() {
 	return (
 		<Dialog.Root open={open} onOpenChange={(details) => setOpen(details.open)}>
 			<Dialog.Trigger asChild>
-				<Button type="button">Create project</Button>
+				<Button type="button">New project</Button>
 			</Dialog.Trigger>
 
 			<DialogContent title="Creating project">

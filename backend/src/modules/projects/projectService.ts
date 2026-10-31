@@ -5,6 +5,13 @@ import type { CreateProjectInput, UpdateProjectInput } from "./projectTypes.js";
 const projectInclude = {
   _count: { select: { tasks: true } },
   tasks: { where: { status: "DONE" }, select: { id: true } },
+  projectMembers: {
+    select: {
+      userId: true,
+      role: true,
+      user: { select: { fullName: true } },
+    },
+  },
 } as const;
 
 export async function createProject(userId: string, input: CreateProjectInput) {
@@ -24,7 +31,7 @@ export async function createProject(userId: string, input: CreateProjectInput) {
     include: projectInclude,
   });
 
-  return toProjectResponse(newProject);
+  return toProjectResponse(newProject, userId);
 }
 
 export async function getProjectsByMemberId(userId: string) {
@@ -33,30 +40,25 @@ export async function getProjectsByMemberId(userId: string) {
     orderBy: {
       createdAt: "desc",
     },
-    include: {
-      ...projectInclude,
-      projectMembers: { where: { userId }, select: { role: true } },
-    },
+    include: projectInclude,
   });
 
-  return projects.map(toProjectResponse);
+  return projects.map((project) => toProjectResponse(project, userId));
 }
 
 export async function getProjectById(projectId: string, userId: string) {
   const project = await prisma.project.findFirst({
     where: { id: projectId, projectMembers: { some: { userId } } },
-    include: {
-      ...projectInclude,
-      projectMembers: { where: { userId }, select: { role: true } },
-    },
+    include: projectInclude,
   });
 
-  return project ? toProjectResponse(project) : null;
+  return project ? toProjectResponse(project, userId) : null;
 }
 
 export async function updateProject(
   projectId: string,
   input: UpdateProjectInput,
+  userId: string,
 ) {
   const project = await prisma.project.update({
     where: {
@@ -71,7 +73,7 @@ export async function updateProject(
     include: projectInclude,
   });
 
-  return toProjectResponse(project);
+  return toProjectResponse(project, userId);
 }
 
 export async function deleteProject(projectId: string) {
