@@ -10,8 +10,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "eslint \"src/**/*.ts\"",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" \"prisma/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"prisma/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "seed": "tsx prisma/seed.ts",
     "assign-owner": "tsx prisma/assign-owner.ts"

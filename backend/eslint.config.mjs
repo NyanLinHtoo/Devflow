@@ -19,7 +19,9 @@ export default tseslint.config(
       },
       sourceType: "commonjs",
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ["prisma/*.ts"],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },

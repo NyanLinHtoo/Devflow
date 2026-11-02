@@ -488,7 +488,9 @@ async function main() {
   console.log(`Seeded ${projects.length} projects and ${taskCount} tasks.`);
   console.log(`Owner: ${owner.email}`);
   console.log(`Dummy users password: ${DUMMY_PASSWORD}`);
-  console.log(`Database now has ${projectCount} projects and ${taskCount} tasks.`);
+  console.log(
+    `Database now has ${projectCount} projects and ${taskCount} tasks.`,
+  );
 }
 
 main()
