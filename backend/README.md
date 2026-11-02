@@ -84,7 +84,8 @@ The API for **DevFlow**, a project and task-management application. It is a Type
 | `npm run start`      | Run the compiled production server         |
 | `npm run lint`       | Run ESLint                                 |
 | `npm run format`     | Format source with Prettier                |
-| `npm run typecheck`  | Type-check without emitting                |
+| `npm run typecheck`  | Type-check without emitting              |
+| `npm run make-admin` | Promote an existing account to `ADMIN`   |
 | `npx prisma generate`| Generate the Prisma client                 |
 | `npx prisma migrate dev` | Create and apply development migrations |
 | `npx prisma studio`  | Inspect the database                       |
@@ -103,6 +104,7 @@ The API for **DevFlow**, a project and task-management application. It is a Type
 | `EMAIL_FROM`         | no       | From address (default `DevFlow <onboarding@resend.dev>`)               |
 | `COOKIE_DOMAIN`      | no       | Sets the cookie `Domain` attribute when the API and client share a domain |
 | `TRUST_PROXY`        | no       | Set to `"true"` behind a proxy so rate limiting uses the real client IP |
+| `EXPOSE_AUTH_TOKENS` | no       | Set to `"true"` to return verification/reset tokens in API responses. Defaults to on only when `NODE_ENV=development`; never enable in production |
 
 ## Architecture
 
@@ -152,16 +154,24 @@ Conventions:
 
 ### Account role
 
-Each user also has an account-level `role` (`MANAGER` or `MEMBER`) used only for creating projects.
-New accounts are created as `MEMBER`; only `MANAGER` accounts may create projects. Promote a user
-manually (for example in Prisma Studio or with SQL):
+Each user also has an account-level `role` used for project creation and admin access:
 
-```sql
-UPDATE "User" SET "role" = 'MANAGER' WHERE "email" = 'someone@example.com';
+| Role      | Capabilities                                                        |
+| --------- | ------------------------------------------------------------------- |
+| `ADMIN`   | Manage user roles through `/admin` and create projects              |
+| `MANAGER` | Create projects                                                     |
+| `MEMBER`  | Default; participates through project roles                         |
+
+New accounts are created as `MEMBER`. Bootstrap the first admin with the CLI:
+
+```bash
+npm run make-admin -- someone@example.com
 ```
 
-The account role is independent of the per-project role: a `MEMBER` account can still be a `MANAGER`
-of an individual project.
+Admins can then change roles from the Users page. Every role change is written to
+`AdminAuditLog`. The last remaining `ADMIN` cannot be demoted or deleted. The account role is
+independent of the per-project role: a `MEMBER` account can still be a `MANAGER` of an
+individual project.
 
 ## API overview
 
@@ -188,7 +198,9 @@ All protected endpoints require a valid access-token cookie; unauthenticated req
 | Tasks | POST   | `/projects/:projectId/tasks`                   | Create a task                              |
 | Tasks | GET    | `/projects/:projectId/tasks`                   | List a project's tasks                     |
 | Tasks | GET/PATCH/DELETE | `/projects/:projectId/tasks/:taskId`  | Read, update, or delete a task             |
-| Tasks | PATCH  | `/projects/:projectId/tasks/:taskId/assignee`  | Assign or unassign a task                  |
+| Tasks | PATCH  | `/projects/:projectId/tasks/:taskId/assignee`  | Assign or unassign a task                 |
+| Admin | GET    | `/admin/users`                                 | List and search users (admins only)       |
+| Admin | PATCH  | `/admin/users/:userId/role`                    | Change an account role and audit it       |
 
 Malformed route parameters return `400`; valid identifiers outside the caller's access return `404`.
 
@@ -199,11 +211,16 @@ Malformed route parameters return `400`; valid identifiers outside the caller's 
 - Reset and verification tokens are stored as SHA-256 hashes and are single-use with expiry.
 - Non-safe methods (anything other than GET/HEAD/OPTIONS) must carry an `Origin` (or `Referer`) matching `FRONTEND_ORIGIN`.
 - Auth routes are rate-limited per IP; `@fastify/helmet` sets response security headers.
+- Verification and reset tokens are returned in API responses only in development. Set
+  `EXPOSE_AUTH_TOKENS=true` to force this locally; production defaults to hiding them.
 - Cookies and `Authorization` headers are redacted from logs.
 
 ## Deployment notes
 
 - Run migrations with `npx prisma migrate deploy` on release.
+- Run the API with `NODE_ENV=production` (the `npm start` script sets it). This enables `Secure`
+  cookies and hides verification/reset tokens. If you start `node dist/server.js` directly, set
+  `NODE_ENV` yourself.
 - Set `TRUST_PROXY=true` when deployed behind a load balancer or platform proxy so rate limiting sees the real client IP.
 - Verify a sending domain in Resend and set `EMAIL_FROM` accordingly; the default test sender only delivers to the account owner.
 - Ensure the frontend's API base URL and `FRONTEND_ORIGIN` match the deployed origins, and that requests are sent with `credentials: "include"`.

@@ -30,7 +30,10 @@ import {
 } from "./authService.js";
 import { RefreshTokenPayload } from "./authTypes.js";
 
-const exposeAuthTokens = process.env.NODE_ENV !== "production";
+const exposeAuthTokens =
+  process.env.EXPOSE_AUTH_TOKENS === "true" ||
+  (process.env.EXPOSE_AUTH_TOKENS === undefined &&
+    process.env.NODE_ENV === "development");
 
 const cookieDomain = process.env.COOKIE_DOMAIN;
 

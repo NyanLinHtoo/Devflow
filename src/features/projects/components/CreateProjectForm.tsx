@@ -8,14 +8,19 @@ import { TextArea } from "@/components/ui/text-area";
 import { useCreateProject } from "@/hooks/useProjects";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CreateProjectFormData, createProjectSchema } from "../schemas";
 
+type CreateProjectFormProps = {
+	onSuccess?: () => void;
+	cancelTrigger?: ReactNode;
+};
+
 export default function CreateProjectForm({
 	onSuccess,
-}: {
-	onSuccess?: () => void;
-}) {
+	cancelTrigger,
+}: CreateProjectFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -98,14 +103,18 @@ export default function CreateProjectForm({
 				it.
 			</p>
 
-			<Button
-				type="submit"
-				className="w-full"
-				disabled={createProjectMutation.isPending}>
-				{createProjectMutation.isPending
-					? "Creating project..."
-					: "Create project"}
-			</Button>
+			<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				{cancelTrigger}
+
+				<Button
+					type="submit"
+					className="w-full sm:w-auto"
+					disabled={createProjectMutation.isPending}>
+					{createProjectMutation.isPending
+						? "Creating project..."
+						: "Create project"}
+				</Button>
+			</div>
 		</form>
 	);
 }

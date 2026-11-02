@@ -1,4 +1,7 @@
 import { apiFetch } from "@/lib/api";
+import { isApiError } from "@/lib/apiError";
+import { forgetTask } from "@/lib/cache";
+import { toaster } from "@/lib/toaster";
 import type {
 	CreateTaskInput,
 	Task,
@@ -12,6 +15,7 @@ export function useTasks(projectId: string) {
 		queryKey: ["projects", projectId, "tasks"],
 		queryFn: () => apiFetch<Task[]>(`/projects/${projectId}/tasks`),
 		enabled: Boolean(projectId),
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -20,6 +24,7 @@ export function useTask(projectId: string, taskId: string) {
 		queryKey: ["projects", projectId, "tasks", taskId],
 		queryFn: () => apiFetch<Task>(`/projects/${projectId}/tasks/${taskId}`),
 		enabled: Boolean(projectId && taskId),
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -54,7 +59,24 @@ export function useUpdateTask(projectId: string) {
 				method: "PATCH",
 				body: JSON.stringify(data),
 			}),
-		meta: { successMessage: "Task updated" },
+		meta: { successMessage: "Task updated", skipErrorToast: true },
+
+		onError: (error, variables) => {
+			if (isApiError(error) && error.status === 404) {
+				forgetTask(queryClient, projectId, variables.taskId);
+				toaster.error({
+					title: "Task no longer available",
+					description:
+						"It may have been deleted with its project. Your changes were not saved.",
+				});
+				return;
+			}
+
+			toaster.error({
+				title: "Something went wrong",
+				description: error instanceof Error ? error.message : undefined,
+			});
+		},
 
 		onSuccess: async (updatedTask) => {
 			await queryClient.invalidateQueries({
@@ -81,7 +103,20 @@ export function useDeleteTask(projectId: string) {
 			apiFetch<{ message: string }>(`/projects/${projectId}/tasks/${taskId}`, {
 				method: "DELETE",
 			}),
-		meta: { successMessage: "Task deleted" },
+		meta: { successMessage: "Task deleted", skipErrorToast: true },
+
+		onError: (error, taskId) => {
+			if (isApiError(error) && error.status === 404) {
+				forgetTask(queryClient, projectId, taskId);
+				toaster.success({ title: "Task already deleted" });
+				return;
+			}
+
+			toaster.error({
+				title: "Something went wrong",
+				description: error instanceof Error ? error.message : undefined,
+			});
+		},
 
 		onSuccess: (_data, taskId) => {
 			queryClient.setQueryData<Task[]>(listKey, (tasks) =>

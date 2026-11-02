@@ -7,14 +7,15 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "cross-env NODE_ENV=development tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "cross-env NODE_ENV=production node dist/server.js",
     "lint": "eslint \"src/**/*.ts\" \"prisma/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"prisma/**/*.ts\"",
     "typecheck": "tsc --noEmit",
     "seed": "tsx prisma/seed.ts",
-    "assign-owner": "tsx prisma/assign-owner.ts"
+    "assign-owner": "tsx prisma/assign-owner.ts",
+    "make-admin": "tsx prisma/make-admin.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",
@@ -25,6 +26,7 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "argon2": "^0.45.1",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "fastify": "^5.12.0",
     "pg": "^8.23.0",

@@ -131,6 +131,25 @@ enum ProjectRole {
 }
 
 enum UserRole {
+  ADMIN
   MANAGER
   MEMBER
+}
+
+enum AdminAction {
+  ROLE_CHANGED
+}
+
+model AdminAuditLog {
+  id           String      @id @default(uuid()) @db.Uuid
+  actorId      String      @db.Uuid
+  targetUserId String      @db.Uuid
+  action       AdminAction
+  fromRole     UserRole?
+  toRole       UserRole?
+  reason       String?
+  createdAt    DateTime    @default(now())
+
+  @@index([targetUserId])
+  @@index([createdAt])
 }

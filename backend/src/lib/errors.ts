@@ -11,6 +11,14 @@ export const appErrorCatalog = {
     statusCode: 409,
     message: "User already exists",
   },
+  userNotFound: {
+    statusCode: 404,
+    message: "User not found",
+  },
+  lastAdmin: {
+    statusCode: 409,
+    message: "At least one admin must remain",
+  },
 } as const;
 
 export type AppErrorKind = keyof typeof appErrorCatalog;

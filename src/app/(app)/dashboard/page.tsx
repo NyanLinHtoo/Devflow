@@ -14,7 +14,7 @@ import {
 import { useDashboardSummary } from "@/hooks/useDashboard";
 import { useProjects } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { roleLabels } from "@/lib/roles";
+import { canCreateProjects, roleLabels } from "@/lib/roles";
 import { CheckCircle2, Clock, FolderKanban, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -131,7 +131,7 @@ export default function DashboardPage() {
 							onClick={() => router.push("/projects")}>
 							View projects
 						</Button>
-						{user.role === "MANAGER" ? <CreateProjectDialog /> : null}
+						{canCreateProjects(user.role) ? <CreateProjectDialog /> : null}
 					</>
 				}
 			/>

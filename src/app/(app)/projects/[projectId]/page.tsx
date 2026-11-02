@@ -16,8 +16,12 @@ import { useProjectMembers } from "@/hooks/useProjectMembers";
 import { useProject } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
+import { isApiError } from "@/lib/apiError";
+import { forgetProject } from "@/lib/cache";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ProjectDetail() {
 	const params = useParams<{ projectId: string }>();
@@ -28,18 +32,30 @@ export default function ProjectDetail() {
 		isLoading: isAuthLoading,
 		isError: isAuthError,
 	} = useRequireAuth();
-	const { data: project, isLoading, isError } = useProject(projectId);
+	const {
+		data: project,
+		isLoading,
+		isError,
+		error: projectError,
+	} = useProject(projectId);
 	const {
 		data: tasks,
 		isLoading: isTaskLoading,
 		isError: isTaskError,
 	} = useTasks(projectId);
 	const { data: members = [] } = useProjectMembers(projectId);
+	const queryClient = useQueryClient();
 
 	const currentMember = members.find(
 		(member) => member.userId === currentUser?.id,
 	);
 	const canManage = currentMember?.role === "MANAGER";
+
+	useEffect(() => {
+		if (isApiError(projectError) && projectError.status === 404) {
+			forgetProject(queryClient, projectId);
+		}
+	}, [projectError, projectId, queryClient]);
 
 	if (isAuthLoading) {
 		return (
@@ -62,9 +78,24 @@ export default function ProjectDetail() {
 	}
 
 	if (isError) {
+		const projectIsGone =
+			isApiError(projectError) && projectError.status === 404;
+
 		return (
 			<Container>
-				<ErrorState message="Failed to load project." />
+				{projectIsGone ? (
+					<div className="space-y-3">
+						<ErrorState message="This project is no longer available. It may have been deleted, or you may have been removed." />
+
+						<Link
+							href="/projects"
+							className="text-sm font-medium hover:underline">
+							Back to projects
+						</Link>
+					</div>
+				) : (
+					<ErrorState message="Failed to load project." />
+				)}
 			</Container>
 		);
 	}
@@ -72,7 +103,15 @@ export default function ProjectDetail() {
 	if (!project) {
 		return (
 			<Container>
-				<ErrorState message="Project not found." />
+				<div className="space-y-3">
+					<ErrorState message="This project is no longer available." />
+
+					<Link
+						href="/projects"
+						className="text-sm font-medium hover:underline">
+						Back to projects
+					</Link>
+				</div>
 			</Container>
 		);
 	}

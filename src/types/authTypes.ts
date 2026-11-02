@@ -1,4 +1,4 @@
-export type AccountRole = "MANAGER" | "MEMBER";
+export type AccountRole = "ADMIN" | "MANAGER" | "MEMBER";
 
 export type CurrentUser = {
 	id: string;

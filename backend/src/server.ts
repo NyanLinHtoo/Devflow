@@ -10,6 +10,7 @@ import { pruneExpired } from "./lib/cleanup.js";
 import { isAppError } from "./lib/errors.js";
 import prisma from "./lib/prisma.js";
 import { isValidationError } from "./lib/validation.js";
+import { adminRoutes } from "./modules/admin/adminRoute.js";
 import { authRoutes } from "./modules/auth/authRoute.js";
 import { dashboardRoutes } from "./modules/dashboard/dashboardRoute.js";
 import { projectRoutes } from "./modules/projects/projectRoute.js";
@@ -164,6 +165,7 @@ app.register((protectedApp) => {
   protectedApp.register(projectMemberRoutes, { prefix: "/projects" });
   protectedApp.register(userRoutes, { prefix: "/users" });
   protectedApp.register(dashboardRoutes, { prefix: "/dashboard" });
+  protectedApp.register(adminRoutes, { prefix: "/admin" });
 });
 
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;

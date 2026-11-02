@@ -9,6 +9,7 @@ import CreateProjectDialog from "@/features/projects/components/CreateProjectDia
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import { useProjects } from "@/hooks/useProjects";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { canCreateProjects } from "@/lib/roles";
 import { useState } from "react";
 
 type ProjectFilter = "ALL" | "MANAGED" | "MEMBER";
@@ -41,7 +42,7 @@ export default function ProjectsPage() {
 		return null;
 	}
 
-	const canCreate = user.role === "MANAGER";
+	const canCreate = canCreateProjects(user.role);
 
 	if (isLoading) {
 		return (
@@ -78,7 +79,7 @@ export default function ProjectsPage() {
 				description={
 					canCreate
 						? `${projects?.length ?? 0} projects`
-						: "Only managers can create projects. Ask a manager to add you."
+						: "Only managers and admins can create projects. Ask one to add you."
 				}
 				actions={canCreate ? <CreateProjectDialog /> : undefined}
 			/>

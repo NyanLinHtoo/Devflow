@@ -23,15 +23,17 @@ export default function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
 				<CreateTaskForm
 					projectId={projectId}
 					onSuccess={() => setOpen(false)}
+					cancelTrigger={
+						<Dialog.CloseTrigger asChild>
+							<Button
+								type="button"
+								variant="secondary"
+								className="w-full sm:w-auto">
+								Cancel
+							</Button>
+						</Dialog.CloseTrigger>
+					}
 				/>
-
-				<div className="mt-6 flex justify-end gap-3">
-					<Dialog.CloseTrigger asChild>
-						<Button type="button" variant="secondary">
-							Cancel
-						</Button>
-					</Dialog.CloseTrigger>
-				</div>
 			</DialogContent>
 		</Dialog.Root>
 	);

@@ -91,6 +91,11 @@ async function main() {
     );
   }
 
+  await prisma.user.update({
+    where: { id: owner.id },
+    data: { role: "ADMIN" },
+  });
+
   const ownerProjects = await prisma.project.findMany({
     where: { projectMembers: { some: { userId: owner.id } } },
     select: { id: true },
@@ -486,7 +491,7 @@ async function main() {
   ]);
 
   console.log(`Seeded ${projects.length} projects and ${taskCount} tasks.`);
-  console.log(`Owner: ${owner.email}`);
+  console.log(`Owner: ${owner.email} (ADMIN)`);
   console.log(`Dummy users password: ${DUMMY_PASSWORD}`);
   console.log(
     `Database now has ${projectCount} projects and ${taskCount} tasks.`,

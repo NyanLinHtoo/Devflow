@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { useAddProjectMember } from "@/hooks/useProjectMembers";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { AddMemberFormData, addMemberSchema } from "../schemas";
 
@@ -17,11 +18,13 @@ const roleOptions = [
 type AddMemberFormProps = {
 	projectId: string;
 	onSuccess?: () => void;
+	cancelTrigger?: ReactNode;
 };
 
 export default function AddMemberForm({
 	projectId,
 	onSuccess,
+	cancelTrigger,
 }: AddMemberFormProps) {
 	const {
 		register,
@@ -81,9 +84,16 @@ export default function AddMemberForm({
 				)}
 			/>
 
-			<Button type="submit" className="w-full" disabled={addMember.isPending}>
-				{addMember.isPending ? "Adding..." : "Add member"}
-			</Button>
+			<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				{cancelTrigger}
+
+				<Button
+					type="submit"
+					className="w-full sm:w-auto"
+					disabled={addMember.isPending}>
+					{addMember.isPending ? "Adding..." : "Add member"}
+				</Button>
+			</div>
 		</form>
 	);
 }

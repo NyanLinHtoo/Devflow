@@ -16,6 +16,7 @@ import {
 	LogOut,
 	Menu,
 	Moon,
+	ShieldCheck,
 	Sun,
 	X,
 } from "lucide-react";
@@ -24,11 +25,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-const navItems = [
+const baseNavItems = [
 	{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
 	{ href: "/tasks", label: "My tasks", icon: ListChecks },
 	{ href: "/projects", label: "Projects", icon: FolderKanban },
 ];
+
+const adminNavItem = {
+	href: "/admin/users",
+	label: "Admin",
+	icon: ShieldCheck,
+};
 
 type Theme = "light" | "dark";
 
@@ -107,6 +114,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const { data: user } = useCurrentUser();
 	const { theme, toggleTheme } = useTheme();
 	const logoutMutation = useLogout();
+	const navItems =
+		user?.role === "ADMIN" ? [...baseNavItems, adminNavItem] : baseNavItems;
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const drawerRef = useRef<HTMLDivElement>(null);
 

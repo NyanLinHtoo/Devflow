@@ -8,20 +8,26 @@ import { Select } from "@/components/ui/select";
 import { TextArea } from "@/components/ui/text-area";
 import { projectStatusOptions } from "@/features/projects/projectLabels";
 import { useUpdateProject } from "@/hooks/useProjects";
+import { isApiError } from "@/lib/apiError";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Project } from "@/types/projectTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { UpdateProjectFormData, updateProjectSchema } from "../schemas";
 
 type EditProjectFormProps = {
 	project: Project;
 	onSuccess?: () => void;
+	onNotFound?: () => void;
+	cancelTrigger?: ReactNode;
 };
 
 export default function EditProjectForm({
 	project,
 	onSuccess,
+	onNotFound,
+	cancelTrigger,
 }: EditProjectFormProps) {
 	const {
 		register,
@@ -56,6 +62,11 @@ export default function EditProjectForm({
 			{
 				onSuccess: () => {
 					onSuccess?.();
+				},
+				onError: (error) => {
+					if (isApiError(error) && error.status === 404) {
+						onNotFound?.();
+					}
 				},
 			},
 		);
@@ -124,14 +135,18 @@ export default function EditProjectForm({
 				)}
 			/>
 
-			<Button
-				type="submit"
-				className="w-full"
-				disabled={updateProjectMutation.isPending}>
-				{updateProjectMutation.isPending
-					? "Updating project..."
-					: "Update project"}
-			</Button>
+			<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				{cancelTrigger}
+
+				<Button
+					type="submit"
+					className="w-full sm:w-auto"
+					disabled={updateProjectMutation.isPending}>
+					{updateProjectMutation.isPending
+						? "Updating project..."
+						: "Update project"}
+				</Button>
+			</div>
 		</form>
 	);
 }

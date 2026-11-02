@@ -11,9 +11,11 @@ import {
 	taskStatusOptions,
 } from "@/features/tasks/taskLabels";
 import { useUpdateTask } from "@/hooks/useTasks";
+import { isApiError } from "@/lib/apiError";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import type { Task } from "@/types/taskTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { type UpdateTaskFormData, updateTaskSchema } from "../schemas";
 
@@ -21,12 +23,16 @@ type EditTaskFormProps = {
 	task: Task;
 	projectId: string;
 	onSuccess?: () => void;
+	onNotFound?: () => void;
+	cancelTrigger?: ReactNode;
 };
 
 export default function EditTaskForm({
 	task,
 	projectId,
 	onSuccess,
+	onNotFound,
+	cancelTrigger,
 }: EditTaskFormProps) {
 	const {
 		register,
@@ -73,6 +79,11 @@ export default function EditTaskForm({
 						status: updatedTask.status,
 					});
 					onSuccess?.();
+				},
+				onError: (error) => {
+					if (isApiError(error) && error.status === 404) {
+						onNotFound?.();
+					}
 				},
 			},
 		);
@@ -160,12 +171,16 @@ export default function EditTaskForm({
 				)}
 			/>
 
-			<Button
-				type="submit"
-				className="w-full"
-				disabled={updateTaskMutation.isPending}>
-				{updateTaskMutation.isPending ? "Updating task..." : "Update task"}
-			</Button>
+			<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				{cancelTrigger}
+
+				<Button
+					type="submit"
+					className="w-full sm:w-auto"
+					disabled={updateTaskMutation.isPending}>
+					{updateTaskMutation.isPending ? "Updating task..." : "Update task"}
+				</Button>
+			</div>
 		</form>
 	);
 }

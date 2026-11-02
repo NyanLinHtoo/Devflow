@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import { canCreateProjects } from "../../lib/roles.js";
 import { validate } from "../../lib/validation.js";
 import { getUserById } from "../auth/authService.js";
 import { isProjectManager } from "../project-members/projectMemberService.js";
@@ -22,7 +23,7 @@ export function projectRoutes(app: FastifyInstance) {
 
     const user = await getUserById(userId);
 
-    if (!user || user.role !== "MANAGER") {
+    if (!user || !canCreateProjects(user.role)) {
       return reply.code(403).send({
         message: "You don't have permission to create projects",
       });

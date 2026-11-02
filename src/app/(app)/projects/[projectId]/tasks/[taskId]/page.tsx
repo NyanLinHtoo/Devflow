@@ -14,8 +14,12 @@ import {
 import { useProjectMembers } from "@/hooks/useProjectMembers";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTask } from "@/hooks/useTasks";
+import { isApiError } from "@/lib/apiError";
+import { forgetTask } from "@/lib/cache";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function TaskDetail() {
 	const params = useParams<{ projectId: string; taskId: string }>();
@@ -27,14 +31,26 @@ export default function TaskDetail() {
 		isLoading: isAuthLoading,
 		isError: isAuthError,
 	} = useRequireAuth();
-	const { data: task, isLoading, isError } = useTask(projectId, taskId);
+	const {
+		data: task,
+		isLoading,
+		isError,
+		error: taskError,
+	} = useTask(projectId, taskId);
 	const { data: members = [] } = useProjectMembers(projectId);
+	const queryClient = useQueryClient();
 
 	const currentMember = members.find(
 		(member) => member.userId === currentUser?.id,
 	);
 
 	const canAssign = currentMember?.role === "MANAGER";
+
+	useEffect(() => {
+		if (isApiError(taskError) && taskError.status === 404) {
+			forgetTask(queryClient, projectId, taskId);
+		}
+	}, [taskError, projectId, taskId, queryClient]);
 
 	if (isAuthLoading) {
 		return (
@@ -57,9 +73,23 @@ export default function TaskDetail() {
 	}
 
 	if (isError) {
+		const taskIsGone = isApiError(taskError) && taskError.status === 404;
+
 		return (
 			<Container>
-				<ErrorState message="Failed to load task." />
+				{taskIsGone ? (
+					<div className="space-y-3">
+						<ErrorState message="This task is no longer available. It may have been deleted, or its project may have been removed." />
+
+						<Link
+							href={`/projects/${projectId}`}
+							className="text-sm font-medium hover:underline">
+							Back to project
+						</Link>
+					</div>
+				) : (
+					<ErrorState message="Failed to load task." />
+				)}
 			</Container>
 		);
 	}
@@ -67,7 +97,15 @@ export default function TaskDetail() {
 	if (!task) {
 		return (
 			<Container>
-				<ErrorState message="Task not found." />
+				<div className="space-y-3">
+					<ErrorState message="This task is no longer available." />
+
+					<Link
+						href={`/projects/${projectId}`}
+						className="text-sm font-medium hover:underline">
+						Back to project
+					</Link>
+				</div>
 			</Container>
 		);
 	}

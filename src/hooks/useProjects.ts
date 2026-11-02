@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
+import { isApiError } from "@/lib/apiError";
+import { forgetProject } from "@/lib/cache";
+import { toaster } from "@/lib/toaster";
 import type {
 	CreateProjectInput,
 	Project,
@@ -18,6 +21,7 @@ export function useProject(projectId: string) {
 		queryKey: ["projects", projectId],
 		queryFn: () => apiFetch<Project>(`/projects/${projectId}`),
 		enabled: Boolean(projectId),
+		refetchOnWindowFocus: true,
 	});
 }
 
@@ -50,7 +54,24 @@ export function useUpdateProject() {
 				method: "PATCH",
 				body: JSON.stringify(data),
 			}),
-		meta: { successMessage: "Project updated" },
+		meta: { successMessage: "Project updated", skipErrorToast: true },
+
+		onError: (error, variables) => {
+			if (isApiError(error) && error.status === 404) {
+				forgetProject(queryClient, variables.projectId);
+				toaster.error({
+					title: "Project no longer available",
+					description:
+						"It may have been deleted, or you may have been removed. Your changes were not saved.",
+				});
+				return;
+			}
+
+			toaster.error({
+				title: "Something went wrong",
+				description: error instanceof Error ? error.message : undefined,
+			});
+		},
 
 		onSuccess: async (updatedProject) => {
 			await queryClient.invalidateQueries({
@@ -73,7 +94,20 @@ export function useDeleteProject() {
 			apiFetch<{ message: string }>(`/projects/${projectId}`, {
 				method: "DELETE",
 			}),
-		meta: { successMessage: "Project deleted" },
+		meta: { successMessage: "Project deleted", skipErrorToast: true },
+
+		onError: (error, projectId) => {
+			if (isApiError(error) && error.status === 404) {
+				forgetProject(queryClient, projectId);
+				toaster.success({ title: "Project already deleted" });
+				return;
+			}
+
+			toaster.error({
+				title: "Something went wrong",
+				description: error instanceof Error ? error.message : undefined,
+			});
+		},
 
 		onSuccess: (_data, projectId) => {
 			queryClient.cancelQueries({ queryKey: ["projects", projectId] });

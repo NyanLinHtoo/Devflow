@@ -59,6 +59,12 @@ export function userRoutes(app: FastifyInstance) {
       });
     }
 
+    if (result.status === "LAST_ADMIN") {
+      return reply.code(409).send({
+        message: "Promote another admin before deleting this account.",
+      });
+    }
+
     reply.clearCookie("access_token", clearCookieOptions);
     reply.clearCookie("refresh_token", clearCookieOptions);
 

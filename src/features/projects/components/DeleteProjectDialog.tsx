@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { DialogContent } from "@/components/ui/dialog";
 import { useDeleteProject } from "@/hooks/useProjects";
+import { isApiError } from "@/lib/apiError";
 import { Dialog } from "@ark-ui/react/dialog";
 import { useRouter } from "next/navigation";
 
@@ -22,8 +23,10 @@ export default function DeleteProjectDialog({
 		try {
 			await deleteProjectMutation.mutateAsync(projectId);
 			router.replace("/projects");
-		} catch {
-			// Errors surface through the global mutation toast.
+		} catch (error) {
+			if (isApiError(error) && error.status === 404) {
+				router.replace("/projects");
+			}
 		}
 	}
 
@@ -35,7 +38,7 @@ export default function DeleteProjectDialog({
 
 			<DialogContent title="Delete project?">
 				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
-					Are you sure you want to delete `{projectName}`? This action cannot be
+					Are you sure you want to delete {projectName}? This action cannot be
 					undone.
 				</Dialog.Description>
 
@@ -51,6 +54,7 @@ export default function DeleteProjectDialog({
 
 					<Button
 						type="button"
+						variant="danger"
 						onClick={handleDelete}
 						disabled={deleteProjectMutation.isPending}>
 						{deleteProjectMutation.isPending ? "Deleting..." : "Delete"}

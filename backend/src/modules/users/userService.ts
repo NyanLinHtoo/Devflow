@@ -1,5 +1,6 @@
 import * as argon2 from "argon2";
 import prisma from "../../lib/prisma.js";
+import { withSerializableRetry } from "../../lib/transactions.js";
 import type {
   ChangePasswordInput,
   DeleteAccountInput,
@@ -63,7 +64,7 @@ export async function changePassword(
 export async function deleteAccount(userId: string, input: DeleteAccountInput) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, passwordHash: true },
+    select: { id: true, passwordHash: true, role: true },
   });
 
   if (!user) {
@@ -79,24 +80,36 @@ export async function deleteAccount(userId: string, input: DeleteAccountInput) {
     return { status: "INVALID_PASSWORD" as const };
   }
 
-  const managerMemberships = await prisma.projectMember.findMany({
-    where: { userId, role: "MANAGER" },
-    select: { projectId: true },
-  });
-
-  for (const membership of managerMemberships) {
-    const managerCount = await prisma.projectMember.count({
-      where: { projectId: membership.projectId, role: "MANAGER" },
+  return withSerializableRetry(async (tx) => {
+    const managerMemberships = await tx.projectMember.findMany({
+      where: { userId, role: "MANAGER" },
+      select: { projectId: true },
     });
 
-    if (managerCount <= 1) {
-      return { status: "LAST_MANAGER" as const };
+    for (const membership of managerMemberships) {
+      const managerCount = await tx.projectMember.count({
+        where: { projectId: membership.projectId, role: "MANAGER" },
+      });
+
+      if (managerCount <= 1) {
+        return { status: "LAST_MANAGER" as const };
+      }
     }
-  }
 
-  await prisma.user.delete({
-    where: { id: userId },
+    if (user.role === "ADMIN") {
+      const adminCount = await tx.user.count({
+        where: { role: "ADMIN" },
+      });
+
+      if (adminCount <= 1) {
+        return { status: "LAST_ADMIN" as const };
+      }
+    }
+
+    await tx.user.delete({
+      where: { id: userId },
+    });
+
+    return { status: "SUCCESS" as const };
   });
-
-  return { status: "SUCCESS" as const };
 }

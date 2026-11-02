@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { DialogContent } from "@/components/ui/dialog";
 import { useDeleteTask } from "@/hooks/useTasks";
+import { isApiError } from "@/lib/apiError";
 import { Dialog } from "@ark-ui/react/dialog";
 import { useRouter } from "next/navigation";
 
@@ -30,8 +31,10 @@ export default function DeleteTaskDialog({
 			if (redirectAfterDelete) {
 				router.replace(`/projects/${projectId}`);
 			}
-		} catch {
-			// Errors surface through the global mutation toast.
+		} catch (error) {
+			if (isApiError(error) && error.status === 404 && redirectAfterDelete) {
+				router.replace(`/projects/${projectId}`);
+			}
 		}
 	}
 
@@ -43,7 +46,7 @@ export default function DeleteTaskDialog({
 
 			<DialogContent title="Delete task?">
 				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
-					Are you sure you want to delete `{taskTitle}`? This action cannot be
+					Are you sure you want to delete {taskTitle}? This action cannot be
 					undone.
 				</Dialog.Description>
 
@@ -59,6 +62,7 @@ export default function DeleteTaskDialog({
 
 					<Button
 						type="button"
+						variant="danger"
 						onClick={handleDelete}
 						disabled={deleteTaskMutation.isPending}>
 						{deleteTaskMutation.isPending ? "Deleting..." : "Delete"}

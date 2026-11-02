@@ -10,17 +10,20 @@ import { taskPriorityOptions } from "@/features/tasks/taskLabels";
 import { useCreateTask } from "@/hooks/useTasks";
 import { dateToInputValue, inputValueToDate } from "@/lib/date";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { type CreateTaskFormData, createTaskSchema } from "../schemas";
 
 type CreateTaskFormProps = {
 	projectId: string;
 	onSuccess?: () => void;
+	cancelTrigger?: ReactNode;
 };
 
 export default function CreateTaskForm({
 	projectId,
 	onSuccess,
+	cancelTrigger,
 }: CreateTaskFormProps) {
 	const {
 		register,
@@ -118,12 +121,16 @@ export default function CreateTaskForm({
 				)}
 			/>
 
-			<Button
-				type="submit"
-				className="w-full"
-				disabled={createTaskMutation.isPending}>
-				{createTaskMutation.isPending ? "Creating task..." : "Create task"}
-			</Button>
+			<div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+				{cancelTrigger}
+
+				<Button
+					type="submit"
+					className="w-full sm:w-auto"
+					disabled={createTaskMutation.isPending}>
+					{createTaskMutation.isPending ? "Creating task..." : "Create task"}
+				</Button>
+			</div>
 		</form>
 	);
 }

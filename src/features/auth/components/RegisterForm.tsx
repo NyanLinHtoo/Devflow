@@ -55,7 +55,8 @@ export default function RegisterForm() {
 					. Verify your email before signing in.
 				</p>
 
-				{registered.verificationToken && (
+				{process.env.NODE_ENV !== "production" &&
+					registered.verificationToken && (
 					<p className="text-sm">
 						<Link
 							href={`/verify-email?token=${registered.verificationToken}`}
