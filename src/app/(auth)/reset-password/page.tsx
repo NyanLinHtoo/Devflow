@@ -1,3 +1,4 @@
+import { ResetPasswordSkeleton } from "@/components/loading";
 import ResetPasswordForm from "@/features/auth/components/ResetPasswordForm";
 import { Suspense } from "react";
 
@@ -18,12 +19,7 @@ export default function ResetPasswordPage() {
 						</p>
 					</div>
 
-					<Suspense
-						fallback={
-							<p className="text-center text-sm text-muted-foreground">
-								Loading...
-							</p>
-						}>
+					<Suspense fallback={<ResetPasswordSkeleton />}>
 						<ResetPasswordForm />
 					</Suspense>
 				</div>

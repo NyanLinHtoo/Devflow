@@ -1,10 +1,11 @@
 "use client";
 
+import { DashboardSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import {
@@ -27,7 +28,11 @@ function formatDueDate(dueDate: string) {
 
 export default function DashboardPage() {
 	const router = useRouter();
-	const { data: user, isError: isAuthError } = useRequireAuth();
+	const {
+		data: user,
+		isLoading: isAuthLoading,
+		isError: isAuthError,
+	} = useRequireAuth();
 	const {
 		data: summary,
 		isLoading: isSummaryLoading,
@@ -36,6 +41,14 @@ export default function DashboardPage() {
 
 	if (isAuthError) {
 		return null;
+	}
+
+	if (isAuthLoading || (isSummaryLoading && !summary)) {
+		return (
+			<Container>
+				<DashboardSkeleton />
+			</Container>
+		);
 	}
 
 	const recentProjects = summary?.recentProjects ?? [];
@@ -76,9 +89,7 @@ export default function DashboardPage() {
 			<PageHeader
 				title={user ? `Welcome back, ${user.fullName}` : "Dashboard"}
 				description={
-					user
-						? `${user.email} · ${roleLabels[user.role]}`
-						: "Loading your workspace..."
+					user ? `${user.email} · ${roleLabels[user.role]}` : undefined
 				}
 				actions={
 					<>
@@ -107,9 +118,7 @@ export default function DashboardPage() {
 									<Icon size={16} aria-hidden="true" />
 									<span>{stat.label}</span>
 								</div>
-								<p className="mt-1 text-2xl font-semibold">
-									{isSummaryLoading ? "..." : stat.value}
-								</p>
+								<p className="mt-1 text-2xl font-semibold">{stat.value}</p>
 								<p className="mt-1 text-xs text-muted-foreground">
 									{stat.hint}
 								</p>
@@ -130,9 +139,7 @@ export default function DashboardPage() {
 						</Link>
 					</div>
 
-					{isSummaryLoading ? (
-						<LoadingState label="Loading projects..." />
-					) : isSummaryError ? (
+					{isSummaryError ? (
 						<ErrorState message="Failed to load projects." />
 					) : recentProjects.length === 0 ? (
 						<EmptyState>
@@ -153,9 +160,7 @@ export default function DashboardPage() {
 							<h2 className="text-lg font-medium">Upcoming</h2>
 						</div>
 
-						{isSummaryLoading ? (
-							<LoadingState label="Loading tasks..." />
-						) : isSummaryError ? (
+						{isSummaryError ? (
 							<ErrorState message="Failed to load upcoming tasks." />
 						) : !summary || summary.upcomingTasks.length === 0 ? (
 							<EmptyState>No upcoming tasks.</EmptyState>

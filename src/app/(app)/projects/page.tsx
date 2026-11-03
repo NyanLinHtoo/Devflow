@@ -1,10 +1,11 @@
 "use client";
 
+import { ProjectsSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import ProjectCard from "@/features/projects/components/ProjectCard";
 import { useProjects } from "@/hooks/useProjects";
@@ -33,7 +34,7 @@ export default function ProjectsPage() {
 	if (isAuthLoading) {
 		return (
 			<Container>
-				<LoadingState />
+				<ProjectsSkeleton />
 			</Container>
 		);
 	}
@@ -47,7 +48,7 @@ export default function ProjectsPage() {
 	if (isLoading) {
 		return (
 			<Container>
-				<LoadingState label="Loading projects..." />
+				<ProjectsSkeleton />
 			</Container>
 		);
 	}

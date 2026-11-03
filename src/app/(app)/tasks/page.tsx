@@ -1,10 +1,11 @@
 "use client";
 
+import { TasksSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import {
 	taskPriorityChipClasses,
 	taskPriorityLabels,
@@ -43,7 +44,7 @@ export default function MyTasksPage() {
 	if (isAuthLoading) {
 		return (
 			<Container>
-				<LoadingState />
+				<TasksSkeleton />
 			</Container>
 		);
 	}
@@ -55,7 +56,7 @@ export default function MyTasksPage() {
 	if (isLoading) {
 		return (
 			<Container>
-				<LoadingState label="Loading your tasks..." />
+				<TasksSkeleton />
 			</Container>
 		);
 	}

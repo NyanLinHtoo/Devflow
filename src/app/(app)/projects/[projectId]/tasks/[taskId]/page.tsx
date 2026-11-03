@@ -1,9 +1,10 @@
 "use client";
 
+import { TaskDetailSkeleton } from "@/components/loading";
 import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { ErrorState, LoadingState } from "@/components/ui/state";
+import { ErrorState } from "@/components/ui/state";
 import DeleteTaskDialog from "@/features/tasks/components/DeleteTaskDialog";
 import EditTaskDialog from "@/features/tasks/components/EditTaskDialog";
 import TaskAssigneeSelect from "@/features/tasks/components/TaskAssigneeSelect";
@@ -55,7 +56,7 @@ export default function TaskDetail() {
 	if (isAuthLoading) {
 		return (
 			<Container>
-				<LoadingState />
+				<TaskDetailSkeleton />
 			</Container>
 		);
 	}
@@ -67,7 +68,7 @@ export default function TaskDetail() {
 	if (isLoading) {
 		return (
 			<Container>
-				<LoadingState label="Loading task..." />
+				<TaskDetailSkeleton />
 			</Container>
 		);
 	}

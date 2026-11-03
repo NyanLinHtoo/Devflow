@@ -1,8 +1,9 @@
 "use client";
 
+import { ProjectDetailSkeleton, TaskGridSkeleton } from "@/components/loading";
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import MemberList from "@/features/members/components/MemberList";
 import DeleteProjectDialog from "@/features/projects/components/DeleteProjectDialog";
 import EditProjectDialog from "@/features/projects/components/EditProjectDialog";
@@ -60,7 +61,7 @@ export default function ProjectDetail() {
 	if (isAuthLoading) {
 		return (
 			<Container>
-				<LoadingState />
+				<ProjectDetailSkeleton />
 			</Container>
 		);
 	}
@@ -72,7 +73,7 @@ export default function ProjectDetail() {
 	if (isLoading) {
 		return (
 			<Container>
-				<LoadingState label="Loading project..." />
+				<ProjectDetailSkeleton />
 			</Container>
 		);
 	}
@@ -186,7 +187,7 @@ export default function ProjectDetail() {
 					))}
 				</div>
 			) : isTaskLoading ? (
-				<LoadingState label="Loading tasks..." />
+				<TaskGridSkeleton rows={3} />
 			) : isTaskError ? (
 				<ErrorState message="Failed to load tasks." />
 			) : (

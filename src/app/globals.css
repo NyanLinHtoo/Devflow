@@ -9,6 +9,7 @@
 	--border: #e7e3f0;
 	--muted-foreground: #7a7585;
 	--primary: #6c5ce7;
+	--primary-soft: #efecfe;
 	--primary-foreground: #ffffff;
 	--ring: #6c5ce7;
 	--danger: #b3455b;
@@ -28,6 +29,7 @@
 	--border: #332d3e;
 	--muted-foreground: #a29caf;
 	--primary: #b3a7ff;
+	--primary-soft: #241f3a;
 	--primary-foreground: #181523;
 	--ring: #b3a7ff;
 	--danger: #f29aa8;
@@ -46,6 +48,7 @@
 	--color-border: var(--border);
 	--color-muted-foreground: var(--muted-foreground);
 	--color-primary: var(--primary);
+	--color-primary-soft: var(--primary-soft);
 	--color-primary-foreground: var(--primary-foreground);
 	--color-ring: var(--ring);
 	--color-danger: var(--danger);
@@ -89,4 +92,30 @@
 	background-size: 28px 28px;
 	-webkit-mask-image: linear-gradient(to bottom, black, transparent);
 	mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.skeleton {
+	position: relative;
+	overflow: hidden;
+	background-color: var(--surface-muted);
+}
+
+.skeleton::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	transform: translateX(-100%);
+	background-image: linear-gradient(
+		90deg,
+		transparent,
+		color-mix(in srgb, var(--foreground) 7%, transparent),
+		transparent
+	);
+	animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+	100% {
+		transform: translateX(100%);
+	}
 }

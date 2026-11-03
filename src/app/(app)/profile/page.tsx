@@ -1,7 +1,8 @@
 "use client";
 
+import { ProfileSkeleton } from "@/components/loading";
 import { Container } from "@/components/ui/container";
-import { ErrorState, LoadingState } from "@/components/ui/state";
+import { ErrorState } from "@/components/ui/state";
 import ChangePasswordForm from "@/features/profile/components/ChangePasswordForm";
 import DeleteAccountDialog from "@/features/profile/components/DeleteAccountDialog";
 import ProfileHeader from "@/features/profile/components/ProfileHeader";
@@ -14,7 +15,7 @@ export default function ProfilePage() {
 	if (isLoading) {
 		return (
 			<Container>
-				<LoadingState />
+				<ProfileSkeleton />
 			</Container>
 		);
 	}

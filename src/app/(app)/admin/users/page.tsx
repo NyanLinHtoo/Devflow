@@ -1,12 +1,13 @@
 "use client";
 
+import { AdminUsersSkeleton } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { Select } from "@/components/ui/select";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import AdminUserTable from "@/features/admin/components/AdminUserTable";
 import { accountRoleFilterOptions } from "@/features/admin/roleOptions";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
@@ -42,7 +43,7 @@ export default function AdminUsersPage() {
 	if (isAuthLoading || !user) {
 		return (
 			<Container>
-				<LoadingState />
+				<AdminUsersSkeleton />
 			</Container>
 		);
 	}
@@ -51,6 +52,14 @@ export default function AdminUsersPage() {
 		return (
 			<Container>
 				<ErrorState message="You don't have access to admin tools." />
+			</Container>
+		);
+	}
+
+	if (isLoading && !data) {
+		return (
+			<Container>
+				<AdminUsersSkeleton />
 			</Container>
 		);
 	}
@@ -99,8 +108,6 @@ export default function AdminUsersPage() {
 
 			{isError ? (
 				<ErrorState message="Failed to load users." />
-			) : isLoading && !data ? (
-				<LoadingState label="Loading users..." />
 			) : !data || data.users.length === 0 ? (
 				<EmptyState>No users match your filters.</EmptyState>
 			) : (

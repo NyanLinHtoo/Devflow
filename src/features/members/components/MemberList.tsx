@@ -1,8 +1,9 @@
 "use client";
 
+import { MemberListSkeleton } from "@/components/loading";
 import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
-import { EmptyState, ErrorState, LoadingState } from "@/components/ui/state";
+import { EmptyState, ErrorState } from "@/components/ui/state";
 import {
 	useProjectMembers,
 	useUpdateProjectMemberRole,
@@ -30,6 +31,10 @@ export default function MemberList({
 	const { data: members, isLoading, isError } = useProjectMembers(projectId);
 	const updateRole = useUpdateProjectMemberRole(projectId);
 
+	if (isLoading) {
+		return <MemberListSkeleton />;
+	}
+
 	return (
 		<section aria-labelledby="members-heading">
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -40,9 +45,7 @@ export default function MemberList({
 				{canManage ? <AddMemberDialog projectId={projectId} /> : null}
 			</div>
 
-			{isLoading ? (
-				<LoadingState label="Loading members..." />
-			) : isError ? (
+			{isError ? (
 				<ErrorState message="Failed to load members." />
 			) : !members || members.length === 0 ? (
 				<EmptyState>No members yet.</EmptyState>

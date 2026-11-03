@@ -6,11 +6,16 @@ import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useRegister, useResendVerification } from "@/hooks/useAuth";
+import { useCooldown } from "@/hooks/useCooldown";
+import { isApiError } from "@/lib/apiError";
+import { formatCountdown } from "@/lib/countdown";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { RegisterFormData, registerSchema } from "../schemas";
+
+const RESEND_COOLDOWN_SECONDS = 300;
 
 export default function RegisterForm() {
 	const [registered, setRegistered] = useState<{
@@ -36,6 +41,7 @@ export default function RegisterForm() {
 
 	const registerMutation = useRegister();
 	const resendMutation = useResendVerification();
+	const cooldown = useCooldown();
 
 	function onSubmit(data: RegisterFormData) {
 		registerMutation.mutate(data, {
@@ -44,8 +50,27 @@ export default function RegisterForm() {
 					email: data.email,
 					verificationToken: response.emailVerification?.token,
 				});
+				cooldown.start(RESEND_COOLDOWN_SECONDS);
 			},
 		});
+	}
+
+	function handleResend() {
+		if (!registered) {
+			return;
+		}
+
+		resendMutation.mutate(
+			{ email: registered.email },
+			{
+				onSuccess: () => cooldown.start(RESEND_COOLDOWN_SECONDS),
+				onError: (error) => {
+					if (isApiError(error) && error.status === 429) {
+						cooldown.start(error.retryAfter ?? RESEND_COOLDOWN_SECONDS);
+					}
+				},
+			},
+		);
 	}
 
 	if (registered) {
@@ -61,24 +86,24 @@ export default function RegisterForm() {
 
 				{process.env.NODE_ENV !== "production" &&
 					registered.verificationToken && (
-					<p className="text-sm">
-						<Link
-							href={`/verify-email?token=${registered.verificationToken}`}
-							className="font-medium text-foreground hover:underline">
-							Verify now (development)
-						</Link>
-					</p>
-				)}
+						<p className="text-sm">
+							<Link
+								href={`/verify-email?token=${registered.verificationToken}`}
+								className="font-medium text-foreground hover:underline">
+								Verify now (development)
+							</Link>
+						</p>
+					)}
 
 				<Button
 					type="button"
 					className="w-full"
-					onClick={() => resendMutation.mutate({ email: registered.email })}
-					disabled={resendMutation.isPending}>
-					{resendMutation.isPending
-						? "Sending..."
-						: resendMutation.isSuccess
-							? "Verification email sent"
+					onClick={handleResend}
+					disabled={resendMutation.isPending || cooldown.isActive}>
+					{cooldown.isActive
+						? `Resend in ${formatCountdown(cooldown.remaining)}`
+						: resendMutation.isPending
+							? "Sending..."
 							: "Resend verification email"}
 				</Button>
 

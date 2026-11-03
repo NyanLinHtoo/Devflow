@@ -436,6 +436,18 @@ export function authRoutes(app: FastifyInstance) {
         existingUser.id,
       );
 
+      if (resendVerification.status === "COOLDOWN") {
+        const retryAfter = Math.max(
+          1,
+          Math.ceil((resendVerification.retryAt.getTime() - Date.now()) / 1000),
+        );
+
+        return reply.code(429).header("Retry-After", String(retryAfter)).send({
+          message: "Please wait before requesting another verification email.",
+          retryAfter,
+        });
+      }
+
       if (resendVerification.status !== "CREATED") {
         return reply.send({
           message:
