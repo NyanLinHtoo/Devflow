@@ -26,6 +26,10 @@ export default function RegisterForm() {
 	} = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
+			fullName: "",
+			email: "",
+			password: "",
+			confirmPassword: "",
 			acceptedTerms: false,
 		},
 	});
@@ -98,6 +102,7 @@ export default function RegisterForm() {
 					type="text"
 					placeholder="Enter your name"
 					autoComplete="name"
+					maxLength={30}
 					{...register("fullName")}
 				/>
 			</FormField>
@@ -108,6 +113,7 @@ export default function RegisterForm() {
 					type="email"
 					placeholder="you@example.com"
 					autoComplete="email"
+					maxLength={254}
 					{...register("email")}
 				/>
 			</FormField>
@@ -120,6 +126,7 @@ export default function RegisterForm() {
 					id="password"
 					placeholder="Enter your password"
 					autoComplete="new-password"
+					maxLength={128}
 					{...register("password")}
 				/>
 			</FormField>
@@ -132,6 +139,7 @@ export default function RegisterForm() {
 					id="confirmPassword"
 					placeholder="Confirm your password"
 					autoComplete="new-password"
+					maxLength={128}
 					{...register("confirmPassword")}
 				/>
 			</FormField>

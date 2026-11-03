@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api";
+import type { Project } from "@/types/projectTypes";
 import { useQuery } from "@tanstack/react-query";
 
 export type DashboardUpcomingTask = {
@@ -11,16 +12,6 @@ export type DashboardUpcomingTask = {
 	assigneeName: string | null;
 };
 
-export type DashboardActivity = {
-	id: string;
-	title: string;
-	status: "TODO" | "IN_PROGRESS" | "DONE";
-	updatedAt: string;
-	projectId: string;
-	projectName: string;
-	actorName: string | null;
-};
-
 export type DashboardSummary = {
 	projectCount: number;
 	openTaskCount: number;
@@ -30,12 +21,18 @@ export type DashboardSummary = {
 	memberCount: number;
 	managerCount: number;
 	upcomingTasks: DashboardUpcomingTask[];
-	recentActivity: DashboardActivity[];
+	recentProjects: Project[];
+	projectsThisMonth: number;
 };
 
-export function useDashboardSummary() {
-	return useQuery({
-		queryKey: ["dashboard", "summary"],
+export function dashboardSummaryQueryOptions() {
+	return {
+		queryKey: ["dashboard", "summary"] as const,
 		queryFn: () => apiFetch<DashboardSummary>("/dashboard/summary"),
-	});
+		staleTime: 60_000,
+	};
+}
+
+export function useDashboardSummary() {
+	return useQuery(dashboardSummaryQueryOptions());
 }

@@ -74,6 +74,8 @@ model Project {
   updatedAt      DateTime        @updatedAt
   tasks          Task[]
   projectMembers ProjectMember[]
+
+  @@index([createdAt])
 }
 
 enum ProjectStatus {
@@ -98,6 +100,9 @@ model Task {
   assignedMemberId String?        @db.Uuid
 
   @@unique([projectId, title])
+  @@index([projectId, status])
+  @@index([assignedMemberId, status])
+  @@index([projectId, dueDate])
 }
 
 enum TaskStatus {
@@ -123,6 +128,8 @@ model ProjectMember {
   assignedTasks Task[]
 
   @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId, role])
 }
 
 enum ProjectRole {

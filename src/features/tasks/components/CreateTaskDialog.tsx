@@ -20,20 +20,22 @@ export default function CreateTaskDialog({ projectId }: CreateTaskDialogProps) {
 			</Dialog.Trigger>
 
 			<DialogContent title="Creating task">
-				<CreateTaskForm
-					projectId={projectId}
-					onSuccess={() => setOpen(false)}
-					cancelTrigger={
-						<Dialog.CloseTrigger asChild>
-							<Button
-								type="button"
-								variant="secondary"
-								className="w-full sm:w-auto">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					}
-				/>
+				{open && (
+					<CreateTaskForm
+						projectId={projectId}
+						onSuccess={() => setOpen(false)}
+						cancelTrigger={
+							<Dialog.CloseTrigger asChild>
+								<Button
+									type="button"
+									variant="secondary"
+									className="w-full sm:w-auto">
+									Cancel
+								</Button>
+							</Dialog.CloseTrigger>
+						}
+					/>
+				)}
 			</DialogContent>
 		</Dialog.Root>
 	);

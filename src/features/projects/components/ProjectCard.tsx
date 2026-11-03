@@ -26,10 +26,12 @@ type ProjectCardProps = {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
 	return (
-		<Link href={`/projects/${project.id}`} className="block">
-			<Card className="h-full transition-colors hover:border-foreground/30">
+		<Link href={`/projects/${project.id}`} className="block min-w-0">
+			<Card className="h-full min-w-0 transition-colors hover:border-foreground/30">
 				<div className="flex items-start justify-between gap-2">
-					<h2 className="font-medium text-foreground">{project.name}</h2>
+					<h2 className="line-clamp-2 min-w-0 wrap-break-word font-medium text-foreground">
+						{project.name}
+					</h2>
 
 					<span
 						className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${projectStatusChipClasses[project.status]}`}>
@@ -38,7 +40,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 				</div>
 
 				{project.description && (
-					<p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+					<p className="mt-2 line-clamp-2 wrap-break-word text-sm text-muted-foreground">
 						{project.description}
 					</p>
 				)}

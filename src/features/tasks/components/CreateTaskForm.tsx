@@ -34,6 +34,8 @@ export default function CreateTaskForm({
 	} = useForm<CreateTaskFormData>({
 		resolver: zodResolver(createTaskSchema),
 		defaultValues: {
+			title: "",
+			description: "",
 			priority: "MEDIUM",
 			dueDate: "",
 		},
@@ -52,7 +54,12 @@ export default function CreateTaskForm({
 
 		createTaskMutation.mutate(taskData, {
 			onSuccess: () => {
-				reset();
+				reset({
+					title: "",
+					description: "",
+					priority: "MEDIUM",
+					dueDate: "",
+				});
 				onSuccess?.();
 			},
 		});
@@ -68,6 +75,7 @@ export default function CreateTaskForm({
 					id="title"
 					type="text"
 					placeholder="Enter your task title"
+					maxLength={100}
 					{...register("title")}
 				/>
 			</FormField>
@@ -79,6 +87,7 @@ export default function CreateTaskForm({
 				<TextArea
 					id="description"
 					placeholder="Project description"
+					maxLength={500}
 					{...register("description")}
 				/>
 			</FormField>

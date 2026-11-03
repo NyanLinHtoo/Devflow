@@ -15,7 +15,10 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
 	.object({
-		fullName: z.string().min(2, "Full name must be at least 2 characters"),
+		fullName: z
+			.string()
+			.min(2, "Full name must be at least 2 characters")
+			.max(30, "Full name must be at most 30 characters"),
 		email: z.email({
 			error: "Please enter a valid email address",
 		}),

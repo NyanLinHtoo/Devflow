@@ -3,6 +3,7 @@ import type {
 	LoginFormData,
 	RegisterFormData,
 } from "@/features/auth/schemas";
+import { dashboardSummaryQueryOptions } from "@/hooks/useDashboard";
 import { apiFetch } from "@/lib/api";
 import type { CurrentUser } from "@/types/authTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,10 +29,11 @@ export function useLogin() {
 			}),
 		meta: { successMessage: "Signed in", skipErrorToast: true },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
 				queryKey: ["currentUser"],
 			});
+			void queryClient.prefetchQuery(dashboardSummaryQueryOptions());
 		},
 	});
 }

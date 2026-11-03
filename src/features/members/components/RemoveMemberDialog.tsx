@@ -29,7 +29,7 @@ export default function RemoveMemberDialog({
 			</Dialog.Trigger>
 
 			<DialogContent title="Remove member?">
-				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
+				<Dialog.Description className="mt-2 wrap-break-word text-sm text-muted-foreground">
 					Remove {memberName} from this project? Any tasks assigned to them will
 					be unassigned.
 				</Dialog.Description>
@@ -46,6 +46,7 @@ export default function RemoveMemberDialog({
 
 					<Button
 						type="button"
+						variant="danger"
 						disabled={removeMember.isPending}
 						onClick={() =>
 							removeMember.mutate(memberId, {

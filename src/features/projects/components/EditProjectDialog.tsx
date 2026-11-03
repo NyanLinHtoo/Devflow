@@ -23,24 +23,26 @@ export default function EditProjectDialog({ project }: EditProjectFormProps) {
 			</Dialog.Trigger>
 
 			<DialogContent title="Editing project">
-				<EditProjectForm
-					project={project}
-					onSuccess={() => setOpen(false)}
-					onNotFound={() => {
-						setOpen(false);
-						router.replace("/projects");
-					}}
-					cancelTrigger={
-						<Dialog.CloseTrigger asChild>
-							<Button
-								type="button"
-								variant="secondary"
-								className="w-full sm:w-auto">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					}
-				/>
+				{open && (
+					<EditProjectForm
+						project={project}
+						onSuccess={() => setOpen(false)}
+						onNotFound={() => {
+							setOpen(false);
+							router.replace("/projects");
+						}}
+						cancelTrigger={
+							<Dialog.CloseTrigger asChild>
+								<Button
+									type="button"
+									variant="secondary"
+									className="w-full sm:w-auto">
+									Cancel
+								</Button>
+							</Dialog.CloseTrigger>
+						}
+					/>
+				)}
 			</DialogContent>
 		</Dialog.Root>
 	);

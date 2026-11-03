@@ -5,17 +5,22 @@ import { FormField } from "@/components/ui/form-field";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useChangePassword } from "@/hooks/useProfile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { type ChangePasswordFormData, changePasswordSchema } from "../schemas";
 
 export default function ChangePasswordForm() {
 	const {
-		register,
+		control,
 		handleSubmit,
 		reset,
 		formState: { errors },
 	} = useForm<ChangePasswordFormData>({
 		resolver: zodResolver(changePasswordSchema),
+		defaultValues: {
+			currentPassword: "",
+			newPassword: "",
+			confirmPassword: "",
+		},
 	});
 
 	const changePassword = useChangePassword();
@@ -28,7 +33,11 @@ export default function ChangePasswordForm() {
 			},
 			{
 				onSuccess: () => {
-					reset();
+					reset({
+						currentPassword: "",
+						newPassword: "",
+						confirmPassword: "",
+					});
 				},
 			},
 		);
@@ -50,10 +59,20 @@ export default function ChangePasswordForm() {
 					label="Current password"
 					htmlFor="currentPassword"
 					error={errors.currentPassword?.message}>
-					<PasswordInput
-						id="currentPassword"
-						autoComplete="current-password"
-						{...register("currentPassword")}
+					<Controller
+						control={control}
+						name="currentPassword"
+						render={({ field }) => (
+							<PasswordInput
+								id="currentPassword"
+								name={field.name}
+								autoComplete="current-password"
+								maxLength={128}
+								value={field.value}
+								onChange={field.onChange}
+								onBlur={field.onBlur}
+							/>
+						)}
 					/>
 				</FormField>
 
@@ -62,10 +81,20 @@ export default function ChangePasswordForm() {
 						label="New password"
 						htmlFor="newPassword"
 						error={errors.newPassword?.message}>
-						<PasswordInput
-							id="newPassword"
-							autoComplete="new-password"
-							{...register("newPassword")}
+						<Controller
+							control={control}
+							name="newPassword"
+							render={({ field }) => (
+								<PasswordInput
+									id="newPassword"
+									name={field.name}
+									autoComplete="new-password"
+									maxLength={128}
+									value={field.value}
+									onChange={field.onChange}
+									onBlur={field.onBlur}
+								/>
+							)}
 						/>
 					</FormField>
 
@@ -73,10 +102,20 @@ export default function ChangePasswordForm() {
 						label="Confirm new password"
 						htmlFor="confirmPassword"
 						error={errors.confirmPassword?.message}>
-						<PasswordInput
-							id="confirmPassword"
-							autoComplete="new-password"
-							{...register("confirmPassword")}
+						<Controller
+							control={control}
+							name="confirmPassword"
+							render={({ field }) => (
+								<PasswordInput
+									id="confirmPassword"
+									name={field.name}
+									autoComplete="new-password"
+									maxLength={128}
+									value={field.value}
+									onChange={field.onChange}
+									onBlur={field.onBlur}
+								/>
+							)}
 						/>
 					</FormField>
 				</div>

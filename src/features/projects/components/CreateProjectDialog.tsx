@@ -16,19 +16,21 @@ export default function CreateProjectDialog() {
 			</Dialog.Trigger>
 
 			<DialogContent title="Creating project">
-				<CreateProjectForm
-					onSuccess={() => setOpen(false)}
-					cancelTrigger={
-						<Dialog.CloseTrigger asChild>
-							<Button
-								type="button"
-								variant="secondary"
-								className="w-full sm:w-auto">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					}
-				/>
+				{open && (
+					<CreateProjectForm
+						onSuccess={() => setOpen(false)}
+						cancelTrigger={
+							<Dialog.CloseTrigger asChild>
+								<Button
+									type="button"
+									variant="secondary"
+									className="w-full sm:w-auto">
+									Cancel
+								</Button>
+							</Dialog.CloseTrigger>
+						}
+					/>
+				)}
 			</DialogContent>
 		</Dialog.Root>
 	);

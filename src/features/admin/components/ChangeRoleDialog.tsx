@@ -12,7 +12,7 @@ import { roleLabels } from "@/lib/roles";
 import type { AdminUser } from "@/types/adminTypes";
 import type { AccountRole } from "@/types/authTypes";
 import { Dialog } from "@ark-ui/react/dialog";
-import { type FormEvent, useState } from "react";
+import { type SubmitEvent, useState } from "react";
 
 type ChangeRoleDialogProps = {
 	user: AdminUser;
@@ -35,7 +35,7 @@ export default function ChangeRoleDialog({ user }: ChangeRoleDialogProps) {
 		}
 	}
 
-	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
 
 		if (role === user.role) {
@@ -65,7 +65,9 @@ export default function ChangeRoleDialog({ user }: ChangeRoleDialogProps) {
 	const changed = role !== user.role;
 
 	return (
-		<Dialog.Root open={open} onOpenChange={(details) => handleOpenChange(details.open)}>
+		<Dialog.Root
+			open={open}
+			onOpenChange={(details) => handleOpenChange(details.open)}>
 			<Dialog.Trigger asChild>
 				<Button type="button" variant="secondary" size="sm">
 					Change role

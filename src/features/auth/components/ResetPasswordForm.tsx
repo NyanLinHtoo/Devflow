@@ -22,6 +22,10 @@ export default function ResetPasswordForm() {
 		formState: { errors },
 	} = useForm<ResetPasswordFormData>({
 		resolver: zodResolver(resetPasswordSchema),
+		defaultValues: {
+			password: "",
+			confirmPassword: "",
+		},
 	});
 
 	function onSubmit(data: ResetPasswordFormData) {
@@ -53,6 +57,7 @@ export default function ResetPasswordForm() {
 					id="password"
 					placeholder="Enter your new password"
 					autoComplete="new-password"
+					maxLength={128}
 					{...register("password")}
 				/>
 			</FormField>
@@ -65,6 +70,7 @@ export default function ResetPasswordForm() {
 					id="confirmPassword"
 					placeholder="Confirm your new password"
 					autoComplete="new-password"
+					maxLength={128}
 					{...register("confirmPassword")}
 				/>
 			</FormField>

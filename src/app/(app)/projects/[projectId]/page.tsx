@@ -129,7 +129,9 @@ export default function ProjectDetail() {
 					title={project.name}
 					description={
 						<>
-							{project.description ? <p>{project.description}</p> : null}
+							{project.description ? (
+								<p className="wrap-break-word">{project.description}</p>
+							) : null}
 							<div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
 								<span
 									className={`rounded-full px-2 py-0.5 font-medium ${projectStatusChipClasses[project.status]}`}>
@@ -178,7 +180,7 @@ export default function ProjectDetail() {
 			</div>
 
 			{tasks && tasks.length > 0 ? (
-				<div className="grid gap-4">
+				<div className="grid min-w-0 gap-4">
 					{tasks.map((task) => (
 						<TaskCard key={task.id} task={task} projectId={projectId} />
 					))}

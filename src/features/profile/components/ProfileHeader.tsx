@@ -41,7 +41,7 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 				</div>
 
 				<div className="min-w-0 flex-1">
-					<h1 className="text-2xl font-semibold tracking-tight">
+					<h1 className="wrap-break-word text-2xl font-semibold tracking-tight">
 						{user.fullName}
 					</h1>
 

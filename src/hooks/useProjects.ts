@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { isApiError } from "@/lib/apiError";
 import { forgetProject } from "@/lib/cache";
-import { toaster } from "@/lib/toaster";
+import { deferToast, toaster } from "@/lib/toaster";
 import type {
 	CreateProjectInput,
 	Project,
@@ -13,6 +13,7 @@ export function useProjects() {
 	return useQuery({
 		queryKey: ["projects"],
 		queryFn: () => apiFetch<Project[]>("/projects"),
+		staleTime: 60_000,
 	});
 }
 
@@ -21,7 +22,7 @@ export function useProject(projectId: string) {
 		queryKey: ["projects", projectId],
 		queryFn: () => apiFetch<Project>(`/projects/${projectId}`),
 		enabled: Boolean(projectId),
-		refetchOnWindowFocus: true,
+		refetchOnWindowFocus: "always",
 	});
 }
 
@@ -36,10 +37,14 @@ export function useCreateProject() {
 			}),
 		meta: { successMessage: "Project created" },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
 				queryKey: ["projects"],
 				exact: true,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});
@@ -59,28 +64,36 @@ export function useUpdateProject() {
 		onError: (error, variables) => {
 			if (isApiError(error) && error.status === 404) {
 				forgetProject(queryClient, variables.projectId);
-				toaster.error({
-					title: "Project no longer available",
-					description:
-						"It may have been deleted, or you may have been removed. Your changes were not saved.",
-				});
+				deferToast(() =>
+					toaster.error({
+						title: "Project no longer available",
+						description:
+							"It may have been deleted, or you may have been removed. Your changes were not saved.",
+					}),
+				);
 				return;
 			}
 
-			toaster.error({
-				title: "Something went wrong",
-				description: error instanceof Error ? error.message : undefined,
-			});
+			deferToast(() =>
+				toaster.error({
+					title: "Something went wrong",
+					description: error instanceof Error ? error.message : undefined,
+				}),
+			);
 		},
 
-		onSuccess: async (updatedProject) => {
-			await queryClient.invalidateQueries({
+		onSuccess: (updatedProject) => {
+			void queryClient.invalidateQueries({
 				queryKey: ["projects"],
 				exact: true,
 			});
 
-			await queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", updatedProject.id],
+			});
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});
@@ -99,14 +112,18 @@ export function useDeleteProject() {
 		onError: (error, projectId) => {
 			if (isApiError(error) && error.status === 404) {
 				forgetProject(queryClient, projectId);
-				toaster.success({ title: "Project already deleted" });
+				deferToast(() =>
+					toaster.success({ title: "Project already deleted" }),
+				);
 				return;
 			}
 
-			toaster.error({
-				title: "Something went wrong",
-				description: error instanceof Error ? error.message : undefined,
-			});
+			deferToast(() =>
+				toaster.error({
+					title: "Something went wrong",
+					description: error instanceof Error ? error.message : undefined,
+				}),
+			);
 		},
 
 		onSuccess: (_data, projectId) => {
@@ -120,6 +137,10 @@ export function useDeleteProject() {
 			queryClient.invalidateQueries({
 				queryKey: ["projects", projectId],
 				refetchType: "none",
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});

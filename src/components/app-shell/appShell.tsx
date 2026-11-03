@@ -5,9 +5,11 @@ import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/useAuth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { dashboardSummaryQueryOptions } from "@/hooks/useDashboard";
 import { getInitials } from "@/lib/initials";
 import { roleLabels } from "@/lib/roles";
 import type { CurrentUser } from "@/types/authTypes";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	ChevronRight,
 	FolderKanban,
@@ -114,12 +116,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 	const { data: user } = useCurrentUser();
 	const { theme, toggleTheme } = useTheme();
 	const logoutMutation = useLogout();
+	const queryClient = useQueryClient();
 	const navItems =
 		user?.role === "ADMIN" ? [...baseNavItems, adminNavItem] : baseNavItems;
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const drawerRef = useRef<HTMLDivElement>(null);
 
 	const isProfileActive = pathname.startsWith("/profile");
+
+	useEffect(() => {
+		if (user) {
+			void queryClient.prefetchQuery(dashboardSummaryQueryOptions());
+		}
+	}, [user, queryClient]);
 
 	function closeMenu() {
 		setMenuOpen(false);

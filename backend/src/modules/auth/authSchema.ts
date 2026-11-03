@@ -12,7 +12,10 @@ const passwordSchema = z
   .max(128, "Password must be at most 128 characters");
 
 export const registerSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  fullName: z
+    .string()
+    .min(2, "Full name must be at least 2 characters")
+    .max(30, "Full name must be at most 30 characters"),
   email: normalizedEmail,
   password: passwordSchema,
   acceptedTerms: z.boolean().refine((value) => value === true, {

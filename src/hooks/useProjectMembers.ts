@@ -11,6 +11,7 @@ export function useProjectMembers(projectId: string) {
 		queryKey: membersKey(projectId),
 		queryFn: () => apiFetch<ProjectMember[]>(`/projects/${projectId}/members`),
 		enabled: Boolean(projectId),
+		refetchOnWindowFocus: "always",
 	});
 }
 
@@ -25,9 +26,13 @@ export function useAddProjectMember(projectId: string) {
 			}),
 		meta: { successMessage: "Member added" },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
 				queryKey: membersKey(projectId),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});
@@ -74,9 +79,13 @@ export function useUpdateProjectMemberRole(projectId: string) {
 			}
 		},
 
-		onSettled: async () => {
-			await queryClient.invalidateQueries({
+		onSettled: () => {
+			void queryClient.invalidateQueries({
 				queryKey: membersKey(projectId),
+			});
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});
@@ -95,13 +104,17 @@ export function useRemoveProjectMember(projectId: string) {
 			),
 		meta: { successMessage: "Member removed" },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
 				queryKey: membersKey(projectId),
 			});
 
-			await queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
+			});
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
 			});
 		},
 	});

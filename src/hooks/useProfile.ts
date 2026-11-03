@@ -26,6 +26,7 @@ export function useUpdateProfile() {
 
 		onSuccess: (user) => {
 			queryClient.setQueryData(["currentUser"], user);
+			void queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 		},
 	});
 }

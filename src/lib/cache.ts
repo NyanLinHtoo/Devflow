@@ -7,7 +7,10 @@ export function forgetProject(queryClient: QueryClient, projectId: string) {
 		projects?.filter((project) => project.id !== projectId),
 	);
 
-	queryClient.invalidateQueries({ queryKey: ["dashboard", "summary"] });
+	queryClient.invalidateQueries({
+		queryKey: ["dashboard", "summary"],
+		refetchType: "all",
+	});
 	queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 }
 
@@ -21,6 +24,9 @@ export function forgetTask(
 		(tasks) => tasks?.filter((task) => task.id !== taskId),
 	);
 
-	queryClient.invalidateQueries({ queryKey: ["dashboard", "summary"] });
+	queryClient.invalidateQueries({
+		queryKey: ["dashboard", "summary"],
+		refetchType: "all",
+	});
 	queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
 }

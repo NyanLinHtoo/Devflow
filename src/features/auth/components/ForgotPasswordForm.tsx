@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CooldownNotice } from "@/components/ui/cooldown";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { useForgotPassword } from "@/hooks/useAuth";
 import { useCooldown } from "@/hooks/useCooldown";
 import { isApiError } from "@/lib/apiError";
 import { formatCountdown } from "@/lib/countdown";
+import { deferToast, toaster } from "@/lib/toaster";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,6 +22,9 @@ export default function ForgotPasswordForm() {
 		formState: { errors },
 	} = useForm<ForgotPasswordFormData>({
 		resolver: zodResolver(forgotPasswordSchema),
+		defaultValues: {
+			email: "",
+		},
 	});
 
 	const forgotPasswordMutation = useForgotPassword();
@@ -34,10 +37,25 @@ export default function ForgotPasswordForm() {
 		forgotPasswordMutation.mutate(data, {
 			onSuccess: () => {
 				cooldown.start(RESEND_COOLDOWN_SECONDS);
+
+				deferToast(() =>
+					toaster.create({
+						type: "info",
+						title: `You can request another email in 5 minutes`,
+					}),
+				);
 			},
 			onError: (error) => {
 				if (isApiError(error) && error.status === 429) {
-					cooldown.start(error.retryAfter ?? 60);
+					const seconds = error.retryAfter ?? 60;
+					cooldown.start(seconds);
+
+					deferToast(() =>
+						toaster.create({
+							type: "warning",
+							title: `You can request another email in ${formatCountdown(seconds)}`,
+						}),
+					);
 					return;
 				}
 
@@ -63,6 +81,7 @@ export default function ForgotPasswordForm() {
 					type="email"
 					placeholder="you@example.com"
 					autoComplete="email"
+					maxLength={254}
 					{...register("email")}
 				/>
 			</FormField>
@@ -72,11 +91,6 @@ export default function ForgotPasswordForm() {
 					{formError}
 				</p>
 			) : null}
-
-			<CooldownNotice
-				remaining={cooldown.remaining}
-				message="You can request another email in"
-			/>
 
 			<Button
 				type="submit"

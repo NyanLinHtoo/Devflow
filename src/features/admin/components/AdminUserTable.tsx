@@ -6,7 +6,7 @@ import type { AdminUser } from "@/types/adminTypes";
 export default function AdminUserTable({ users }: { users: AdminUser[] }) {
 	return (
 		<Card className="overflow-x-auto p-0">
-			<table className="w-full min-w-[720px] text-left text-sm">
+			<table className="w-full min-w-180 text-left text-sm">
 				<thead className="border-b border-border text-xs uppercase text-muted-foreground">
 					<tr>
 						<th scope="col" className="px-4 py-3 font-medium">

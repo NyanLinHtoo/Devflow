@@ -46,6 +46,22 @@ export async function getProjectsByMemberId(userId: string) {
   return projects.map((project) => toProjectResponse(project, userId));
 }
 
+export async function getRecentProjectsByMemberId(
+  userId: string,
+  take: number,
+) {
+  const projects = await prisma.project.findMany({
+    where: { projectMembers: { some: { userId } } },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take,
+    include: projectInclude,
+  });
+
+  return projects.map((project) => toProjectResponse(project, userId));
+}
+
 export async function getProjectById(projectId: string, userId: string) {
   const project = await prisma.project.findFirst({
     where: { id: projectId, projectMembers: { some: { userId } } },

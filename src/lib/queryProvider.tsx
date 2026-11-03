@@ -1,7 +1,7 @@
 "use client";
 
 import { isApiError } from "@/lib/apiError";
-import { toaster } from "@/lib/toaster";
+import { deferToast, toaster } from "@/lib/toaster";
 import {
 	MutationCache,
 	QueryClient,
@@ -27,7 +27,9 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 						const { successMessage } = getToastMeta(mutation.meta);
 
 						if (successMessage) {
-							toaster.success({ title: successMessage });
+							deferToast(() =>
+								toaster.success({ title: successMessage }),
+							);
 						}
 					},
 					onError: (error, _variables, _context, mutation) => {
@@ -37,10 +39,13 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 							return;
 						}
 
-						toaster.error({
-							title: "Something went wrong",
-							description: error instanceof Error ? error.message : undefined,
-						});
+						deferToast(() =>
+							toaster.error({
+								title: "Something went wrong",
+								description:
+									error instanceof Error ? error.message : undefined,
+							}),
+						);
 					},
 				}),
 				defaultOptions: {

@@ -9,6 +9,7 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { roleLabels } from "@/lib/roles";
 import type { CurrentUser } from "@/types/authTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { type ProfileFormData, profileSchema } from "../schemas";
 
@@ -27,6 +28,15 @@ type ProfileInfoFormProps = {
 };
 
 export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
+	const formValues = useMemo(
+		() => ({
+			fullName: user.fullName,
+			timezone: user.timezone ?? "",
+			bio: user.bio ?? "",
+		}),
+		[user.fullName, user.timezone, user.bio],
+	);
+
 	const {
 		register,
 		handleSubmit,
@@ -35,32 +45,21 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 		formState: { errors },
 	} = useForm<ProfileFormData>({
 		resolver: zodResolver(profileSchema),
-		defaultValues: {
-			fullName: user.fullName,
-			timezone: user.timezone ?? "",
-			bio: user.bio ?? "",
-		},
+		defaultValues: formValues,
 	});
+
+	useEffect(() => {
+		reset(formValues);
+	}, [formValues, reset]);
 
 	const updateProfile = useUpdateProfile();
 
 	function onSubmit(data: ProfileFormData) {
-		updateProfile.mutate(
-			{
-				fullName: data.fullName,
-				timezone: data.timezone || null,
-				bio: data.bio?.trim() ? data.bio : null,
-			},
-			{
-				onSuccess: (updatedUser) => {
-					reset({
-						fullName: updatedUser.fullName,
-						timezone: updatedUser.timezone ?? "",
-						bio: updatedUser.bio ?? "",
-					});
-				},
-			},
-		);
+		updateProfile.mutate({
+			fullName: data.fullName,
+			timezone: data.timezone || null,
+			bio: data.bio?.trim() ? data.bio : null,
+		});
 	}
 
 	return (
@@ -80,7 +79,21 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 						label="Full name"
 						htmlFor="fullName"
 						error={errors.fullName?.message}>
-						<Input id="fullName" type="text" {...register("fullName")} />
+						<Controller
+							control={control}
+							name="fullName"
+							render={({ field }) => (
+								<Input
+									id="fullName"
+									type="text"
+									name={field.name}
+									maxLength={30}
+									value={field.value}
+									onChange={field.onChange}
+									onBlur={field.onBlur}
+								/>
+							)}
+						/>
 					</FormField>
 
 					<FormField label="Email" htmlFor="email">
@@ -130,7 +143,12 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 							htmlFor="bio"
 							error={errors.bio?.message}
 							helperText="Shown on your profile. Max 160 characters.">
-							<TextArea id="bio" rows={3} {...register("bio")} />
+							<TextArea
+								id="bio"
+								rows={3}
+								maxLength={160}
+								{...register("bio")}
+							/>
 						</FormField>
 					</div>
 				</div>
@@ -139,7 +157,7 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 					<Button
 						type="button"
 						variant="secondary"
-						onClick={() => reset()}
+						onClick={() => reset(formValues)}
 						disabled={updateProfile.isPending}>
 						Cancel
 					</Button>

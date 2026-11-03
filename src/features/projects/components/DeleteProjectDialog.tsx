@@ -37,7 +37,7 @@ export default function DeleteProjectDialog({
 			</Dialog.Trigger>
 
 			<DialogContent title="Delete project?">
-				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
+				<Dialog.Description className="mt-2 wrap-break-word text-sm text-muted-foreground">
 					Are you sure you want to delete {projectName}? This action cannot be
 					undone.
 				</Dialog.Description>

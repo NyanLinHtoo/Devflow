@@ -1,7 +1,7 @@
 import { apiFetch } from "@/lib/api";
 import { isApiError } from "@/lib/apiError";
 import { forgetTask } from "@/lib/cache";
-import { toaster } from "@/lib/toaster";
+import { deferToast, toaster } from "@/lib/toaster";
 import type {
 	CreateTaskInput,
 	Task,
@@ -15,7 +15,7 @@ export function useTasks(projectId: string) {
 		queryKey: ["projects", projectId, "tasks"],
 		queryFn: () => apiFetch<Task[]>(`/projects/${projectId}/tasks`),
 		enabled: Boolean(projectId),
-		refetchOnWindowFocus: true,
+		refetchOnWindowFocus: "always",
 	});
 }
 
@@ -24,7 +24,7 @@ export function useTask(projectId: string, taskId: string) {
 		queryKey: ["projects", projectId, "tasks", taskId],
 		queryFn: () => apiFetch<Task>(`/projects/${projectId}/tasks/${taskId}`),
 		enabled: Boolean(projectId && taskId),
-		refetchOnWindowFocus: true,
+		refetchOnWindowFocus: "always",
 	});
 }
 
@@ -39,13 +39,17 @@ export function useCreateTask(projectId: string) {
 			}),
 		meta: { successMessage: "Task created" },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
 				exact: true,
 			});
 
-			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
+			});
 		},
 	});
 }
@@ -64,31 +68,39 @@ export function useUpdateTask(projectId: string) {
 		onError: (error, variables) => {
 			if (isApiError(error) && error.status === 404) {
 				forgetTask(queryClient, projectId, variables.taskId);
-				toaster.error({
-					title: "Task no longer available",
-					description:
-						"It may have been deleted with its project. Your changes were not saved.",
-				});
+				deferToast(() =>
+					toaster.error({
+						title: "Task no longer available",
+						description:
+							"It may have been deleted with its project. Your changes were not saved.",
+					}),
+				);
 				return;
 			}
 
-			toaster.error({
-				title: "Something went wrong",
-				description: error instanceof Error ? error.message : undefined,
-			});
+			deferToast(() =>
+				toaster.error({
+					title: "Something went wrong",
+					description: error instanceof Error ? error.message : undefined,
+				}),
+			);
 		},
 
-		onSuccess: async (updatedTask) => {
-			await queryClient.invalidateQueries({
+		onSuccess: (updatedTask) => {
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
 				exact: true,
 			});
 
-			await queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks", updatedTask.id],
 			});
 
-			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
+			});
 		},
 	});
 }
@@ -108,14 +120,16 @@ export function useDeleteTask(projectId: string) {
 		onError: (error, taskId) => {
 			if (isApiError(error) && error.status === 404) {
 				forgetTask(queryClient, projectId, taskId);
-				toaster.success({ title: "Task already deleted" });
+				deferToast(() => toaster.success({ title: "Task already deleted" }));
 				return;
 			}
 
-			toaster.error({
-				title: "Something went wrong",
-				description: error instanceof Error ? error.message : undefined,
-			});
+			deferToast(() =>
+				toaster.error({
+					title: "Something went wrong",
+					description: error instanceof Error ? error.message : undefined,
+				}),
+			);
 		},
 
 		onSuccess: (_data, taskId) => {
@@ -129,6 +143,10 @@ export function useDeleteTask(projectId: string) {
 				refetchType: "none",
 			});
 			queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
+			});
 		},
 	});
 }
@@ -150,17 +168,21 @@ export function useUpdateTaskAssignee(projectId: string) {
 			}),
 		meta: { successMessage: "Assignee updated" },
 
-		onSuccess: async (updatedTask) => {
-			await queryClient.invalidateQueries({
+		onSuccess: (updatedTask) => {
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks"],
 				exact: true,
 			});
 
-			await queryClient.invalidateQueries({
+			void queryClient.invalidateQueries({
 				queryKey: ["projects", projectId, "tasks", updatedTask.id],
 			});
 
-			await queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({ queryKey: ["tasks", "mine"] });
+			void queryClient.invalidateQueries({
+				queryKey: ["dashboard", "summary"],
+				refetchType: "all",
+			});
 		},
 	});
 }

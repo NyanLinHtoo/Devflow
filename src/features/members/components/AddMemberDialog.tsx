@@ -20,20 +20,22 @@ export default function AddMemberDialog({ projectId }: AddMemberDialogProps) {
 			</Dialog.Trigger>
 
 			<DialogContent title="Add member">
-				<AddMemberForm
-					projectId={projectId}
-					onSuccess={() => setOpen(false)}
-					cancelTrigger={
-						<Dialog.CloseTrigger asChild>
-							<Button
-								type="button"
-								variant="secondary"
-								className="w-full sm:w-auto">
-								Cancel
-							</Button>
-						</Dialog.CloseTrigger>
-					}
-				/>
+				{open && (
+					<AddMemberForm
+						projectId={projectId}
+						onSuccess={() => setOpen(false)}
+						cancelTrigger={
+							<Dialog.CloseTrigger asChild>
+								<Button
+									type="button"
+									variant="secondary"
+									className="w-full sm:w-auto">
+									Cancel
+								</Button>
+							</Dialog.CloseTrigger>
+						}
+					/>
+				)}
 			</DialogContent>
 		</Dialog.Root>
 	);

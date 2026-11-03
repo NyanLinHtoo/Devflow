@@ -35,6 +35,7 @@ export default function AddMemberForm({
 	} = useForm<AddMemberFormData>({
 		resolver: zodResolver(addMemberSchema),
 		defaultValues: {
+			email: "",
 			role: "MEMBER",
 		},
 	});
@@ -61,6 +62,7 @@ export default function AddMemberForm({
 					type="email"
 					placeholder="teammate@example.com"
 					autoComplete="off"
+					maxLength={254}
 					{...register("email")}
 				/>
 			</FormField>

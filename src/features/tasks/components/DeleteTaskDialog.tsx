@@ -45,7 +45,7 @@ export default function DeleteTaskDialog({
 			</Dialog.Trigger>
 
 			<DialogContent title="Delete task?">
-				<Dialog.Description className="mt-2 text-sm text-muted-foreground">
+				<Dialog.Description className="mt-2 wrap-break-word text-sm text-muted-foreground">
 					Are you sure you want to delete {taskTitle}? This action cannot be
 					undone.
 				</Dialog.Description>

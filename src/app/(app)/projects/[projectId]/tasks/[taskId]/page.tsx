@@ -136,16 +136,16 @@ export default function TaskDetail() {
 				/>
 			</div>
 
-			<Card className="mb-6">
-				<dl className="grid gap-4 sm:grid-cols-2">
-					<div>
+			<Card className="mb-6 min-w-0">
+				<dl className="grid min-w-0 gap-4 sm:grid-cols-2">
+					<div className="min-w-0">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Status
 						</dt>
 						<dd className="mt-1 text-sm">{taskStatusLabels[task.status]}</dd>
 					</div>
 
-					<div>
+					<div className="min-w-0">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Priority
 						</dt>
@@ -154,7 +154,7 @@ export default function TaskDetail() {
 						</dd>
 					</div>
 
-					<div>
+					<div className="min-w-0">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Due date
 						</dt>
@@ -165,7 +165,7 @@ export default function TaskDetail() {
 						</dd>
 					</div>
 
-					<div>
+					<div className="min-w-0">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Created
 						</dt>
@@ -174,18 +174,18 @@ export default function TaskDetail() {
 						</dd>
 					</div>
 
-					<div className="sm:col-span-2">
+					<div className="min-w-0 sm:col-span-2">
 						<dt className="text-xs font-medium text-muted-foreground">
 							Description
 						</dt>
-						<dd className="mt-1 text-sm">
+						<dd className="mt-1 wrap-break-word text-sm">
 							{task.description || "No description"}
 						</dd>
 					</div>
 				</dl>
 			</Card>
 
-			<Card>
+			<Card className="min-w-0">
 				<TaskAssigneeSelect
 					projectId={projectId}
 					taskId={task.id}

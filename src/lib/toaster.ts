@@ -6,3 +6,7 @@ export const toaster = createToaster({
 	max: 3,
 	overlap: false,
 });
+
+export function deferToast(callback: () => void) {
+	setTimeout(callback, 0);
+}

@@ -30,6 +30,8 @@ export default function CreateProjectForm({
 	} = useForm<CreateProjectFormData>({
 		resolver: zodResolver(createProjectSchema),
 		defaultValues: {
+			name: "",
+			description: "",
 			dueDate: "",
 		},
 	});
@@ -47,7 +49,7 @@ export default function CreateProjectForm({
 			},
 			{
 				onSuccess: () => {
-					reset();
+					reset({ name: "", description: "", dueDate: "" });
 					onSuccess?.();
 				},
 			},
@@ -64,6 +66,7 @@ export default function CreateProjectForm({
 					id="name"
 					type="text"
 					placeholder="Enter your project name"
+					maxLength={100}
 					{...register("name")}
 				/>
 			</FormField>
@@ -75,6 +78,7 @@ export default function CreateProjectForm({
 				<TextArea
 					id="description"
 					placeholder="Project description"
+					maxLength={500}
 					{...register("description")}
 				/>
 			</FormField>

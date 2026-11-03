@@ -99,6 +99,7 @@ export default function EditTaskForm({
 					id="title"
 					type="text"
 					placeholder="Enter your task title"
+					maxLength={100}
 					{...register("title")}
 				/>
 			</FormField>
@@ -110,6 +111,7 @@ export default function EditTaskForm({
 				<TextArea
 					id="description"
 					placeholder="Project description"
+					maxLength={500}
 					{...register("description")}
 				/>
 			</FormField>

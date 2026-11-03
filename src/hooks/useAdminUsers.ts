@@ -59,9 +59,9 @@ export function useUpdateUserRole() {
 			}),
 		meta: { successMessage: "Role updated", skipErrorToast: true },
 
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
-			await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+		onSuccess: () => {
+			void queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+			void queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 		},
 	});
 }

@@ -82,6 +82,7 @@ export default function EditProjectForm({
 					id="name"
 					type="text"
 					placeholder="Enter your project name"
+					maxLength={100}
 					{...register("name")}
 				/>
 			</FormField>
@@ -93,6 +94,7 @@ export default function EditProjectForm({
 				<TextArea
 					id="description"
 					placeholder="Project description"
+					maxLength={500}
 					{...register("description")}
 				/>
 			</FormField>
