@@ -38,7 +38,6 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 	);
 
 	const {
-		register,
 		handleSubmit,
 		control,
 		reset,
@@ -143,11 +142,20 @@ export default function ProfileInfoForm({ user }: ProfileInfoFormProps) {
 							htmlFor="bio"
 							error={errors.bio?.message}
 							helperText="Shown on your profile. Max 160 characters.">
-							<TextArea
-								id="bio"
-								rows={3}
-								maxLength={160}
-								{...register("bio")}
+							<Controller
+								control={control}
+								name="bio"
+								render={({ field }) => (
+									<TextArea
+										id="bio"
+										rows={3}
+										maxLength={160}
+										name={field.name}
+										value={field.value ?? ""}
+										onChange={field.onChange}
+										onBlur={field.onBlur}
+									/>
+								)}
 							/>
 						</FormField>
 					</div>
