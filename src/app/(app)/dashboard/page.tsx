@@ -14,7 +14,7 @@ import {
 } from "@/features/tasks/taskLabels";
 import { useDashboardSummary } from "@/hooks/useDashboard";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { canCreateProjects, roleLabels } from "@/lib/roles";
+import { canCreateProjects } from "@/lib/roles";
 import { CheckCircle2, Clock, FolderKanban, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,6 +53,7 @@ export default function DashboardPage() {
 
 	const recentProjects = summary?.recentProjects ?? [];
 	const projectsThisMonth = summary?.projectsThisMonth ?? 0;
+	const managerCount = summary?.managerCount ?? 0;
 
 	const stats = [
 		{
@@ -79,7 +80,7 @@ export default function DashboardPage() {
 		{
 			label: "Team members",
 			value: summary?.memberCount ?? 0,
-			hint: `${summary?.managerCount ?? 0} managers`,
+			hint: `${managerCount} ${managerCount === 1 ? "manager" : "managers"}`,
 			icon: Users,
 		},
 	];
@@ -88,9 +89,7 @@ export default function DashboardPage() {
 		<Container>
 			<PageHeader
 				title={user ? `Welcome back, ${user.fullName}` : "Dashboard"}
-				description={
-					user ? `${user.email} · ${roleLabels[user.role]}` : undefined
-				}
+				description={user?.email}
 				actions={
 					<>
 						<Button
