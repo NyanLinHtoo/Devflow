@@ -19,6 +19,7 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTasks } from "@/hooks/useTasks";
 import { isApiError } from "@/lib/apiError";
 import { forgetProject } from "@/lib/cache";
+import { formatDate } from "@/lib/date";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -140,7 +141,7 @@ export default function ProjectDetail() {
 								</span>
 								<span className="text-muted-foreground">
 									{project.dueDate
-										? `Due ${new Date(project.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+										? `Due ${formatDate(project.dueDate)}`
 										: "No due date"}
 								</span>
 								<span className="text-muted-foreground">
@@ -149,7 +150,7 @@ export default function ProjectDetail() {
 								</span>
 							</div>
 							<p className="mt-1 text-xs">
-								Created {new Date(project.createdAt).toLocaleDateString()}
+								Created {formatDate(project.createdAt)}
 							</p>
 						</>
 					}

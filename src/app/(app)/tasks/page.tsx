@@ -14,6 +14,7 @@ import {
 } from "@/features/tasks/taskLabels";
 import { useMyTasks } from "@/hooks/useMyTasks";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { formatDate } from "@/lib/date";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -24,13 +25,6 @@ const filters: { value: TaskFilter; label: string }[] = [
 	{ value: "DONE", label: "Done" },
 	{ value: "ALL", label: "All" },
 ];
-
-function formatDueDate(dueDate: string) {
-	return new Date(dueDate).toLocaleDateString(undefined, {
-		month: "short",
-		day: "numeric",
-	});
-}
 
 export default function MyTasksPage() {
 	const {
@@ -135,7 +129,7 @@ export default function MyTasksPage() {
 										{task.dueDate ? (
 											<>
 												<span aria-hidden="true">·</span>
-												<span>Due {formatDueDate(task.dueDate)}</span>
+												<span>Due {formatDate(task.dueDate)}</span>
 											</>
 										) : null}
 									</div>

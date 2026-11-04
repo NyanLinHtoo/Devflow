@@ -3,16 +3,10 @@ import {
 	projectStatusChipClasses,
 	projectStatusLabels,
 } from "@/features/projects/projectLabels";
+import { formatDate } from "@/lib/date";
 import { getInitials } from "@/lib/initials";
 import Link from "next/link";
 import type { Project } from "@/types/projectTypes";
-
-function formatDueDate(dueDate: string) {
-	return new Date(dueDate).toLocaleDateString(undefined, {
-		month: "short",
-		day: "numeric",
-	});
-}
 
 const avatarColors = [
 	"bg-primary text-primary-foreground",
@@ -82,7 +76,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
 					<span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs text-muted-foreground">
 						{project.dueDate
-							? `Due ${formatDueDate(project.dueDate)}`
+							? `Due ${formatDate(project.dueDate)}`
 							: "No due date"}
 					</span>
 				</div>

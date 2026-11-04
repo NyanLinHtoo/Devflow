@@ -3,6 +3,7 @@ import {
 	taskPriorityLabels,
 	taskStatusLabels,
 } from "@/features/tasks/taskLabels";
+import { formatDate } from "@/lib/date";
 import type { Task } from "@/types/taskTypes";
 import Link from "next/link";
 
@@ -38,7 +39,7 @@ export default function TaskCard({ task, projectId }: TaskCardProps) {
 					<span>
 						{task.dueDate === null
 							? "No due date"
-							: new Date(task.dueDate).toDateString()}
+							: formatDate(task.dueDate)}
 					</span>
 					<span aria-hidden="true">·</span>
 					<span>

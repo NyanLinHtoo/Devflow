@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/useAuth";
+import { formatDate } from "@/lib/date";
 import { getInitials } from "@/lib/initials";
 import { roleLabels } from "@/lib/roles";
 import type { CurrentUser } from "@/types/authTypes";
@@ -54,17 +55,11 @@ export default function ProfileHeader({ user }: ProfileHeaderProps) {
 
 						<span>·</span>
 
-						<span>
-							Joined{" "}
-							{new Date(user.createdAt).toLocaleDateString(undefined, {
-								month: "short",
-								year: "numeric",
-							})}
-						</span>
+						<span>Joined {formatDate(user.createdAt)}</span>
 					</div>
 				</div>
 
-				<div className="flex flex-wrap gap-2 pb-1">
+				<div className="flex w-full flex-wrap gap-2 pb-1 sm:w-auto sm:shrink-0">
 					<Button
 						variant="secondary"
 						onClick={handleLogout}

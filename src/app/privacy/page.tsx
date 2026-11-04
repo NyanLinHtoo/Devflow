@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 	return (
 		<LegalShell
 			title="Privacy Policy"
-			updated="October 1, 2026"
+			updated="Oct 1, 2026"
 			current="privacy"
 			otherHref="/terms"
 			otherLabel="Terms of Use"

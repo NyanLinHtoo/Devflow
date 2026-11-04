@@ -59,7 +59,7 @@ export default function TermsPage() {
 	return (
 		<LegalShell
 			title="Terms of Use"
-			updated="October 1, 2026"
+			updated="Oct 1, 2026"
 			current="terms"
 			otherHref="/privacy"
 			otherLabel="Privacy Policy"

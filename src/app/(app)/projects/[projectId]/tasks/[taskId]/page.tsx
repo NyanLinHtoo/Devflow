@@ -17,6 +17,7 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useTask } from "@/hooks/useTasks";
 import { isApiError } from "@/lib/apiError";
 import { forgetTask } from "@/lib/cache";
+import { formatDate } from "@/lib/date";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -122,7 +123,7 @@ export default function TaskDetail() {
 			<div className="mt-4">
 				<PageHeader
 					title={task.title}
-					description={`Updated ${new Date(task.updatedAt).toLocaleDateString()}`}
+					description={`Updated ${formatDate(task.updatedAt)}`}
 					actions={
 						<>
 							<EditTaskDialog projectId={projectId} task={task} />
@@ -162,7 +163,7 @@ export default function TaskDetail() {
 						<dd className="mt-1 text-sm">
 							{task.dueDate === null
 								? "No due date"
-								: new Date(task.dueDate).toDateString()}
+								: formatDate(task.dueDate)}
 						</dd>
 					</div>
 
@@ -171,7 +172,7 @@ export default function TaskDetail() {
 							Created
 						</dt>
 						<dd className="mt-1 text-sm">
-							{new Date(task.createdAt).toLocaleDateString()}
+							{formatDate(task.createdAt)}
 						</dd>
 					</div>
 

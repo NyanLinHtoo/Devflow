@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import ChangeRoleDialog from "@/features/admin/components/ChangeRoleDialog";
 import RoleBadge from "@/features/admin/components/RoleBadge";
+import { formatDate } from "@/lib/date";
 import type { AdminUser } from "@/types/adminTypes";
 
 export default function AdminUserTable({ users }: { users: AdminUser[] }) {
@@ -51,7 +52,7 @@ export default function AdminUserTable({ users }: { users: AdminUser[] }) {
 							</td>
 
 							<td className="px-4 py-3 text-muted-foreground">
-								{new Date(user.createdAt).toLocaleDateString()}
+								{formatDate(user.createdAt)}
 							</td>
 
 							<td className="px-4 py-3 text-right">

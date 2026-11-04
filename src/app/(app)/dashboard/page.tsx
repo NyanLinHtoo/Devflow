@@ -14,17 +14,11 @@ import {
 } from "@/features/tasks/taskLabels";
 import { useDashboardSummary } from "@/hooks/useDashboard";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { formatDate } from "@/lib/date";
 import { canCreateProjects } from "@/lib/roles";
 import { CheckCircle2, Clock, FolderKanban, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-function formatDueDate(dueDate: string) {
-	return new Date(dueDate).toLocaleDateString(undefined, {
-		month: "short",
-		day: "numeric",
-	});
-}
 
 export default function DashboardPage() {
 	const router = useRouter();
@@ -184,7 +178,7 @@ export default function DashboardPage() {
 											<p className="mt-1  wrap-anywhere text-xs text-muted-foreground">
 												{task.projectName}
 												{task.dueDate
-													? ` · ${formatDueDate(task.dueDate)}`
+													? ` · ${formatDate(task.dueDate)}`
 													: ""}
 												{task.assigneeName ? ` · ${task.assigneeName}` : ""}
 											</p>
